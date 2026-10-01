@@ -1,0 +1,72 @@
+.bubble {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (min-width: 768px) {
+  .bubble { right: 28px; bottom: 28px; }
+}
+
+.icon {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, #161a24, #07080c 70%);
+  color: #2e7dff;
+  border: 1.5px solid rgba(46, 125, 255, 0.75);
+  box-shadow: 0 14px 34px -12px rgba(46, 125, 255, 0.65), 0 6px 16px -6px rgba(0, 0, 0, 0.8);
+  transition: transform 0.5s var(--ease), box-shadow 0.4s, background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+/* Anillo que invita a escribir: se repite unas pocas veces y se detiene */
+.icon::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid rgba(46, 125, 255, 0.7);
+  animation: ring 2.4s var(--ease) 1.5s 4 both;
+  pointer-events: none;
+}
+@keyframes ring {
+  0% { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.label {
+  display: grid;
+  padding: 10px 16px;
+  border-radius: 16px;
+  background: rgba(11, 13, 18, 0.92);
+  border: 1px solid var(--line-2);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 16px 40px -18px rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(10px);
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease), transform 0.5s var(--ease);
+}
+.label b { font-family: var(--font-display); font-weight: 600; font-size: 0.92rem; letter-spacing: -0.01em; color: var(--paper); }
+.label small { font-size: 0.78rem; color: var(--grey); }
+
+@media (hover: hover) {
+  .bubble:hover .icon { transform: translateY(-2px) scale(1.04); color: #fff; background: #1c64e6; border-color: #779eff; box-shadow: 0 18px 40px -10px rgba(46, 125, 255, 0.85), 0 6px 16px -6px rgba(0, 0, 0, 0.8); }
+  .bubble:hover .label { opacity: 1; transform: none; }
+}
+.bubble:focus-visible { outline: none; }
+.bubble:focus-visible .icon { outline: 2px solid var(--blue-2); outline-offset: 4px; }
+.bubble:focus-visible .label { opacity: 1; transform: none; }
+
+@media (max-width: 480px) {
+  .icon { width: 56px; height: 56px; }
+}

@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+/* ============================================================
+   SIBNOVA · sistema visual
+   70 % negro · 20 % blanco/grises · 10 % azul tecnológico
+   ============================================================ */
+@theme {
+  --color-ink: #050609;
+  --color-ink-2: #0b0d12;
+  --color-ink-3: #11141b;
+  --color-paper: #f5f7fb;
+  --color-grey: #8e96a8;
+  --color-grey-2: #697386;
+  --color-blue: #2e7dff;
+  --color-blue-2: #779eff;
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  --ink: #050609;
+  --ink-2: #0b0d12;
+  --ink-3: #11141b;
+  --paper: #f5f7fb;
+  --grey: #8e96a8;
+  --grey-2: #697386;
+  --blue: #2e7dff;
+  --blue-2: #779eff;
+  --line: rgba(245, 247, 251, 0.08);
+  --line-2: rgba(245, 247, 251, 0.14);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --gutter: 20px;
+  --header-h: 68px;
+  color-scheme: dark;
+}
+@media (min-width: 768px) {
+  :root { --gutter: 40px; --header-h: 76px; }
+}
+
+html {
+  background: var(--ink);
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--header-h);
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+@media (min-width: 1024px) { body { font-size: 17px; } }
+
+::selection { background: var(--blue); color: var(--paper); }
+:focus-visible { outline: 2px solid var(--blue-2); outline-offset: 3px; border-radius: 8px; }
+input, textarea, select, button { font: inherit; }
+img { max-width: 100%; display: block; }
+
+/* Barra de scroll y caret con la paleta de la marca */
+* { scrollbar-width: thin; scrollbar-color: #232836 var(--ink); caret-color: var(--blue-2); }
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--ink); }
+::-webkit-scrollbar-thumb { background: #232836; border-radius: 10px; border: 2px solid var(--ink); }
+::-webkit-scrollbar-thumb:hover { background: #2f3647; }
+
+/* ---------- Utilidades de maquetación ---------- */
+.wrap { width: 100%; max-width: 1240px; margin-inline: auto; padding-inline: var(--gutter); }
+.section { position: relative; padding-block: 72px; }
+@media (min-width: 1024px) { .section { padding-block: 104px; } }
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+.h2 { font-size: clamp(2.25rem, 6vw, 4.5rem); }
+.lead { color: var(--grey); font-size: clamp(1.05rem, 1.6vw, 1.25rem); line-height: 1.6; max-width: 56ch; text-wrap: pretty; }
+.num { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.04em; color: var(--grey); font-variant-numeric: tabular-nums; }
+
+.skip {
+  position: fixed; left: 12px; top: -80px; z-index: 200;
+  background: var(--paper); color: var(--ink); padding: 10px 16px; border-radius: 10px; font-weight: 600;
+}
+.skip:focus { top: 12px; }
+
+/* ---------- Botones ---------- */
+.btn {
+  --h: 52px;
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: var(--h); padding: 0 24px; border-radius: 999px;
+  font-weight: 600; font-size: 0.98rem; letter-spacing: -0.01em; white-space: nowrap;
+  transition: transform 0.5s var(--ease), background-color 0.3s, color 0.3s, box-shadow 0.5s var(--ease), border-color 0.3s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn svg { width: 18px; height: 18px; transition: transform 0.5s var(--ease); }
+.btn:hover svg { transform: translateX(3px); }
+.btn:active { transform: scale(0.97); }
+.btn-primary {
+  background: #1c64e6; color: #fff;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) inset, 0 10px 30px -12px rgba(46, 125, 255, 0.7);
+}
+.btn-primary:hover { background: #2470f0; box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 16px 40px -14px rgba(46, 125, 255, 0.85); transform: translateY(-1px); }
+.btn-ghost { color: var(--paper); border: 1px solid var(--line-2); background: rgba(245, 247, 251, 0.02); backdrop-filter: blur(8px); }
+.btn-ghost:hover { border-color: rgba(245, 247, 251, 0.35); background: rgba(245, 247, 251, 0.06); transform: translateY(-1px); }
+.btn-light { background: var(--paper); color: var(--ink); }
+.btn-light:hover { background: #fff; transform: translateY(-1px); }
+.btn-lg { --h: 58px; padding: 0 30px; font-size: 1.02rem; }
+
+/* ---------- Revelados al hacer scroll (los activa GSAP) ---------- */
+.js [data-reveal] { opacity: 0; }
+.split-mask { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.split-word { display: inline-block; will-change: transform, opacity; }
+.js [data-split] .split-word { opacity: 0; }
+
+/* ---------- Tarjetas con luz que sigue al cursor ---------- */
+.spot {
+  position: relative; isolation: isolate;
+  --mx: 50%; --my: 50%;
+}
+.spot::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+  background: radial-gradient(520px circle at var(--mx) var(--my), rgba(46, 125, 255, 0.14), transparent 42%);
+  opacity: 0; transition: opacity 0.4s;
+}
+.spot::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: radial-gradient(360px circle at var(--mx) var(--my), rgba(119, 158, 255, 0.55), transparent 40%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0; transition: opacity 0.4s;
+}
+@media (hover: hover) {
+  .spot:hover::before, .spot:hover::after { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .js [data-reveal], .js [data-split] .split-word { opacity: 1; }
+}
+
+/* Resaltado temporal al llegar desde el buscador */
+.flash { animation: flash 1.9s var(--ease); }
+@keyframes flash {
+  0%, 35% { box-shadow: 0 0 0 2px var(--blue-2), 0 0 40px -6px rgba(46, 125, 255, 0.7); }
+  100% { box-shadow: 0 0 0 2px transparent; }
+}

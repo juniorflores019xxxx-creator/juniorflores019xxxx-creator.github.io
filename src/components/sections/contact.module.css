@@ -1,0 +1,78 @@
+.layout { display: grid; gap: 48px; align-items: start; }
+@media (min-width: 960px) {
+  .layout { grid-template-columns: 0.9fr 1.1fr; gap: 72px; }
+  .copy { position: sticky; top: calc(var(--header-h) + 40px); }
+}
+.copy { display: grid; gap: 22px; }
+
+.channels { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 10px; }
+.channels a, .channels li > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(245, 247, 251, 0.02);
+  transition: border-color 0.3s, background-color 0.3s, transform 0.5s var(--ease);
+}
+.channels a:hover { border-color: rgba(119, 158, 255, 0.35); background: rgba(46, 125, 255, 0.06); transform: translateY(-2px); }
+.channels small { display: block; font-size: 0.75rem; color: var(--grey); }
+.ci { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: rgba(245, 247, 251, 0.05); color: var(--blue-2); flex: none; }
+.go { margin-left: auto; color: var(--grey); transition: transform 0.4s var(--ease), color 0.3s; flex: none; }
+.channels a:hover .go { transform: translate(2px, -2px); color: var(--paper); }
+
+.form {
+  display: grid;
+  gap: 18px;
+  padding: 24px 20px;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(245, 247, 251, 0.04), rgba(245, 247, 251, 0.015));
+}
+@media (min-width: 640px) { .form { padding: 36px; } }
+
+.field { display: grid; gap: 8px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.field label, .field legend { font-size: 0.88rem; font-weight: 500; color: var(--paper); padding: 0; }
+.field input, .field textarea {
+  width: 100%;
+  min-height: 52px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line-2);
+  background: rgba(5, 6, 9, 0.6);
+  color: var(--paper);
+  font-size: 16px;
+  transition: border-color 0.2s, box-shadow 0.3s;
+  resize: vertical;
+}
+.field input::placeholder, .field textarea::placeholder { color: #7d8597; }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(46, 125, 255, 0.2); }
+.field input[aria-invalid="true"], .field textarea[aria-invalid="true"] { border-color: #ff6b6b; }
+.err { font-size: 0.82rem; color: #ff8f8f; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.chip { position: relative; }
+.chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.chip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  color: var(--grey);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.25s, color 0.25s, border-color 0.25s;
+}
+.chip span:hover { color: var(--paper); border-color: rgba(245, 247, 251, 0.3); }
+.chip input:checked + span { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+.chip input:focus-visible + span { outline: 2px solid var(--blue-2); outline-offset: 2px; }
+
+.form :global(.btn) { width: 100%; margin-top: 4px; }
+.form :global(.btn) svg { color: #fff; }
+.note { font-size: 0.82rem; color: var(--grey); text-align: center; }
+.status:empty { display: none; }
+.status { font-size: 0.9rem; padding: 12px 14px; border-radius: 12px; background: rgba(46, 125, 255, 0.12); color: #cfe0ff; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }

@@ -1,0 +1,91 @@
+.section { overflow: hidden; }
+
+.layout { display: grid; gap: 56px; align-items: center; }
+@media (min-width: 960px) {
+  .layout { grid-template-columns: 0.9fr 1.1fr; gap: 48px; }
+}
+.copy { display: grid; gap: 20px; }
+
+.stage { display: grid; place-items: center; }
+.system {
+  position: relative;
+  width: min(100%, 620px);
+  aspect-ratio: 1;
+  container-type: inline-size;
+  will-change: transform;
+}
+
+.halo {
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(46, 125, 255, 0.28), rgba(46, 125, 255, 0.06) 60%, transparent);
+  filter: blur(8px);
+  animation: breathe 6s ease-in-out infinite;
+}
+@keyframes breathe { 50% { transform: scale(1.08); opacity: 0.8; } }
+
+.orbit {
+  position: absolute;
+  inset: 0;
+  animation: spin var(--dur) linear infinite;
+  animation-direction: var(--dir);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.links { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ring { fill: none; stroke: rgba(245, 247, 251, 0.09); stroke-width: 0.18; }
+.link {
+  stroke: rgba(119, 158, 255, 0.45);
+  stroke-width: 0.22;
+  stroke-dasharray: 1.2 2.4;
+  animation: flow 2.8s linear infinite;
+}
+@keyframes flow { to { stroke-dashoffset: -14.4; } }
+
+.node {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: rotate(var(--a)) translateX(calc(var(--r) * 1cqw)) rotate(calc(-1 * var(--a)));
+}
+
+.chip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  color: var(--paper);
+  background: rgba(11, 13, 18, 0.9);
+  border: 1px solid rgba(119, 158, 255, 0.28);
+  /* contra-rotación para que el texto quede siempre derecho */
+  animation: counter var(--dur) linear infinite;
+  animation-direction: var(--dir);
+}
+@keyframes counter { to { transform: translate(-50%, -50%) rotate(-360deg); } }
+@media (max-width: 480px) { .chip { font-size: 0.7rem; padding: 6px 10px; letter-spacing: 0.08em; } }
+
+.core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #ffffff 0%, #eef3ff 62%, #c9d8ff 100%);
+  box-shadow: 0 0 0 1px rgba(119, 158, 255, 0.5), 0 0 0 10px rgba(46, 125, 255, 0.1), 0 0 70px -6px rgba(46, 125, 255, 0.75);
+}
+.core img { width: 80%; height: auto; }
