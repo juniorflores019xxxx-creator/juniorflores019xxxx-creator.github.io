@@ -28,10 +28,10 @@ export const NAV = [
 // Redes sociales: solo se muestran las que tienen URL real.
 // Añade aquí Facebook, Instagram, LinkedIn o TikTok cuando existan las cuentas.
 // Perfiles públicos de SIBNOVA (también se declaran a Google en el JSON-LD como sameAs).
-// TikTok: agregar aquí cuando esté el enlace, con icon "tiktok".
 export const SOCIAL_PROFILES: { label: string; href: string; icon: "instagram" | "facebook" | "x" | "linkedin" | "tiktok" }[] = [
   { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61595041499727", icon: "facebook" },
   { label: "Instagram", href: "https://www.instagram.com/sibnovaltda/", icon: "instagram" },
+  { label: "TikTok", href: "https://www.tiktok.com/@sibnova7", icon: "tiktok" },
   { label: "X", href: "https://x.com/sibnova", icon: "x" },
 ];
 
