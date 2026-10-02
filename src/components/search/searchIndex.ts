@@ -14,6 +14,10 @@ export type Entry = {
 };
 
 export const INDEX: Entry[] = [
+  // Diagnóstico
+  { t: "Diagnóstico digital gratuito", d: "10 preguntas para saber qué digitalizar y automatizar primero", type: "Acción", icon: "doc", href: "/diagnostico/",
+    k: "diagnostico diagnóstico test evaluacion evaluación formulario encuesta cuestionario gratis gratuito por donde empezar madurez digital analisis análisis" },
+
   // Servicios
   { t: "Desarrollo de aplicaciones", d: "Aplicaciones móviles y plataformas digitales", type: "Servicio", icon: "grid", href: "/servicios/desarrollo-de-aplicaciones/", topic: "Aplicación",
     k: "app aplicacion aplicaciones movil celular android ios iphone play store plataforma marketplace apk" },

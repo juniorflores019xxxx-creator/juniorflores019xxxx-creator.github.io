@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es-BO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Diagnóstico digital de tu negocio | SIBNOVA</title>
+<meta name="description" content="Responde 10 preguntas en 2 minutos y descubre qué procesos de tu negocio puedes digitalizar y automatizar con software, inteligencia artificial y automatización.">
+<meta name="theme-color" content="#FFFFFF">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_BO">
+<meta property="og:site_name" content="SIBNOVA">
+<meta property="og:title" content="Diagnóstico digital de tu negocio | SIBNOVA">
+<meta property="og:description" content="10 preguntas, 2 minutos: descubre qué procesos de tu negocio puedes digitalizar y automatizar.">
+<link rel="icon" type="image/png" href="assets/logo-icono.png">
+<link rel="apple-touch-icon" href="assets/logo-icono.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<!-- Google Analytics 4 (opcional): sustituye G-XXXXXXXXXX por tu ID y descomenta.
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script>
+-->
+<style>
+:root{
+  --bg:#FFFFFF; --soft:#F6F7FA; --softer:#FAFBFD;
+  --ink:#0A0B0D; --text:#3A4049; --muted:#5F6672;
+  --line:#E5E8EE; --line-2:#D3D8E1;
+  --blue:#1C64E6; --blue-2:#2E7DFF; --blue-soft:#EEF3FF; --blue-ink:#1A4FC0;
+  --ok:#0E9F5A;
+  --r:18px; --ease:cubic-bezier(.16,1,.3,1);
+  --display:"Sora",system-ui,sans-serif; --sans:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;min-height:100dvh;background:var(--bg);color:var(--text);font:400 16px/1.6 var(--sans);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+h1,h2,h3{font-family:var(--display);color:var(--ink);margin:0;font-weight:600;letter-spacing:-.035em;line-height:1.08;text-wrap:balance}
+p{margin:0}
+button,input,select,textarea{font:inherit}
+:focus-visible{outline:2px solid var(--blue-2);outline-offset:3px;border-radius:10px}
+::selection{background:var(--blue);color:#fff}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* Fondo sutil */
+.bg{position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(60% 45% at 85% 0%,rgba(46,125,255,.10),transparent 70%),radial-gradient(40% 40% at 0% 100%,rgba(46,125,255,.06),transparent 70%)}
+.bg::after{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:48px 48px;opacity:.45;-webkit-mask-image:radial-gradient(60% 50% at 80% 10%,#000,transparent 75%);mask-image:radial-gradient(60% 50% at 80% 10%,#000,transparent 75%)}
+
+/* Cabecera */
+.top{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.82);backdrop-filter:saturate(1.5) blur(14px);-webkit-backdrop-filter:saturate(1.5) blur(14px);border-bottom:1px solid transparent;transition:border-color .3s}
+.top.on{border-bottom-color:var(--line)}
+.bar{max-width:880px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:16px}
+.logo{display:inline-flex;align-items:center;gap:10px;min-height:44px;text-decoration:none}
+.logo img:first-child{height:30px;width:auto}
+.logo img:last-child{height:14px;width:auto}
+.count{margin-left:auto;font:500 .78rem/1 var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.progress{height:3px;background:var(--line);overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--blue-2));transition:width .6s var(--ease)}
+
+/* Contenido */
+main{flex:1;width:100%;max-width:880px;margin:0 auto;padding:40px 20px 120px}
+@media (min-width:720px){main{padding:72px 32px 140px}}
+.step{display:none}
+.step.active{display:block;animation:in .55s var(--ease)}
+.step.back{animation-name:inBack}
+@keyframes in{from{opacity:0;transform:translateY(18px);filter:blur(6px)}}
+@keyframes inBack{from{opacity:0;transform:translateY(-18px);filter:blur(6px)}}
+
+.kicker{font:500 .78rem/1 var(--mono);color:var(--blue-ink);letter-spacing:.02em}
+.q{font-size:clamp(1.7rem,4.6vw,2.6rem);margin-top:12px;max-width:22ch}
+.help{margin-top:12px;color:var(--muted);font-size:1rem;max-width:56ch}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+legend{padding:0}
+
+/* Opciones */
+.opts{display:grid;gap:10px;margin-top:28px}
+@media (min-width:640px){.opts.two{grid-template-columns:1fr 1fr}.opts.three{grid-template-columns:repeat(3,1fr)}}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;width:1px;height:1px}
+.opt label{display:flex;align-items:center;gap:14px;min-height:60px;padding:14px 16px;border:1px solid var(--line-2);border-radius:14px;background:#fff;cursor:pointer;color:var(--ink);font-weight:500;transition:border-color .2s,background-color .2s,box-shadow .3s var(--ease),transform .3s var(--ease)}
+.opt label:hover{border-color:#AEB8C8;transform:translateY(-1px);box-shadow:0 8px 20px -14px rgba(10,11,13,.35)}
+.opt .key{flex:none;width:26px;height:26px;display:grid;place-items:center;border-radius:7px;border:1px solid var(--line-2);font:500 .72rem/1 var(--mono);color:var(--muted);background:var(--softer);transition:all .2s}
+.opt .ic{flex:none;width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:var(--soft);color:var(--ink);transition:all .2s}
+.opt .ic svg{width:20px;height:20px}
+.opt .txt{flex:1;line-height:1.35}
+.opt .txt small{display:block;color:var(--muted);font-weight:400;font-size:.86rem;margin-top:2px}
+.opt .tick{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line-2);display:grid;place-items:center;transition:all .2s}
+.opt.multi .tick{border-radius:6px}
+.opt .tick svg{width:12px;height:12px;color:#fff;opacity:0;transform:scale(.5);transition:all .25s var(--ease)}
+.opt input:checked + label{border-color:var(--blue);background:var(--blue-soft);box-shadow:0 0 0 1px var(--blue) inset}
+.opt input:checked + label .tick{background:var(--blue);border-color:var(--blue)}
+.opt input:checked + label .tick svg{opacity:1;transform:none}
+.opt input:checked + label .key{background:var(--blue);border-color:var(--blue);color:#fff}
+.opt input:checked + label .ic{background:var(--blue);color:#fff}
+.opt input:focus-visible + label{outline:2px solid var(--blue-2);outline-offset:2px}
+.limit{margin-top:12px;font-size:.86rem;color:var(--muted)}
+
+/* Campos de contacto */
+.fields{display:grid;gap:16px;margin-top:28px}
+@media (min-width:640px){.fields{grid-template-columns:1fr 1fr}.fields .full{grid-column:1/-1}}
+.field{display:grid;gap:7px}
+.field label{font-weight:600;font-size:.9rem;color:var(--ink)}
+.field .op{font-weight:400;color:var(--muted)}
+.field input{width:100%;min-height:54px;padding:14px 16px;border-radius:13px;border:1px solid var(--line-2);background:#fff;color:var(--ink);font-size:16px;transition:border-color .2s,box-shadow .2s}
+.field input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(46,125,255,.16)}
+.field input[aria-invalid="true"]{border-color:#D23A2A}
+.field .err{font-size:.82rem;color:#B42318;font-weight:500}
+.privacy{margin-top:16px;font-size:.84rem;color:var(--muted)}
+
+/* Navegación */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:10;background:rgba(255,255,255,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:12px 20px calc(12px + env(safe-area-inset-bottom))}
+.nav-in{max-width:880px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.hint{color:var(--muted);font-size:.84rem;display:none}
+@media (min-width:720px){.hint{display:block}.nav{padding-inline:32px}}
+.hint kbd{font:500 .72rem/1 var(--mono);padding:3px 6px;border:1px solid var(--line-2);border-bottom-width:2px;border-radius:6px;color:var(--ink);background:#fff}
+.btn{--h:52px;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:var(--h);padding:0 24px;border-radius:999px;border:1px solid transparent;font-weight:600;font-size:.98rem;cursor:pointer;text-decoration:none;white-space:nowrap;transition:transform .4s var(--ease),background-color .25s,box-shadow .4s var(--ease),border-color .25s,color .25s,opacity .25s}
+.btn svg{width:18px;height:18px;transition:transform .4s var(--ease)}
+.btn:hover svg{transform:translateX(3px)}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{background:#23262C}
+.btn-blue{background:var(--blue);color:#fff;box-shadow:0 10px 26px -12px rgba(28,100,230,.7)}
+.btn-blue:hover{background:#2470F0}
+.btn-ghost{background:#fff;color:var(--ink);border-color:var(--line-2)}
+.btn-ghost:hover{border-color:#AEB8C8}
+.btn[disabled]{opacity:.35;cursor:not-allowed;transform:none}
+.btn-back{--h:48px;padding:0 16px;background:transparent;color:var(--muted)}
+.btn-back:hover{color:var(--ink)}
+.btn-back svg{transform:rotate(180deg)}
+.btn-back:hover svg{transform:rotate(180deg) translateX(3px)}
+.nav .btn-next{margin-left:auto}
+
+/* Portada del diagnóstico */
+.intro{display:grid;gap:40px;align-items:center}
+@media (min-width:820px){.intro{grid-template-columns:1.1fr .9fr;gap:48px}}
+.intro h1{font-size:clamp(2.3rem,6.4vw,3.8rem);margin-top:14px;max-width:14ch}
+.intro .lead{margin-top:18px;font-size:clamp(1.05rem,1.8vw,1.2rem);color:var(--muted);max-width:46ch}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.facts span{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:.86rem;color:var(--text)}
+.facts svg{width:15px;height:15px;color:var(--blue)}
+.intro .btn{margin-top:32px}
+.preview{border:1px solid var(--line);border-radius:22px;background:#fff;box-shadow:0 2px 4px rgba(10,11,13,.03),0 30px 60px -30px rgba(10,11,13,.25);padding:22px;max-width:380px;justify-self:center;width:100%}
+.preview .p-head{display:flex;justify-content:space-between;align-items:center;font:500 .74rem/1 var(--mono);color:var(--muted)}
+.gauge{position:relative;width:180px;height:100px;margin:22px auto 6px}
+.gauge svg{width:100%;height:100%;overflow:visible}
+.gauge .val{position:absolute;left:0;right:0;bottom:0;text-align:center;white-space:nowrap;font:700 2rem/1 var(--display);color:var(--ink);letter-spacing:-.04em}
+.gauge .val small{font-size:.9rem;color:var(--muted);font-weight:600}
+.preview .lvl{text-align:center;font-weight:600;color:var(--ink)}
+.preview ul{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:8px}
+.preview li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--soft);font-size:.9rem;color:var(--ink)}
+.preview li b{font:500 .72rem/1 var(--mono);color:var(--blue-ink)}
+
+/* Resultado */
+.result-head{display:grid;gap:28px;align-items:center}
+@media (min-width:760px){.result-head{grid-template-columns:1fr auto}}
+.result-head h1{font-size:clamp(2rem,5.4vw,3.2rem);margin-top:12px}
+.result-head .lead{margin-top:14px;color:var(--muted);max-width:52ch;font-size:1.05rem}
+.score-card{border:1px solid var(--line);border-radius:22px;background:#fff;padding:20px 24px;box-shadow:0 20px 50px -30px rgba(10,11,13,.3);min-width:250px}
+.score-card .gauge{margin-top:8px}
+.score-card .lvl{text-align:center;font-weight:600;color:var(--ink);margin-top:6px}
+.score-card small{display:block;text-align:center;color:var(--muted);font-size:.78rem;margin-top:4px}
+.recs{margin-top:40px}
+.recs h2{font-size:clamp(1.4rem,3vw,1.8rem)}
+.rec-list{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px}
+.rec{display:grid;grid-template-columns:auto 1fr;gap:16px;padding:22px;border:1px solid var(--line);border-radius:20px;background:#fff;transition:border-color .3s,box-shadow .4s var(--ease),transform .4s var(--ease);animation:in .6s var(--ease) both}
+.rec:hover{border-color:#C7D6FF;box-shadow:0 18px 40px -24px rgba(28,100,230,.35);transform:translateY(-2px)}
+.rec .n{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--blue-soft);color:var(--blue-ink);font:600 1rem/1 var(--display)}
+.rec h3{font-size:1.2rem;letter-spacing:-.02em}
+.rec .tag{display:inline-block;margin-top:6px;font:500 .72rem/1 var(--mono);color:var(--muted)}
+.rec p{margin-top:8px;color:var(--text);font-size:.96rem}
+.rec .why{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--soft);font-size:.88rem;color:var(--muted)}
+.rec .why b{color:var(--ink);font-weight:600}
+.summary{margin-top:32px;border:1px solid var(--line);border-radius:20px;background:var(--softer);padding:20px 22px}
+.summary h2{font-size:1.15rem}
+.summary dl{margin:14px 0 0;display:grid;gap:10px}
+@media (min-width:640px){.summary dl{grid-template-columns:1fr 1fr;column-gap:24px}}
+.summary dt{font:500 .72rem/1.2 var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.summary dd{margin:3px 0 0;color:var(--ink);font-size:.94rem}
+.cta{margin-top:32px;border-radius:24px;background:var(--ink);color:#fff;padding:28px 24px;position:relative;overflow:hidden;isolation:isolate}
+.cta::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(60% 90% at 90% 0%,rgba(46,125,255,.45),transparent 70%)}
+.cta h2{color:#fff;font-size:clamp(1.4rem,3.4vw,2rem);max-width:22ch}
+.cta p{margin-top:10px;color:#B8C0CE;max-width:52ch}
+.cta .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.cta .btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.28)}
+.cta .btn-ghost:hover{border-color:#fff}
+.note{margin-top:14px;font-size:.84rem;color:var(--muted)}
+.restart{margin-top:24px;background:none;border:0;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:8px 0;min-height:44px}
+.restart:hover{color:var(--ink)}
+
+footer{border-top:1px solid var(--line);padding:18px 20px;text-align:center;font-size:.82rem;color:var(--muted)}
+footer a{color:var(--ink)}
+body.has-nav footer{padding-bottom:96px}
+
+@media print{
+  .top,.nav,.cta .row,.restart,.bg,footer{display:none!important}
+  main{padding:0}
+  .rec,.score-card,.summary{box-shadow:none;break-inside:avoid}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<header class="top" id="top">
+  <div class="bar">
+    <a class="logo" href="/" aria-label="SIBNOVA, ir al sitio web">
+      <img src="assets/sn-logo.png" alt="" width="240" height="113">
+      <img src="assets/logo-nombre.png" alt="" width="360" height="48">
+    </a>
+    <span class="count" id="count" aria-live="polite"></span>
+  </div>
+  <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+</header>
+
+<main>
+  <form id="diag" novalidate>
+    <!-- Portada -->
+    <section class="step active" data-id="intro" aria-labelledby="t-intro">
+      <div class="intro">
+        <div>
+          <span class="kicker">Diagnóstico digital · SIBNOVA</span>
+          <h1 id="t-intro">¿Qué puede automatizar tu negocio?</h1>
+          <p class="lead">Responde 10 preguntas y descubre tu nivel de digitalización y las soluciones que más impacto pueden tener en tu empresa.</p>
+          <div class="facts">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>2 minutos</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resultado al instante</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>Recomendaciones a tu medida</span>
+          </div>
+          <button type="button" class="btn btn-blue" data-action="start">Empezar diagnóstico <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+        <div class="preview" aria-hidden="true">
+          <div class="p-head"><span>Ejemplo de resultado</span><span>SIBNOVA</span></div>
+          <div class="gauge">
+            <svg viewBox="0 0 200 110"><path d="M15 100a85 85 0 0 1 170 0" fill="none" stroke="#E5E8EE" stroke-width="14" stroke-linecap="round"/><path d="M15 100a85 85 0 0 1 170 0" fill="none" stroke="url(#gp)" stroke-width="14" stroke-linecap="round" pathLength="100" stroke-dasharray="42 100"/><defs><linearGradient id="gp" x1="0" x2="1"><stop offset="0" stop-color="#1C64E6"/><stop offset="1" stop-color="#2E7DFF"/></linearGradient></defs></svg>
+            <div class="val">42<small>/100</small></div>
+          </div>
+          <p class="lvl">Nivel: en desarrollo</p>
+          <ul>
+            <li><b>01</b>Asistente de IA en WhatsApp</li>
+            <li><b>02</b>Automatización de ventas y seguimiento</li>
+            <li><b>03</b>Dashboards y reportes automáticos</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <!-- Las preguntas se generan desde la configuración (STEPS) -->
+    <div id="questions"></div>
+    <!-- Resultado -->
+    <section class="step" data-id="result" aria-labelledby="t-result" id="result"></section>
+  </form>
+</main>
+
+<nav class="nav" id="nav" hidden aria-label="Navegación del diagnóstico">
+  <div class="nav-in">
+    <button type="button" class="btn btn-back" data-action="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Atrás</button>
+    <span class="hint" id="hint">Pulsa <kbd>Enter</kbd> para continuar</span>
+    <button type="button" class="btn btn-primary btn-next" data-action="next" id="next">Continuar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+  </div>
+</nav>
+
+<footer>© <span id="year">2026</span> Soluciones Informáticas de Bolivia SIBNOVA Ltda. · <a href="/">sibnova.com.bo</a> · Santa Cruz de la Sierra, Bolivia</footer>
+
+<script>
+/* ============================================================
+   CONFIGURACIÓN
+   ============================================================ */
+const CONFIG = {
+  whatsapp: "59176486765",     // número que recibe los diagnósticos
+  phoneDisplay: "+591 7648 6765",
+  storageKey: "sibnova-diagnostico-v1",
+};
+
+const ICON = {
+  salud: '<path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/><path d="M12 10v4M10 12h4"/>',
+  comercio: '<path d="M4 9h16l-1.5 11h-13z"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/>',
+  construccion: '<path d="M3 20h18M5 20V10l7-5 7 5v10"/><path d="M10 20v-5h4v5"/>',
+  servicios: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>',
+  inmobiliaria: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+  empresa: '<path d="M4 21V5l8-2v18M12 9l8 2v10M2 21h20"/><path d="M7 8h2M7 12h2M7 16h2M15 14h2M15 17h2"/>',
+  institucion: '<path d="M3 9l9-5 9 5M5 9v10M19 9v10M9 9v10M15 9v10M3 20h18"/>',
+  emprendimiento: '<path d="M12 3c3 2 5 6 5 10l-2 3H9l-2-3c0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/><path d="M9 16l-2 4M15 16l2 4"/>',
+  otro: '<circle cx="12" cy="12" r="9"/><path d="M8 12h.01M12 12h.01M16 12h.01"/>',
+};
+
+/* ============================================================
+   PREGUNTAS
+   type: single (una opción) · multi (varias) · contact (datos)
+   ============================================================ */
+const STEPS = [
+  { id: "rubro", type: "single", cols: "two", q: "¿A qué se dedica tu negocio?", help: "Elige la opción que mejor lo describe.",
+    options: [
+      { v: "Salud / clínica", icon: "salud", small: "Consultorios, clínicas, laboratorios" },
+      { v: "Comercio / tienda", icon: "comercio", small: "Venta de productos, distribución" },
+      { v: "Construcción", icon: "construccion", small: "Obras, proyectos, proveedores" },
+      { v: "Servicios profesionales", icon: "servicios", small: "Estudios, consultoras, agencias" },
+      { v: "Inmobiliaria", icon: "inmobiliaria", small: "Venta y alquiler de propiedades" },
+      { v: "Empresa / corporación", icon: "empresa", small: "Varias áreas y procesos internos" },
+      { v: "Institución", icon: "institucion", small: "Educación, gobierno, ONG" },
+      { v: "Emprendimiento tecnológico", icon: "emprendimiento", small: "Quiero crear un producto digital" },
+      { v: "Otro", icon: "otro", small: "Otro tipo de negocio" },
+    ] },
+  { id: "tamano", type: "single", q: "¿Cuántas personas trabajan en tu negocio?",
+    options: [{ v: "Solo yo" }, { v: "2 a 10" }, { v: "11 a 50" }, { v: "51 a 200" }, { v: "Más de 200" }] },
+  { id: "canales", type: "multi", cols: "two", q: "¿Por dónde te contactan hoy tus clientes?", help: "Puedes elegir varias.",
+    options: [{ v: "WhatsApp" }, { v: "Llamadas" }, { v: "Redes sociales" }, { v: "Página web" }, { v: "En persona" }, { v: "Correo" }] },
+  { id: "registro", type: "single", q: "¿Dónde registran la información de clientes, ventas o pedidos?",
+    options: [
+      { v: "En papel o cuaderno" },
+      { v: "En Excel o Google Sheets" },
+      { v: "En un sistema o software" },
+      { v: "Cada uno a su manera / no se registra" },
+    ] },
+  { id: "problemas", type: "multi", cols: "two", max: 4, q: "¿Qué problemas te quitan más tiempo o clientes?", help: "Elige hasta 4.",
+    options: [
+      { v: "Respondemos tarde a los clientes" },
+      { v: "Perdemos clientes por falta de seguimiento" },
+      { v: "Hacemos muchas tareas repetitivas a mano" },
+      { v: "La información está dispersa en varios lugares" },
+      { v: "No tenemos reportes para tomar decisiones" },
+      { v: "Las reservas o citas están desordenadas" },
+      { v: "No controlamos bien el inventario" },
+      { v: "No vendemos por internet" },
+    ] },
+  { id: "objetivos", type: "multi", cols: "two", max: 3, q: "¿Qué te gustaría lograr?", help: "Elige hasta 3.",
+    options: [
+      { v: "Atender a clientes 24/7 con inteligencia artificial" },
+      { v: "Automatizar ventas y seguimiento" },
+      { v: "Tener una aplicación propia" },
+      { v: "Una página web que genere clientes" },
+      { v: "Un sistema de gestión (CRM, inventario, órdenes)" },
+      { v: "Conectar mis herramientas entre sí" },
+      { v: "Dashboards y reportes automáticos" },
+    ] },
+  { id: "herramientas", type: "multi", cols: "two", q: "¿Qué herramientas usan actualmente?", help: "Puedes elegir varias.",
+    options: [{ v: "WhatsApp Business" }, { v: "Excel o Google Sheets" }, { v: "Facebook / Instagram" }, { v: "Un CRM" }, { v: "Sistema contable o ERP" }, { v: "Ninguna de estas" }] },
+  { id: "urgencia", type: "single", q: "¿Cuándo te gustaría empezar?",
+    options: [{ v: "Lo antes posible" }, { v: "En 1 a 3 meses" }, { v: "En 3 a 6 meses" }, { v: "Solo estoy explorando" }] },
+  { id: "presupuesto", type: "single", q: "¿Tienes un presupuesto aproximado?", help: "Nos ayuda a proponerte una solución realista. Puedes elegir “Prefiero conversarlo”.",
+    options: [{ v: "Prefiero conversarlo" }, { v: "Menos de US$ 1.000" }, { v: "US$ 1.000 a 5.000" }, { v: "US$ 5.000 a 15.000" }, { v: "Más de US$ 15.000" }] },
+  { id: "contacto", type: "contact", q: "¿A dónde te enviamos tu diagnóstico?", help: "Verás tu resultado en la siguiente pantalla. Si quieres, podrás enviárselo a SIBNOVA por WhatsApp para revisarlo juntos." },
+];
+
+/* ============================================================
+   RECOMENDACIONES: cada solución suma puntos según las respuestas
+   ============================================================ */
+const SOLUTIONS = {
+  ia:        { title: "Asistente de IA para atención al cliente", tag: "Inteligencia artificial", text: "Un asistente que responde consultas frecuentes, toma datos y deriva a tu equipo, por WhatsApp o en la web, a cualquier hora." },
+  ventas:    { title: "Automatización de ventas y seguimiento", tag: "Automatización empresarial", text: "Cada contacto queda registrado y recibe seguimiento automático, para que ninguna oportunidad se pierda." },
+  procesos:  { title: "Automatización de procesos internos", tag: "Automatización empresarial", text: "Flujos que hacen solas las tareas repetitivas: avisos, aprobaciones, registros y envío de documentos." },
+  integra:   { title: "Integración de tus herramientas", tag: "Integraciones", text: "Conectamos WhatsApp, formularios, hojas de cálculo y sistemas para que la información esté en un solo lugar." },
+  datos:     { title: "Dashboards y reportes automáticos", tag: "Datos & Business Intelligence", text: "Indicadores clave de tu negocio actualizados solos, para decidir con datos y no con intuición." },
+  reservas:  { title: "Agenda y reservas automáticas", tag: "Automatización empresarial", text: "Tus clientes reservan solos, el sistema confirma y envía recordatorios, y tu agenda se ordena." },
+  gestion:   { title: "Sistema de gestión a medida", tag: "Software empresarial", text: "CRM, inventario u órdenes de trabajo diseñados para cómo funciona tu negocio, no al revés." },
+  web:       { title: "Página web o tienda en línea que vende", tag: "Desarrollo web", text: "Un sitio rápido, pensado para convertir visitas en clientes y, si lo necesitas, vender en línea." },
+  app:       { title: "Aplicación propia", tag: "Desarrollo de aplicaciones", text: "Una app móvil o plataforma web para tus clientes o tu equipo, diseñada desde el problema que resuelve." },
+};
+
+const RULES = [
+  { when: ["problemas", "Respondemos tarde a los clientes"], add: { ia: 3, integra: 1 } },
+  { when: ["problemas", "Perdemos clientes por falta de seguimiento"], add: { ventas: 3, gestion: 1 } },
+  { when: ["problemas", "Hacemos muchas tareas repetitivas a mano"], add: { procesos: 3 } },
+  { when: ["problemas", "La información está dispersa en varios lugares"], add: { integra: 3, gestion: 1 } },
+  { when: ["problemas", "No tenemos reportes para tomar decisiones"], add: { datos: 3 } },
+  { when: ["problemas", "Las reservas o citas están desordenadas"], add: { reservas: 3, ia: 1 } },
+  { when: ["problemas", "No controlamos bien el inventario"], add: { gestion: 3 } },
+  { when: ["problemas", "No vendemos por internet"], add: { web: 3 } },
+  { when: ["objetivos", "Atender a clientes 24/7 con inteligencia artificial"], add: { ia: 3 } },
+  { when: ["objetivos", "Automatizar ventas y seguimiento"], add: { ventas: 3 } },
+  { when: ["objetivos", "Tener una aplicación propia"], add: { app: 4 } },
+  { when: ["objetivos", "Una página web que genere clientes"], add: { web: 3 } },
+  { when: ["objetivos", "Un sistema de gestión (CRM, inventario, órdenes)"], add: { gestion: 3 } },
+  { when: ["objetivos", "Conectar mis herramientas entre sí"], add: { integra: 3 } },
+  { when: ["objetivos", "Dashboards y reportes automáticos"], add: { datos: 3 } },
+  { when: ["rubro", "Salud / clínica"], add: { reservas: 2, ia: 1 } },
+  { when: ["rubro", "Comercio / tienda"], add: { web: 1, gestion: 1 } },
+  { when: ["rubro", "Construcción"], add: { gestion: 2, procesos: 1 } },
+  { when: ["rubro", "Servicios profesionales"], add: { ventas: 1, gestion: 1 } },
+  { when: ["rubro", "Inmobiliaria"], add: { ventas: 2, ia: 1 } },
+  { when: ["rubro", "Empresa / corporación"], add: { procesos: 1, datos: 1, integra: 1 } },
+  { when: ["rubro", "Institución"], add: { procesos: 1, gestion: 1 } },
+  { when: ["rubro", "Emprendimiento tecnológico"], add: { app: 3, web: 1 } },
+  { when: ["canales", "WhatsApp"], add: { ia: 1 } },
+  { when: ["registro", "En papel o cuaderno"], add: { gestion: 2 } },
+  { when: ["registro", "Cada uno a su manera / no se registra"], add: { gestion: 2, integra: 1 } },
+];
+
+/* ============================================================
+   ESTADO (se guarda en el navegador por si se interrumpe)
+   ============================================================ */
+let answers = {};
+let index = 0; // 0 = portada, 1..STEPS.length = preguntas, STEPS.length+1 = resultado
+try { const s = JSON.parse(localStorage.getItem(CONFIG.storageKey) || "null"); if (s && s.answers) answers = s.answers; } catch (e) {}
+const save = () => { try { localStorage.setItem(CONFIG.storageKey, JSON.stringify({ answers })); } catch (e) {} };
+
+window.dataLayer = window.dataLayer || [];
+const track = (event, params = {}) => { window.dataLayer.push({ event, ...params }); if (typeof gtag === "function") gtag("event", event, params); };
+
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const svg = (paths, w = 20) => `<svg viewBox="0 0 24 24" width="${w}" height="${w}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+/* ---------- Construcción de las preguntas ---------- */
+const qWrap = document.getElementById("questions");
+qWrap.innerHTML = STEPS.map((s, i) => {
+  const num = String(i + 1).padStart(2, "0");
+  const head = `<span class="kicker">${num} / ${STEPS.length}</span><h2 class="q" id="t-${s.id}" tabindex="-1">${esc(s.q)}</h2>${s.help ? `<p class="help">${esc(s.help)}</p>` : ""}`;
+  if (s.type === "contact") {
+    return `<section class="step" data-id="${s.id}" aria-labelledby="t-${s.id}">${head}
+      <div class="fields">
+        <div class="field"><label for="f-nombre">Nombre</label><input id="f-nombre" name="nombre" autocomplete="name" aria-describedby="e-nombre"><span class="err" id="e-nombre" hidden>Escribe tu nombre.</span></div>
+        <div class="field"><label for="f-empresa">Empresa <span class="op">(opcional)</span></label><input id="f-empresa" name="empresa" autocomplete="organization"></div>
+        <div class="field"><label for="f-whatsapp">WhatsApp</label><input id="f-whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="+591 …" aria-describedby="e-whatsapp"><span class="err" id="e-whatsapp" hidden>Escribe un número de WhatsApp válido.</span></div>
+        <div class="field"><label for="f-ciudad">Ciudad <span class="op">(opcional)</span></label><input id="f-ciudad" name="ciudad" autocomplete="address-level2" placeholder="Santa Cruz de la Sierra"></div>
+        <div class="field full"><label for="f-correo">Correo <span class="op">(opcional)</span></label><input id="f-correo" name="correo" type="email" autocomplete="email" aria-describedby="e-correo"><span class="err" id="e-correo" hidden>Revisa el correo.</span></div>
+      </div>
+      <p class="privacy">Usaremos tus datos solo para responder sobre este diagnóstico.</p>
+    </section>`;
+  }
+  const multi = s.type === "multi";
+  const opts = s.options.map((o, j) => {
+    const id = `${s.id}-${j}`;
+    const key = String.fromCharCode(65 + j);
+    return `<div class="opt ${multi ? "multi" : ""}">
+      <input type="${multi ? "checkbox" : "radio"}" name="${s.id}" id="${id}" value="${esc(o.v)}">
+      <label for="${id}">
+        ${o.icon ? `<span class="ic">${svg(ICON[o.icon])}</span>` : `<span class="key" aria-hidden="true">${key}</span>`}
+        <span class="txt">${esc(o.v)}${o.small ? `<small>${esc(o.small)}</small>` : ""}</span>
+        <span class="tick">${TICK}</span>
+      </label></div>`;
+  }).join("");
+  return `<section class="step" data-id="${s.id}" aria-labelledby="t-${s.id}">
+    <fieldset><legend class="sr-only">${esc(s.q)}</legend>${head}
+      <div class="opts ${s.cols || ""}">${opts}</div>
+      ${s.max ? `<p class="limit" id="lim-${s.id}" aria-live="polite"></p>` : ""}
+    </fieldset></section>`;
+}).join("");
+
+const form = document.getElementById("diag");
+const sections = [...form.querySelectorAll(".step")];
+const nav = document.getElementById("nav");
+const nextBtn = document.getElementById("next");
+const bar = document.getElementById("bar");
+const count = document.getElementById("count");
+
+/* Restaurar respuestas guardadas */
+for (const s of STEPS) {
+  const v = answers[s.id];
+  if (s.type === "contact" && v) Object.entries(v).forEach(([k, val]) => { const el = form.elements[k]; if (el) el.value = val; });
+  else if (Array.isArray(v)) v.forEach((x) => { const el = form.querySelector(`input[name="${s.id}"][value="${CSS.escape(x)}"]`); if (el) el.checked = true; });
+  else if (v) { const el = form.querySelector(`input[name="${s.id}"][value="${CSS.escape(v)}"]`); if (el) el.checked = true; }
+}
+
+/* ---------- Lectura y validación ---------- */
+function read(step) {
+  if (step.type === "single") return form.querySelector(`input[name="${step.id}"]:checked`)?.value || "";
+  if (step.type === "multi") return [...form.querySelectorAll(`input[name="${step.id}"]:checked`)].map((i) => i.value);
+  return ["nombre", "empresa", "whatsapp", "ciudad", "correo"].reduce((o, k) => (o[k] = form.elements[k].value.trim(), o), {});
+}
+function valid(step, showErrors = false) {
+  const v = read(step);
+  if (step.type === "single") return !!v;
+  if (step.type === "multi") return v.length > 0;
+  const okName = v.nombre.length >= 2;
+  const okPhone = /^\+?[\d\s().-]{7,}$/.test(v.whatsapp) && v.whatsapp.replace(/\D/g, "").length >= 7;
+  const okMail = !v.correo || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.correo);
+  if (showErrors) {
+    [["nombre", okName], ["whatsapp", okPhone], ["correo", okMail]].forEach(([k, ok]) => {
+      form.elements[k].setAttribute("aria-invalid", !ok);
+      document.getElementById("e-" + k).hidden = ok;
+    });
+    const first = !okName ? "nombre" : !okPhone ? "whatsapp" : !okMail ? "correo" : null;
+    if (first) form.elements[first].focus();
+  }
+  return okName && okPhone && okMail;
+}
+
+/* ---------- Navegación entre pasos ---------- */
+function show(i, dir = 1) {
+  index = Math.max(0, Math.min(i, STEPS.length + 1));
+  sections.forEach((sec, k) => {
+    sec.classList.toggle("active", k === index);
+    sec.classList.toggle("back", k === index && dir < 0);
+  });
+  const inQuestions = index >= 1 && index <= STEPS.length;
+  nav.hidden = !inQuestions;
+  document.body.classList.toggle("has-nav", inQuestions);
+  bar.style.width = `${(Math.min(index, STEPS.length) / STEPS.length) * 100}%`;
+  count.textContent = inQuestions ? `${index} / ${STEPS.length}` : index > STEPS.length ? "Resultado" : "";
+  if (inQuestions) {
+    const step = STEPS[index - 1];
+    nextBtn.innerHTML = (index === STEPS.length ? "Ver mi diagnóstico " : "Continuar ") + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+    nextBtn.disabled = step.type !== "contact" && !valid(step);
+    updateLimit(step);
+    requestAnimationFrame(() => document.getElementById("t-" + step.id)?.focus({ preventScroll: true }));
+  }
+  window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+}
+
+function next() {
+  if (index === 0) { show(1); track("diagnostico_inicio"); return; }
+  const step = STEPS[index - 1];
+  if (!step) return;
+  if (!valid(step, true)) return;
+  answers[step.id] = read(step);
+  save();
+  track("diagnostico_paso", { paso: step.id });
+  if (index === STEPS.length) { renderResult(); show(STEPS.length + 1); track("diagnostico_completado", { nivel: lastLevel }); return; }
+  show(index + 1);
+}
+
+function updateLimit(step) {
+  if (!step.max) return;
+  const n = read(step).length;
+  form.querySelectorAll(`input[name="${step.id}"]`).forEach((i) => { i.disabled = !i.checked && n >= step.max; i.closest(".opt").style.opacity = i.disabled ? .45 : 1; });
+  const lim = document.getElementById("lim-" + step.id);
+  if (lim) lim.textContent = n >= step.max ? `Elegiste ${step.max}. Quita una para cambiarla.` : n ? `${n} de ${step.max} elegidas` : "";
+}
+
+form.addEventListener("change", (e) => {
+  const step = STEPS[index - 1];
+  if (!step || step.type === "contact") return;
+  answers[step.id] = read(step); save();
+  updateLimit(step);
+  nextBtn.disabled = !valid(step);
+  // Una sola opción: avanza sola, como en un cuestionario conversacional
+  if (step.type === "single" && e.target.checked) setTimeout(() => { if (STEPS[index - 1] === step) next(); }, 280);
+});
+form.addEventListener("input", (e) => {
+  if (e.target.matches(".field input")) {
+    e.target.removeAttribute("aria-invalid");
+    const err = document.getElementById("e-" + e.target.name); if (err) err.hidden = true;
+    answers.contacto = read(STEPS[STEPS.length - 1]); save();
+  }
+});
+form.addEventListener("submit", (e) => { e.preventDefault(); next(); });
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("[data-action]"); if (!a) return;
+  const act = a.dataset.action;
+  if (act === "start" || act === "next") next();
+  if (act === "back") show(index - 1, -1);
+  if (act === "restart") { answers = {}; save(); form.reset(); show(0); track("diagnostico_reiniciar"); }
+  if (act === "print") window.print();
+});
+document.addEventListener("keydown", (e) => {
+  // Atajo: A, B, C… marca la opción correspondiente
+  const cur = STEPS[index - 1];
+  if (cur && cur.type !== "contact" && /^[a-z]$/i.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    const opt = document.getElementById(`${cur.id}-${e.key.toUpperCase().charCodeAt(0) - 65}`);
+    if (opt && !opt.disabled) { e.preventDefault(); opt.click(); }
+    return;
+  }
+  if (e.key !== "Enter" || index === 0 || index > STEPS.length) return;
+  if (e.target.matches("button, a")) return;
+  e.preventDefault(); next();
+});
+const topBar = document.getElementById("top");
+addEventListener("scroll", () => topBar.classList.toggle("on", scrollY > 8), { passive: true });
+
+/* ---------- Resultado ---------- */
+let lastLevel = "";
+function computeScore(a) {
+  let s = 0;
+  s += { "En papel o cuaderno": 5, "En Excel o Google Sheets": 15, "En un sistema o software": 30, "Cada uno a su manera / no se registra": 0 }[a.registro] ?? 0;
+  const ch = a.canales || [];
+  s += Math.min(20, (ch.includes("Página web") ? 10 : 0) + (ch.includes("Redes sociales") ? 5 : 0) + (ch.includes("WhatsApp") ? 5 : 0) + (ch.includes("Correo") ? 3 : 0));
+  const t = a.herramientas || [];
+  s += Math.min(25, (t.includes("Un CRM") ? 10 : 0) + (t.includes("Sistema contable o ERP") ? 10 : 0) + (t.includes("WhatsApp Business") ? 5 : 0) + (t.includes("Excel o Google Sheets") ? 3 : 0) + (t.includes("Facebook / Instagram") ? 2 : 0));
+  s += Math.max(0, 25 - 6 * (a.problemas || []).length);
+  return Math.max(5, Math.min(100, Math.round(s)));
+}
+function levelFor(score) {
+  if (score < 40) return { name: "Inicial", text: "Tu negocio depende mucho de procesos manuales. Es la etapa donde la tecnología genera el cambio más visible: menos tareas a mano y más control." };
+  if (score < 70) return { name: "En desarrollo", text: "Ya usas algunas herramientas digitales, pero todavía no trabajan juntas. Conectarlas y automatizar lo repetitivo puede liberar mucho tiempo a tu equipo." };
+  return { name: "Avanzado", text: "Tu negocio ya tiene una buena base digital. El siguiente paso es automatizar con inteligencia artificial y aprovechar tus datos para decidir mejor." };
+}
+function recommend(a) {
+  const pts = {}, why = {};
+  for (const r of RULES) {
+    const [k, val] = r.when;
+    const ans = a[k];
+    const hit = Array.isArray(ans) ? ans.includes(val) : ans === val;
+    if (!hit) continue;
+    for (const [sol, p] of Object.entries(r.add)) {
+      pts[sol] = (pts[sol] || 0) + p;
+      (why[sol] = why[sol] || []).push({ k, val, p });
+    }
+  }
+  return Object.entries(pts).sort((x, y) => y[1] - x[1]).slice(0, 3).map(([sol]) => {
+    const reasons = why[sol].sort((x, y) => y.p - x.p).filter((r) => r.k !== "canales").slice(0, 2).map((r) => `«${r.val}»`);
+    return { ...SOLUTIONS[sol], id: sol, reasons };
+  });
+}
+function gaugeSVG(score) {
+  return `<div class="gauge"><svg viewBox="0 0 200 110" aria-hidden="true"><path d="M15 100a85 85 0 0 1 170 0" fill="none" stroke="#E5E8EE" stroke-width="14" stroke-linecap="round"/><path class="g-arc" d="M15 100a85 85 0 0 1 170 0" fill="none" stroke="url(#gr)" stroke-width="14" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100"/><defs><linearGradient id="gr" x1="0" x2="1"><stop offset="0" stop-color="#1C64E6"/><stop offset="1" stop-color="#2E7DFF"/></linearGradient></defs></svg><div class="val"><span class="g-num">0</span><small>/100</small></div></div>`;
+}
+function renderResult() {
+  const a = answers;
+  const score = computeScore(a);
+  const lvl = levelFor(score);
+  lastLevel = lvl.name;
+  const recs = recommend(a);
+  const c = a.contacto || {};
+  const first = (c.nombre || "").split(" ")[0];
+  const labels = { rubro: "Rubro", tamano: "Tamaño del equipo", canales: "Canales de contacto", registro: "Registro de información", problemas: "Problemas principales", objetivos: "Objetivos", herramientas: "Herramientas actuales", urgencia: "Cuándo empezar", presupuesto: "Presupuesto" };
+  const list = (v) => Array.isArray(v) ? v.join(", ") : v || "—";
+  const result = document.getElementById("result");
+  result.innerHTML = `
+    <div class="result-head">
+      <div>
+        <span class="kicker">Tu diagnóstico${c.empresa ? " · " + esc(c.empresa) : ""}</span>
+        <h1 id="t-result" tabindex="-1">${first ? esc(first) + ", tu" : "Tu"} nivel de digitalización es <span style="color:var(--blue)">${lvl.name.toLowerCase()}</span>.</h1>
+        <p class="lead">${lvl.text}</p>
+      </div>
+      <div class="score-card" role="img" aria-label="Puntaje de digitalización: ${score} de 100, nivel ${lvl.name}">
+        ${gaugeSVG(score)}
+        <p class="lvl">Nivel: ${lvl.name}</p>
+        <small>Resultado orientativo según tus respuestas</small>
+      </div>
+    </div>
+    <div class="recs">
+      <h2>Las 3 soluciones con más impacto para tu negocio</h2>
+      <ol class="rec-list">
+        ${recs.map((r, i) => `<li class="rec" style="animation-delay:${.1 + i * .08}s">
+          <span class="n">${i + 1}</span>
+          <div>
+            <h3>${esc(r.title)}</h3>
+            <span class="tag">${esc(r.tag)}</span>
+            <p>${esc(r.text)}</p>
+            ${r.reasons.length ? `<p class="why"><b>Por qué:</b> indicaste ${r.reasons.join(" y ")}.</p>` : ""}
+          </div></li>`).join("")}
+      </ol>
+    </div>
+    <div class="cta">
+      <h2>Revisemos tu diagnóstico juntos.</h2>
+      <p>Envíalo a SIBNOVA por WhatsApp con todas tus respuestas. Lo analizamos y te contactamos para conversar cómo aplicarlo en tu negocio.</p>
+      <div class="row">
+        <a class="btn btn-blue" id="send-wa" target="_blank" rel="noopener">Enviar mi diagnóstico por WhatsApp <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <button type="button" class="btn btn-ghost" data-action="print">Guardar como PDF</button>
+      </div>
+    </div>
+    <p class="note">Al pulsar se abre WhatsApp con tu diagnóstico ya redactado; solo tienes que enviarlo. Si no se abre, escríbenos al ${CONFIG.phoneDisplay}.</p>
+    <div class="summary">
+      <h2>Tus respuestas</h2>
+      <dl>${Object.entries(labels).map(([k, l]) => `<div><dt>${l}</dt><dd>${esc(list(a[k]))}</dd></div>`).join("")}</dl>
+    </div>
+    <button type="button" class="restart" data-action="restart">Hacer el diagnóstico de nuevo</button>`;
+
+  // Mensaje de WhatsApp con todas las respuestas
+  const lines = [
+    "Hola SIBNOVA, completé el diagnóstico digital de mi negocio.",
+    "",
+    `Nombre: ${c.nombre || "-"}`,
+    c.empresa ? `Empresa: ${c.empresa}` : null,
+    `WhatsApp: ${c.whatsapp || "-"}`,
+    c.correo ? `Correo: ${c.correo}` : null,
+    c.ciudad ? `Ciudad: ${c.ciudad}` : null,
+    "",
+    `Resultado: ${score}/100 · nivel ${lvl.name}`,
+    `Soluciones sugeridas: ${recs.map((r, i) => `${i + 1}) ${r.title}`).join("  ")}`,
+    "",
+    ...Object.entries(labels).map(([k, l]) => `${l}: ${list(a[k])}`),
+  ].filter((x) => x !== null).join("\n");
+  const wa = document.getElementById("send-wa");
+  wa.href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(lines)}`;
+  wa.addEventListener("click", () => track("diagnostico_enviado_whatsapp", { nivel: lvl.name, puntaje: score }));
+
+  // Animación del indicador
+  const arc = result.querySelector(".g-arc"), num = result.querySelector(".g-num");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced) { arc.setAttribute("stroke-dasharray", `${score} 100`); num.textContent = score; }
+  else {
+    const t0 = performance.now(), dur = 1400;
+    const tick = (now) => { const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 4); arc.setAttribute("stroke-dasharray", `${(score * e).toFixed(1)} 100`); num.textContent = Math.round(score * e); if (p < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(() => document.getElementById("t-result")?.focus({ preventScroll: true }));
+}
+
+document.getElementById("year").textContent = new Date().getFullYear();
+show(0);
+</script>
+</body>
+</html>

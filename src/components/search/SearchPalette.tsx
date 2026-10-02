@@ -103,6 +103,8 @@ export default function SearchPalette() {
       return;
     }
 
+    // El diagnóstico es una página estática fuera de Next: carga completa
+    if (item.href === "/diagnostico/") { window.location.assign(item.href); return; }
     // Páginas propias (p. ej. /servicios/desarrollo-web/)
     if (item.href?.startsWith("/")) { router.push(item.href); return; }
 

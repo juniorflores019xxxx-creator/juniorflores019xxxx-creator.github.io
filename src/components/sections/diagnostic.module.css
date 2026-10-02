@@ -1,0 +1,36 @@
+.section { padding: 8px 0 72px; }
+@media (min-width: 1024px) { .section { padding: 16px 0 104px; } }
+
+.card {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: 28px;
+  align-items: center;
+  padding: 32px 24px;
+  border-radius: 28px;
+  border: 1px solid rgba(119, 158, 255, 0.22);
+  background:
+    radial-gradient(80% 140% at 100% 0%, rgba(46, 125, 255, 0.22), transparent 60%),
+    linear-gradient(180deg, rgba(245, 247, 251, 0.04), rgba(245, 247, 251, 0.01));
+}
+@media (min-width: 900px) {
+  .card { grid-template-columns: 1fr auto; gap: 48px; padding: 48px 56px; }
+}
+
+.copy { display: grid; gap: 14px; }
+.title { font-size: clamp(1.9rem, 4vw, 3rem); max-width: 18ch; }
+.text { color: var(--grey); font-size: 1.04rem; line-height: 1.6; max-width: 58ch; }
+
+.points { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.points li {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  color: var(--paper);
+  background: rgba(46, 125, 255, 0.1);
+  border: 1px solid rgba(119, 158, 255, 0.2);
+}
+
+.btn { justify-self: start; }
+@media (min-width: 900px) { .btn { justify-self: end; } }

@@ -19,14 +19,13 @@ export const WHATSAPP_URL = `https://wa.me/${SITE.whatsapp}`;
 
 export const NAV = [
   { label: "Servicios", href: "/#servicios" },
+  { label: "Diagnóstico", href: "/diagnostico/" },
   { label: "Proceso", href: "/#proceso" },
   { label: "Proyectos", href: "/#proyectos" },
   { label: "Nosotros", href: "/#nosotros" },
   { label: "Contacto", href: "/#contacto" },
 ] as const;
 
-// Redes sociales: solo se muestran las que tienen URL real.
-// Añade aquí Facebook, Instagram, LinkedIn o TikTok cuando existan las cuentas.
 // Perfiles públicos de SIBNOVA (también se declaran a Google en el JSON-LD como sameAs).
 export const SOCIAL_PROFILES: { label: string; href: string; icon: "instagram" | "facebook" | "x" | "linkedin" | "tiktok" }[] = [
   { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61595041499727", icon: "facebook" },

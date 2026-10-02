@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/hero/Hero";
 import Services from "@/components/sections/Services";
+import Diagnostic from "@/components/sections/Diagnostic";
 import Process from "@/components/sections/Process";
 import Ecosystem from "@/components/sections/Ecosystem";
 import Projects from "@/components/sections/Projects";
@@ -19,6 +20,7 @@ export default function Home() {
       <main id="contenido">
         <Hero />
         <Services />
+        <Diagnostic />
         <Process />
         <Ecosystem />
         <Projects />
