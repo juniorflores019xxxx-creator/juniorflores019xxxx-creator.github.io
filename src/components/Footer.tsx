@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { SITE, SOCIAL } from "@/lib/site";
-import { IconFacebook, IconInstagram, IconLinkedIn, IconMail, IconTikTok, IconWhatsApp } from "@/components/ui/icons";
+import { IconFacebook, IconInstagram, IconLinkedIn, IconMail, IconTikTok, IconWhatsApp, IconX } from "@/components/ui/icons";
 import styles from "./footer.module.css";
 
-const ICONS = { whatsapp: IconWhatsApp, mail: IconMail, instagram: IconInstagram, facebook: IconFacebook, linkedin: IconLinkedIn, tiktok: IconTikTok };
+const ICONS = { whatsapp: IconWhatsApp, mail: IconMail, instagram: IconInstagram, facebook: IconFacebook, linkedin: IconLinkedIn, tiktok: IconTikTok, x: IconX };
 
 const LINKS = [
   { label: "Servicios", href: "/#servicios" },

@@ -27,11 +27,18 @@ export const NAV = [
 
 // Redes sociales: solo se muestran las que tienen URL real.
 // Añade aquí Facebook, Instagram, LinkedIn o TikTok cuando existan las cuentas.
-export const SOCIAL: { label: string; href: string; icon: "whatsapp" | "mail" | "instagram" | "facebook" | "linkedin" | "tiktok" }[] = [
+// Perfiles públicos de SIBNOVA (también se declaran a Google en el JSON-LD como sameAs).
+// TikTok: agregar aquí cuando esté el enlace, con icon "tiktok".
+export const SOCIAL_PROFILES: { label: string; href: string; icon: "instagram" | "facebook" | "x" | "linkedin" | "tiktok" }[] = [
+  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61595041499727", icon: "facebook" },
+  { label: "Instagram", href: "https://www.instagram.com/sibnovaltda/", icon: "instagram" },
+  { label: "X", href: "https://x.com/sibnova", icon: "x" },
+];
+
+export const SOCIAL: { label: string; href: string; icon: "whatsapp" | "mail" | "instagram" | "facebook" | "x" | "linkedin" | "tiktok" }[] = [
   { label: "WhatsApp", href: WHATSAPP_URL, icon: "whatsapp" },
+  ...SOCIAL_PROFILES,
   { label: "Correo", href: `mailto:${SITE.email}`, icon: "mail" },
-  // { label: "Instagram", href: "https://www.instagram.com/…", icon: "instagram" },
-  // { label: "LinkedIn", href: "https://www.linkedin.com/company/…", icon: "linkedin" },
 ];
 
 export const FOUNDERS = [

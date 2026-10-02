@@ -66,6 +66,9 @@ export const IconFacebook = (p: P) => (
 export const IconLinkedIn = (p: P) => (
   <svg {...base} {...p}><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7" /></svg>
 );
+export const IconX = (p: P) => (
+  <svg {...base} {...p}><path d="M4.5 4h4.2l10.8 16h-4.2zM19.5 4l-6.6 7.3M4.5 20l6.6-7.3" /></svg>
+);
 export const IconTikTok = (p: P) => (
   <svg {...base} {...p}><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5M14 3c.5 2.6 2.4 4.5 5 5" /></svg>
 );

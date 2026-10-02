@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Sora, Onest, JetBrains_Mono } from "next/font/google";
-import { SITE } from "@/lib/site";
+import { SITE, SOCIAL_PROFILES } from "@/lib/site";
 import "./globals.css";
 
 const sora = Sora({ variable: "--font-sora", subsets: ["latin"], display: "swap" });
@@ -52,6 +52,7 @@ const jsonLd = {
   description: SITE.description,
   telephone: SITE.phone,
   email: SITE.email,
+  sameAs: SOCIAL_PROFILES.map((s) => s.href),
   address: { "@type": "PostalAddress", addressLocality: "Santa Cruz de la Sierra", addressCountry: "BO" },
   founder: [
     { "@type": "Person", name: "Junior Herlan Flores Valeriano", jobTitle: "CEO · Desarrollador en inteligencia artificial" },
