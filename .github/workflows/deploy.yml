@@ -1,4 +1,5 @@
-# Publica la web en GitHub Pages cada vez que se sube un cambio a main.
+# Publica la web en GitHub Pages y deja la versión construida en la rama "hostinger"
+# (Hostinger la descarga con su despliegue Git) cada vez que se sube un cambio a main.
 name: Publicar web
 
 on:
@@ -7,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -26,6 +27,15 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      # Copia lista para Hostinger: la rama "hostinger" contiene solo la web construida
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          publish_branch: hostinger
+          force_orphan: true
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out
