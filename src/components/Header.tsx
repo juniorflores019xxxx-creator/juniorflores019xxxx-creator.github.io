@@ -73,7 +73,7 @@ export default function Header() {
       <div className={`wrap ${styles.bar}`}>
         <Link href="/" className={styles.logo} aria-label={`${SITE.name}, ir al inicio`} onClick={() => setOpen(false)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <span className={styles.plate}><img src="/brand/sn-logo.png" alt="" width={865} height={407} className={styles.symbol} /></span>
+          <span className={styles.plate}><img src="/brand/sn-logo-256.webp" alt="" width={865} height={407} className={styles.symbol} /></span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/sibnova-nombre-claro.png" alt="" width={631} height={84} className={styles.wordmark} />
         </Link>

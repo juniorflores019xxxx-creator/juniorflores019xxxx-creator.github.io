@@ -20,7 +20,7 @@
 .heroCopy { display: grid; gap: 18px; justify-items: start; }
 
 .crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 0.86rem; color: var(--grey); }
-.crumbs a { color: var(--grey); transition: color 0.2s; }
+.crumbs a { color: var(--grey); transition: color 0.2s; display: inline-block; padding-block: 10px; }
 .crumbs a:hover { color: var(--paper); }
 .crumbs [aria-current] { color: var(--paper); }
 

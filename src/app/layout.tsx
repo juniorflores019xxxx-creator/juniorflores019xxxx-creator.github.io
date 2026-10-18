@@ -67,6 +67,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         {/* Marca que JS está activo antes de pintar, para que los revelados no parpadeen */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        {/* La copia en github.io redirige al dominio oficial */}
+        <script dangerouslySetInnerHTML={{ __html: "if(/github\\.io$/.test(location.hostname))location.replace('https://sibnova.com.bo'+location.pathname+location.search+location.hash)" }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
       <body>

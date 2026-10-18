@@ -5,9 +5,9 @@ export const SITE = {
   fullLegalName: "Soluciones Informáticas de Bolivia SIBNOVA Ltda.",
   tagline: "Soluciones Informáticas de Bolivia",
   url: "https://sibnova.com.bo",
-  title: "SIBNOVA | Soluciones Informáticas de Bolivia",
+  title: "SIBNOVA · Desarrollo de software e IA en Santa Cruz, Bolivia",
   description:
-    "Desarrollo de aplicaciones, inteligencia artificial, automatización empresarial y soluciones digitales en Bolivia.",
+    "Desarrollamos aplicaciones, páginas web, automatización e inteligencia artificial para empresas en Santa Cruz y toda Bolivia. Haz el diagnóstico gratis.",
   phone: "+59176486765",
   phoneDisplay: "+591 7648 6765",
   whatsapp: "59176486765",

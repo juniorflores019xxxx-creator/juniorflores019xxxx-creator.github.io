@@ -198,3 +198,4 @@
   35%, 85% { color: var(--paper); border-color: rgba(119, 158, 255, 0.45); background: rgba(46, 125, 255, 0.1); }
   100% { color: var(--grey); border-color: var(--line-2); background: rgba(245, 247, 251, 0.03); }
 }
+.featCtas { display: flex; flex-wrap: wrap; gap: 10px; }

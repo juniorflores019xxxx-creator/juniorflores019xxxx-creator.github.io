@@ -27,8 +27,8 @@ export async function generateMetadata(props: PageProps<"/servicios/[slug]">): P
     title,
     description: `${s.short} ${s.intro}`.slice(0, 160),
     alternates: { canonical: `/servicios/${s.slug}/` },
-    openGraph: { title, description: s.short, url: `/servicios/${s.slug}/`, type: "website", locale: "es_BO", siteName: SITE.name },
-    twitter: { card: "summary_large_image", title, description: s.short },
+    openGraph: { title, description: s.short, url: `/servicios/${s.slug}/`, type: "website", locale: "es_BO", siteName: SITE.name, images: ["/opengraph-image.png"] },
+    twitter: { card: "summary_large_image", title, description: s.short, images: ["/opengraph-image.png"] },
   };
 }
 

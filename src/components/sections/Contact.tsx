@@ -108,7 +108,7 @@ export default function Contact({ defaultTopic = "Aplicación" }: { defaultTopic
           <button type="submit" className="btn btn-primary btn-lg">
             <IconWhatsApp width={18} height={18} /> Continuar en WhatsApp
           </button>
-          <p className={styles.note}>Se abrirá WhatsApp con tu mensaje ya redactado para que lo envíes.</p>
+          <p className={styles.note}>Se abrirá WhatsApp con tu mensaje ya redactado para que lo envíes. Usamos tus datos solo para responderte (<a href="/privacidad/">Política de privacidad</a>).</p>
           <p className={styles.status} role="status" aria-live="polite">{status}</p>
         </form>
       </div>

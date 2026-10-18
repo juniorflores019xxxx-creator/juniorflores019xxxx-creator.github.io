@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "postbuild": "node scripts/fix-segments.mjs",
+    "postbuild": "node scripts/fix-segments.mjs && node scripts/fix-404.mjs",
     "start": "next start",
     "lint": "eslint",
     "preview": "node scripts/preview.mjs"

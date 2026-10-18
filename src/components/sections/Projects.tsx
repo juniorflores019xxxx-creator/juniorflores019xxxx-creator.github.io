@@ -1,7 +1,7 @@
 "use client";
 
 import { useTilt } from "@/components/ui/useTilt";
-import { ArrowRight, IconCheck, IconWhatsApp } from "@/components/ui/icons";
+import { ArrowRight, ArrowUpRight, IconCheck, IconWhatsApp } from "@/components/ui/icons";
 import Split from "@/components/ui/Split";
 import styles from "./projects.module.css";
 
@@ -67,9 +67,14 @@ export default function Projects() {
               <li>Ubicación del usuario al crear una solicitud</li>
               <li>Seguimiento de la solicitud activa</li>
             </ul>
-            <a href="#contacto" className="btn btn-ghost">
-              Quiero un producto así <ArrowRight />
-            </a>
+            <div className={styles.featCtas}>
+              <a href="https://juniorflores019xxxx-creator.github.io/te-resuelvo-app/" target="_blank" rel="noopener" className="btn btn-primary">
+                Ver Te Resuelvo <ArrowUpRight />
+              </a>
+              <a href="#contacto" className="btn btn-ghost">
+                Quiero un producto así <ArrowRight />
+              </a>
+            </div>
           </div>
 
           <div className={styles.featVisual}>

@@ -76,3 +76,4 @@
 .status:empty { display: none; }
 .status { font-size: 0.9rem; padding: 12px 14px; border-radius: 12px; background: rgba(46, 125, 255, 0.12); color: #cfe0ff; }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.note a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }

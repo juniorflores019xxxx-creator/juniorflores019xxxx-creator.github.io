@@ -63,7 +63,7 @@ export default function Ecosystem() {
             <Orbit items={INNER} radius={29} dur={60} offset={-90} reverse />
             <div className={styles.core} aria-hidden="true">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/brand/sn-logo.png" alt="" width={865} height={407} loading="lazy" />
+              <img src="/brand/sn-logo-256.webp" alt="" width={865} height={407} loading="lazy" />
             </div>
           </div>
         </div>

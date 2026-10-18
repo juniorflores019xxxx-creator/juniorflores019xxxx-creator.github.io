@@ -22,7 +22,7 @@ export default function Footer() {
         <div className={styles.brand}>
           <Link href="/" className={styles.logo} aria-label="SIBNOVA, volver al inicio">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <span className={styles.plate}><img src="/brand/sn-logo.png" alt="" width={865} height={407} loading="lazy" /></span>
+            <span className={styles.plate}><img src="/brand/sn-logo-256.webp" alt="" width={865} height={407} loading="lazy" /></span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/brand/sibnova-nombre-claro.png" alt="" width={631} height={84} loading="lazy" />
           </Link>
@@ -56,6 +56,7 @@ export default function Footer() {
       </div>
       <div className={`wrap ${styles.bottom}`}>
         <span>© {year} {SITE.fullLegalName}</span>
+        <Link href="/privacidad/" className={styles.domain}>Política de privacidad</Link>
         <span className={styles.domain}>sibnova.com.bo</span>
       </div>
     </footer>
