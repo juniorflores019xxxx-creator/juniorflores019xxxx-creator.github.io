@@ -57,6 +57,8 @@ scripts/preview.mjs     servidor local para revisar out/
 | Nombres o cargos de los fundadores | `src/lib/site.ts` → `FOUNDERS` |
 | Fotos | reemplaza los archivos en `public/img/` con el mismo nombre |
 | Textos de servicios / proceso | `src/components/sections/Services.tsx` / `Process.tsx` |
+| Paquetes y precios del catálogo | `src/lib/catalog.ts` |
+| Modelos de ejemplo por rubro | `src/lib/models.ts` (después de cambiarlos, actualiza las capturas en `public/modelos/capturas/`) |
 | Colores | `src/app/globals.css` → `:root` |
 
 ## Páginas de servicio

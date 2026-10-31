@@ -19,6 +19,7 @@ export const WHATSAPP_URL = `https://wa.me/${SITE.whatsapp}`;
 
 export const NAV = [
   { label: "Servicios", href: "/#servicios" },
+  { label: "Catálogo", href: "/catalogo/" },
   { label: "Diagnóstico", href: "/diagnostico/" },
   { label: "Proceso", href: "/#proceso" },
   { label: "Proyectos", href: "/#proyectos" },

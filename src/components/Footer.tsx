@@ -11,6 +11,7 @@ const LINKS = [
   { label: "Inteligencia Artificial", href: "/servicios/inteligencia-artificial/" },
   { label: "Automatización", href: "/servicios/automatizacion-empresarial/" },
   { label: "Desarrollo Web", href: "/servicios/desarrollo-web/" },
+  { label: "Catálogo de páginas web", href: "/catalogo/" },
   { label: "Contacto", href: "#contacto" },
 ];
 

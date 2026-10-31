@@ -1,5 +1,6 @@
 // Contenido de los servicios: tarjetas de la portada y páginas de detalle (/servicios/[slug]/).
 // Regla del contenido: nada de cifras de resultados, clientes, precios ni plazos garantizados.
+// Los únicos precios públicos están en src/lib/catalog.ts.
 export type ServiceIcon = "apps" | "ai" | "automation" | "web";
 
 export type Service = {
@@ -253,6 +254,7 @@ export const SERVICES: Service[] = [
       "Proyectos que requieren un sistema web a medida",
     ],
     faq: [
+      { q: "¿Cuánto cuesta una página web?", a: "Depende de lo que necesites. En nuestro catálogo de páginas web encuentras cuatro paquetes con su precio de partida; el monto exacto queda escrito en la proforma." },
       { q: "¿Incluye dominio y hosting?", a: "Te ayudamos a registrarlos a nombre de tu empresa. Su costo anual o mensual va aparte y queda detallado en la proforma." },
       { q: "¿Podré editar el contenido?", a: "Sí. Si lo necesitas, incluimos un panel para cambiar textos, imágenes, productos o publicaciones sin programar." },
       { q: "¿Mi sitio aparecerá en Google?", a: "Dejamos el SEO técnico listo: velocidad, estructura y registro en Search Console. El posicionamiento también depende del contenido y de la competencia, por eso no prometemos un puesto fijo." },

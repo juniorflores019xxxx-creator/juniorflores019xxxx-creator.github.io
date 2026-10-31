@@ -1,0 +1,109 @@
+/* ---------- Cabecera ---------- */
+.hero { position: relative; overflow: hidden; padding: calc(var(--header-h) + 40px) 0 40px; }
+@media (min-width: 1024px) { .hero { padding: calc(var(--header-h) + 56px) 0 56px; } }
+.glow {
+  position: absolute;
+  width: 900px;
+  aspect-ratio: 1;
+  right: -300px;
+  top: -320px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(46, 125, 255, 0.22), rgba(46, 125, 255, 0.05) 60%, transparent);
+  pointer-events: none;
+}
+.heroInner { position: relative; display: grid; gap: 16px; justify-items: start; }
+.title { font-size: clamp(2.5rem, 6.5vw, 4.75rem); max-width: 16ch; }
+
+/* ---------- Paquetes ---------- */
+.plansSection { padding-bottom: 24px; }
+.plans { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+@media (min-width: 720px) { .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1160px) { .plans { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.plan {
+  scroll-margin-top: calc(var(--header-h) + 16px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px 22px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(245, 247, 251, 0.035), rgba(245, 247, 251, 0.01));
+}
+.plan:target { border-color: var(--blue-2); }
+.featured {
+  border-color: rgba(119, 158, 255, 0.5);
+  background:
+    radial-gradient(90% 60% at 100% 0%, rgba(46, 125, 255, 0.24), transparent 65%),
+    linear-gradient(180deg, rgba(46, 125, 255, 0.08), rgba(245, 247, 251, 0.01));
+}
+
+.planHead { display: grid; gap: 4px; }
+.planNum { display: flex; justify-content: space-between; align-items: center; min-height: 24px; font-family: var(--font-mono); font-size: 0.78rem; color: var(--blue-2); }
+.planNum em {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-style: normal;
+  font-size: 0.7rem;
+  color: #fff;
+  background: #1c64e6;
+}
+.planName { font-family: var(--font-display); font-weight: 600; font-size: 1.6rem; letter-spacing: -0.03em; line-height: 1.15; }
+.kind { color: var(--grey); font-size: 0.95rem; }
+
+.price { display: grid; gap: 2px; padding-top: 14px; border-top: 1px solid var(--line); }
+.price small { color: var(--grey); font-size: 0.82rem; }
+.price b { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.9rem, 2.6vw, 2.2rem); letter-spacing: -0.04em; line-height: 1.1; white-space: nowrap; }
+.weeks { color: var(--blue-2); font-size: 0.86rem; }
+.pitch { color: var(--paper); font-size: 0.98rem; line-height: 1.5; }
+
+.includes { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.includes li { display: flex; gap: 9px; align-items: flex-start; color: var(--grey); font-size: 0.92rem; line-height: 1.45; }
+.includes svg { flex: none; margin-top: 1px; color: var(--blue-2); }
+
+.ideal { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); color: var(--grey); font-size: 0.88rem; line-height: 1.5; }
+.ideal b { color: var(--paper); font-weight: 600; }
+.seeModels { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--blue-2); font-weight: 600; font-size: 0.92rem; }
+.seeModels svg { width: 16px; height: 16px; }
+.planBtn { width: 100%; }
+.planBtn:global(.btn-ghost) svg { color: var(--blue-2); }
+
+.note { margin-top: 18px; color: var(--grey); font-size: 0.9rem; }
+.accent { font-style: normal; color: var(--blue-2); }
+
+/* ---------- Modelos ---------- */
+.modelGroup { scroll-margin-top: calc(var(--header-h) + 16px); margin-top: 40px; }
+.modelGroup:first-of-type { margin-top: 0; }
+.modelPlan { margin-bottom: 14px; font-family: var(--font-display); font-weight: 600; font-size: 1.4rem; letter-spacing: -0.03em; }
+.models { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+@media (min-width: 620px) { .models { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .models { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.model { display: grid; gap: 10px; padding: 10px 10px 12px; border-radius: 18px; border: 1px solid var(--line); background: rgba(245, 247, 251, 0.025); }
+.thumb { display: block; overflow: hidden; border-radius: 10px; }
+.thumb img { width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: cover; object-position: top; transition: transform 0.5s var(--ease); }
+.thumb:hover img { transform: scale(1.03); }
+.modelMeta { display: flex; align-items: baseline; gap: 8px; font-size: 0.95rem; }
+.modelMeta b { font-family: var(--font-mono); color: var(--blue-2); }
+.modelMeta small { margin-left: auto; color: var(--grey); font-size: 0.8rem; white-space: nowrap; }
+.modelActs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.modelActs a { --h: 44px; padding: 0 12px; font-size: 0.9rem; }
+
+/* ---------- Comparación ---------- */
+.tableWrap { position: relative; overflow-x: auto; border-radius: 18px; border: 1px solid var(--line); }
+.table { width: 100%; min-width: 720px; border-collapse: collapse; font-size: 0.95rem; }
+.table th, .table td { padding: 14px 16px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--line); }
+.table tbody tr:last-child th, .table tbody tr:last-child td { border-bottom: 0; }
+.table thead th { font-family: var(--font-display); font-weight: 600; font-size: 1.02rem; color: var(--paper); background: rgba(245, 247, 251, 0.03); }
+.table tbody th { font-weight: 500; color: var(--paper); }
+.table td { color: var(--grey); }
+.yes { color: var(--blue-2); }
+.no { color: var(--grey-2); }
+
+/* ---------- Condiciones ---------- */
+.termsSection { padding-bottom: 8px; }
+.payment { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.payment li { display: flex; align-items: baseline; gap: 12px; color: var(--grey); font-size: 0.97rem; }
+.payment b { min-width: 4ch; font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; letter-spacing: -0.03em; color: var(--paper); }
+.help { color: var(--grey); font-size: 0.97rem; line-height: 1.55; }
+.helpLink { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 8px; color: var(--blue-2); font-weight: 600; font-size: 0.95rem; }
+.helpLink svg { width: 16px; height: 16px; }

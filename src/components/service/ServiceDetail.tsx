@@ -34,6 +34,9 @@ export default function ServiceDetail({ service }: { service: Service }) {
               <a href={`${WHATSAPP_URL}?text=${waText}`} target="_blank" rel="noopener" className="btn btn-ghost btn-lg">
                 <IconWhatsApp width={18} height={18} /> Escribir por WhatsApp
               </a>
+              {service.slug === "desarrollo-web" && (
+                <Link href="/catalogo/" className="btn btn-ghost btn-lg">Ver catálogo y precios</Link>
+              )}
             </div>
           </div>
 
