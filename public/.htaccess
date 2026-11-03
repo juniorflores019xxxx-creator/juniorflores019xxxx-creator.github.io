@@ -2,6 +2,9 @@
 # HTTPS se fuerza desde el panel de Hostinger (Seguridad → SSL) cuando el certificado esté activo.
 ErrorDocument 404 /404.html
 
+# Los antiguos modelos por rubro se reemplazaron por el catálogo de 20 diseños
+RedirectMatch 301 ^/modelos(/.*)?$ /catalogo/#disenos
+
 # Una sola dirección: www.sibnova.com.bo → sibnova.com.bo
 <IfModule mod_rewrite.c>
   RewriteEngine On

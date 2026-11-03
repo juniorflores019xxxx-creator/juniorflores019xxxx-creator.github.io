@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { CATALOG_FAQ, COMPARE, PAYMENT, WEB_PLANS, formatBs, type WebPlan } from "@/lib/catalog";
-import { chooseText, modelHref, modelsOf, pagesLabel, PLANS } from "@/lib/models";
+import { CATALOG_FAQ, COMPARE, CONCEPTS, PAYMENT, WEB_PLANS, WORKS, formatBs, type WebPlan } from "@/lib/catalog";
+import DesignCatalog from "@/components/designs/DesignCatalog";
 import { WHATSAPP_URL } from "@/lib/site";
 import { ArrowRight, IconCheck, IconWhatsApp } from "@/components/ui/icons";
 import Split from "@/components/ui/Split";
@@ -26,7 +26,7 @@ export default function Catalog() {
           </nav>
           <span className="num" data-reveal>Catálogo de páginas web</span>
           <h1 id="catalogo-titulo" className={`display ${styles.title}`} data-reveal>Elige la web que tu negocio necesita</h1>
-          <p className="lead" data-reveal>Cuatro paquetes con precio de partida claro y modelos listos para elegir. Tú eliges el que más te gusta y lo adaptamos a tu marca.</p>
+          <p className="lead" data-reveal>Cuatro paquetes con precio de partida claro y 20 diseños para elegir. Tú eliges el estilo que más te gusta y lo adaptamos a tu marca.</p>
         </div>
       </section>
 
@@ -48,44 +48,61 @@ export default function Catalog() {
                   {p.includes.map((d) => <li key={d}><IconCheck width={18} height={18} />{d}</li>)}
                 </ul>
                 <p className={styles.ideal}><b>Ideal para:</b> {p.idealFor}</p>
-                <a href={`#modelos-${p.slug}`} className={styles.seeModels}>Ver 4 modelos <ArrowRight /></a>
+                <a href="#disenos" className={styles.seeModels}>Ver los 20 diseños <ArrowRight /></a>
                 <a href={planLink(p)} target="_blank" rel="noopener" className={`btn ${p.featured ? "btn-primary" : "btn-ghost"} ${styles.planBtn}`}>
                   <IconWhatsApp width={18} height={18} /> Quiero este paquete
                 </a>
               </li>
             ))}
           </ul>
-          <p className={styles.note}>Precios de partida en bolivianos. El monto exacto queda escrito en tu proforma.</p>
+          <p className={styles.note}>Precios iniciales en bolivianos. El presupuesto final depende de las funciones, el contenido y el alcance de tu proyecto, y queda escrito en tu proforma.</p>
         </div>
       </section>
 
-      {/* ---------- Modelos para elegir ---------- */}
-      <section id="modelos" className="section" aria-labelledby="modelos-titulo">
+      {/* ---------- Trabajos reales ---------- */}
+      <section id="trabajos" className="section" aria-labelledby="trabajos-titulo">
         <div className="wrap">
           <div className={service.head}>
-            <h2 id="modelos-titulo" className="display h2">Elige tu <em className={styles.accent}>modelo</em></h2>
-            <p className="lead" data-reveal>Abre cada modelo, navega sus páginas y dinos cuál prefieres. Los negocios y datos son de ejemplo.</p>
+            <h2 id="trabajos-titulo" className="display h2">Webs que ya <em className={styles.accent}>hicimos</em></h2>
+            <p className="lead" data-reveal>Sitios reales diseñados y desarrollados por SIBNOVA.</p>
           </div>
-          {PLANS.map((plan) => (
-            <div key={plan.id} id={`modelos-${plan.id}`} className={styles.modelGroup}>
-              <h3 className={styles.modelPlan}>{plan.label}</h3>
-              <ul className={styles.models}>
-                {modelsOf(plan.id).map((m) => (
-                  <li key={m.slug} className={styles.model} data-reveal>
-                    <Link href={modelHref(m)} className={styles.thumb}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={`/modelos/capturas/${m.slug}.webp`} alt={`Vista del modelo ${m.code}: ${m.plan.label}, ${m.rubro.label.toLowerCase()}`} width={640} height={400} loading="lazy" />
-                    </Link>
-                    <p className={styles.modelMeta}><b>{m.code}</b>{m.rubro.label}<small>{pagesLabel(m)}</small></p>
-                    <div className={styles.modelActs}>
-                      <Link href={modelHref(m)} className="btn btn-ghost">Ver modelo</Link>
-                      <a href={waLink(chooseText(m))} target="_blank" rel="noopener" className="btn btn-primary" aria-label={`Elegir el modelo ${m.code}`}>Elegir</a>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <ul className={styles.works}>
+            {WORKS.map((w) => (
+              <li key={w.name} className={styles.work} data-reveal>
+                <div className={styles.workShots}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={`/trabajos/${w.shot}-pc.webp`} alt={`Web de ${w.name} en computadora`} width={1200} height={750} loading="lazy" className={styles.workPc} />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={`/trabajos/${w.shot}-movil.webp`} alt={`Web de ${w.name} en celular`} width={390} height={844} loading="lazy" className={styles.workPhone} />
+                </div>
+                <div className={styles.workBody}>
+                  <span className={styles.workKind}>{w.kind}</span>
+                  <h3>{w.name}</h3>
+                  <p>{w.text}</p>
+                  <ul className={service.checks}>
+                    {w.points.map((p) => <li key={p}><IconCheck width={18} height={18} />{p}</li>)}
+                  </ul>
+                  {w.href
+                    ? <a href={w.href} target="_blank" rel="noopener" className={styles.helpLink}>Ver la web <ArrowRight /></a>
+                    : <span className={styles.workStatus}>{w.status}</span>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* ---------- Catálogo de diseños ---------- */}
+      <section id="disenos" className="section" aria-labelledby="disenos-titulo">
+        <div className="wrap">
+          <div className={service.head}>
+            <h2 id="disenos-titulo" className="display h2">Encuentra el diseño web ideal para tu <em className={styles.accent}>negocio</em></h2>
+            <p className="lead" data-reveal>Explora nuestros modelos de diseño web, visualiza demostraciones y selecciona el estilo que mejor representa tu empresa.</p>
+          </div>
+          <DesignCatalog />
+          <ul className={styles.concepts} aria-label="Qué eliges en cada paso">
+            {CONCEPTS.map((c, i) => <li key={c.t}><span>{String(i + 1).padStart(2, "0")}</span><b>{c.t}</b><p>{c.d}</p></li>)}
+          </ul>
         </div>
       </section>
 

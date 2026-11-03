@@ -42,7 +42,7 @@ export default function Privacidad() {
             <span className="num">Legal</span>
             <h1 id="priv-titulo" className="display h2">Política de privacidad</h1>
             <p className="lead">Te explicamos qué datos nos envías, para qué los usamos y cómo puedes pedir que los corrijamos o eliminemos.</p>
-            <p className={styles.meta}><span>Versión <b>1.0</b></span><span>Vigente desde <b>octubre de 2026</b></span></p>
+            <p className={styles.meta}><span>Versión <b>1.1</b></span><span>Vigente desde <b>noviembre de 2026</b></span></p>
           </div>
         </section>
 
@@ -72,13 +72,16 @@ export default function Privacidad() {
                 <tbody>
                   <tr><td>Formulario «Hablemos de tu proyecto»</td><td>Nombre, WhatsApp o correo, el tema que te interesa y tu mensaje.</td></tr>
                   <tr><td>Diagnóstico digital</td><td>Tus respuestas sobre el negocio (rubro, tamaño, herramientas, problemas, objetivos, plazo y presupuesto aproximado) y tus datos de contacto: nombre, WhatsApp y, si quieres, empresa, ciudad y correo.</td></tr>
+                  <tr><td>Solicitud de página web (catálogo)</td><td>Tus datos de contacto (nombre, correo, teléfono, ciudad y, si quieres, empresa, NIT y cargo), la información de tu negocio, el diseño y el paquete que elegiste, las funciones que necesitas, tus plazos y presupuesto aproximado, y los archivos que subas (logo, fotos, videos o documentos).</td></tr>
                   <tr><td>WhatsApp y correo</td><td>Lo que nos escribas, tu número o dirección y tu nombre de perfil.</td></tr>
                 </tbody>
               </table>
             </div>
             <p>
-              <strong>El sitio no guarda tus datos en nuestros servidores.</strong> Al enviar el formulario o el diagnóstico se
-              abre WhatsApp con el mensaje ya escrito: nos llega solo si tú lo envías. Las respuestas del diagnóstico se
+              El formulario «Hablemos de tu proyecto» y el diagnóstico <strong>no guardan tus datos en nuestros servidores</strong>: al
+              enviarlos se abre WhatsApp con el mensaje ya escrito y nos llega solo si tú lo envías. La <strong>solicitud de página web</strong> del
+              catálogo, en cambio, sí se guarda en nuestro servidor de Hostinger, junto con los archivos que subas, para que nuestro equipo
+              la revise; te damos un número de solicitud para seguirla. Las respuestas del diagnóstico se
               guardan en tu propio navegador para que no las pierdas si recargas la página; puedes borrarlas con «Hacer el
               diagnóstico de nuevo» o limpiando los datos del navegador.
             </p>
@@ -125,7 +128,8 @@ export default function Privacidad() {
             <h2 id="seguridad"><span>{n("seguridad")}</span>Seguridad</h2>
             <p>
               El sitio funciona siempre con conexión cifrada (HTTPS). Solo el equipo de SIBNOVA que atiende tu consulta accede
-              a tus mensajes.
+              a tus mensajes. Las solicitudes de página web y sus archivos se guardan fuera de la parte pública del sitio y solo se
+              ven desde una bandeja protegida con contraseña. El formulario nunca te pide contraseñas de tu correo, tu banco o tu hosting.
             </p>
 
             <h2 id="proyectos"><span>{n("proyectos")}</span>Datos de proyectos de clientes</h2>

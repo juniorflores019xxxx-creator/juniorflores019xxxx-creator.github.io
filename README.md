@@ -58,7 +58,7 @@ scripts/preview.mjs     servidor local para revisar out/
 | Fotos | reemplaza los archivos en `public/img/` con el mismo nombre |
 | Textos de servicios / proceso | `src/components/sections/Services.tsx` / `Process.tsx` |
 | Paquetes y precios del catálogo | `src/lib/catalog.ts` |
-| Modelos de ejemplo por rubro | `src/lib/models.ts` (después de cambiarlos, actualiza las capturas en `public/modelos/capturas/`) |
+| Los 20 diseños y sus demos | `src/lib/designs.ts` (fotos en `public/disenos/fotos/`, capturas en `public/disenos/capturas/`) |
 | Colores | `src/app/globals.css` → `:root` |
 
 ## Páginas de servicio
@@ -109,3 +109,24 @@ El botón lo dice claramente ("Continuar en WhatsApp").
 4. Registra el sitemap en Google Search Console.
 
 Alternativa sin configuración: Vercel o Netlify detectan Next.js y publican directamente.
+
+## Catálogo de diseños y solicitudes
+
+- **`/catalogo/`**: paquetes, trabajos reales y los 20 diseños con buscador y filtro por rubro (`src/components/designs/DesignCatalog.tsx`).
+- **`/catalogo/disenos/<estilo>/`**: una demo por estilo (`src/components/designs/DesignDemo.tsx` + `demo.module.css`). Negocios ficticios; fotos de Unsplash.
+- **`/catalogo/solicitud/`**: formulario de 7 pasos (`RequestForm.tsx`). El diseño elegido se guarda en el navegador y viaja en `?diseno=`.
+- El **estilo no cambia el precio**: el precio inicial sale del paquete (`src/lib/catalog.ts`). En cada build se genera `/api/catalogo.json`, que el servidor usa para validar paquetes, diseños y precios.
+
+### Servidor de solicitudes (PHP en Hostinger)
+
+| Archivo | Qué hace |
+|---|---|
+| `public/api/solicitud.php` | Recibe la solicitud, valida todo, calcula el precio desde `catalogo.json`, guarda archivos y avisa por correo a `sibnovaltda@gmail.com` |
+| `public/api/_lib.php` | Funciones comunes (no se puede abrir por URL) |
+| `public/admin/index.php` | Bandeja protegida: lista, detalle, cambio de estado con historial y descarga de archivos |
+
+- **Dónde se guardan los datos:** en `sibnova-datos/`, al lado de `public_html/` (fuera de la parte pública). Es una base SQLite más la carpeta `archivos/`. Publicar una versión nueva del sitio **no los borra**. Haz copia de esa carpeta cada mes desde el Administrador de archivos de Hostinger.
+- **Requisitos:** PHP 8.1 o superior con `pdo_sqlite`, `fileinfo` y `mbstring` (vienen activos en Hostinger), y `upload_max_filesize` de 12 MB o más.
+- **Primer uso:** abre `https://sibnova.com.bo/admin/`, escribe la clave de activación (se entrega aparte, nunca va en Git) y crea tu contraseña de 12 caracteres o más. La clave de activación deja de servir después.
+- **Protección:** campo trampa y tiempo mínimo contra robots, 30 intentos y 5 solicitudes válidas por hora y conexión, verificación del tipo real de cada archivo, límite de 10 archivos (10 MB cada uno, 40 MB en total), bloqueo de 15 minutos tras 5 contraseñas incorrectas, sesiones con cookie segura y token contra falsificación de formularios.
+- Si el servidor no responde, el formulario ofrece enviar la solicitud por WhatsApp (sin archivos).
