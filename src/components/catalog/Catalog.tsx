@@ -2,7 +2,8 @@ import Link from "next/link";
 import {
   ADDONS, CATALOG_FAQ, COMPARE, CONCEPTS, FOUNDERS, PAYMENT, STORE_PLANS, WEB_PLANS, WHATSAPP_CATALOG, WORKS, formatBs, priceLabel,
 } from "@/lib/catalog";
-import { REQUEST_URL } from "@/lib/designs";
+import { DESIGNS, REQUEST_URL, shotSrc } from "@/lib/designs";
+import Gallery3D from "@/components/ui/Gallery3D";
 import DesignCatalog from "@/components/designs/DesignCatalog";
 import { ArrowRight, ArrowUpRight, IconCheck } from "@/components/ui/icons";
 import Split from "@/components/ui/Split";
@@ -17,7 +18,8 @@ export default function Catalog() {
       {/* ---------- Cabecera ---------- */}
       <section className={styles.hero} aria-labelledby="catalogo-titulo">
         <div className={styles.glow} aria-hidden="true" />
-        <div className={`wrap ${styles.heroInner}`}>
+        <div className={`wrap ${styles.heroGrid}`}>
+        <div className={styles.heroInner}>
           <nav aria-label="Ruta" className={service.crumbs} data-reveal>
             <Link href="/">Inicio</Link>
             <span aria-hidden="true">/</span>
@@ -31,6 +33,15 @@ export default function Catalog() {
           <a href="#fundadores" className={styles.founderPill} data-reveal>
             <b>Clientes Fundadores</b> {FOUNDERS.slots} cupos hasta el {FOUNDERS.deadline} <ArrowRight />
           </a>
+        </div>
+        <Gallery3D
+          variant="stack"
+          className={styles.heroVisual}
+          images={["futurista", "glassmorphism", "premium-luxury"].map((slug) => {
+            const d = DESIGNS.find((x) => x.slug === slug)!;
+            return { src: shotSrc(d), alt: `Vista del diseño ${d.n} ${d.name}`, label: `${d.n} · ${d.name}` };
+          })}
+        />
         </div>
       </section>
 

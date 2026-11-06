@@ -4,7 +4,32 @@ import { WHATSAPP_URL } from "@/lib/site";
 import { SERVICE_ICONS } from "@/components/ui/serviceIcons";
 import { ArrowRight, IconCheck, IconWhatsApp } from "@/components/ui/icons";
 import Split from "@/components/ui/Split";
+import Gallery3D, { type Gallery3DImage } from "@/components/ui/Gallery3D";
 import styles from "./service.module.css";
+
+// Imágenes de referencia por servicio (fotos de banco con licencia libre, no son proyectos de clientes).
+const SERVICE_IMAGES: Record<string, Gallery3DImage[]> = {
+  "desarrollo-de-aplicaciones": [
+    { src: "/img/3d/tienda-pago.webp", alt: "Persona usando su celular para hacer un pedido en un comercio", label: "Pedidos desde el celular" },
+    { src: "/img/3d/tableta.webp", alt: "Tableta con lápiz digital y teclado", label: "Apps para celular y tablet" },
+    { src: "/img/3d/laptop-graficos.webp", alt: "Computadora portátil con un panel de estadísticas", label: "Paneles de administración" },
+  ],
+  "inteligencia-artificial": [
+    { src: "/img/3d/circuito-neon.webp", alt: "Circuito electrónico iluminado con luz azul", label: "Modelos de IA" },
+    { src: "/img/3d/tierra-noche.webp", alt: "Vista nocturna de la Tierra con ciudades iluminadas", label: "Datos conectados" },
+    { src: "/img/3d/circuito.webp", alt: "Detalle de una placa de circuito", label: "Automatización inteligente" },
+  ],
+  "automatizacion-empresarial": [
+    { src: "/img/3d/reunion.webp", alt: "Equipo organizando tareas en una pizarra con notas", label: "Procesos ordenados" },
+    { src: "/img/3d/dashboard.webp", alt: "Monitor con gráficos y reportes de datos", label: "Reportes automáticos" },
+    { src: "/img/3d/cowork.webp", alt: "Oficina abierta con personas trabajando en computadoras", label: "Equipos conectados" },
+  ],
+  "desarrollo-web": [
+    { src: "/img/3d/teclado-neon.webp", alt: "Teclado de computadora iluminado con colores", label: "Diseño moderno" },
+    { src: "/img/3d/laptop-oscura.webp", alt: "Computadora portátil entreabierta con luz de colores", label: "Sitios rápidos" },
+    { src: "/img/3d/presentacion.webp", alt: "Persona presentando a un grupo en una oficina", label: "Pensados para vender" },
+  ],
+};
 
 export default function ServiceDetail({ service }: { service: Service }) {
   const Icon = SERVICE_ICONS[service.icon];
@@ -52,6 +77,8 @@ export default function ServiceDetail({ service }: { service: Service }) {
           </div>
         </div>
       </section>
+
+      {SERVICE_IMAGES[service.slug] && <Gallery3D images={SERVICE_IMAGES[service.slug]} />}
 
       {/* ---------- Lo que resolvemos ---------- */}
       <section className={`section ${styles.painSection}`} aria-labelledby="que-resolvemos">

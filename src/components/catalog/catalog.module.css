@@ -147,3 +147,8 @@
 .small { color: var(--grey-2); font-size: 0.84rem; line-height: 1.55; max-width: 80ch; }
 .thPrice { display: block; margin-top: 2px; font-family: var(--font-sans); font-weight: 500; font-size: 0.84rem; color: var(--blue-2); }
 .foundersHead .soon { justify-self: start; }
+
+/* Cabecera con capturas de diseños en 3D */
+.heroGrid { position: relative; display: grid; gap: 40px; align-items: center; }
+@media (min-width: 960px) { .heroGrid { grid-template-columns: 1.05fr 0.95fr; gap: 56px; } }
+.heroVisual { width: 100%; }
