@@ -112,3 +112,38 @@
 .help { color: var(--grey); font-size: 0.97rem; line-height: 1.55; }
 .helpLink { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 8px; color: var(--blue-2); font-weight: 600; font-size: 0.95rem; }
 .helpLink svg { width: 16px; height: 16px; }
+
+/* ---------- Lanzamiento comercial ---------- */
+.founderPill { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 44px; margin-top: 6px; padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(119, 158, 255, 0.35); background: rgba(46, 125, 255, 0.08); color: var(--grey); font-size: 0.92rem; transition: border-color 0.3s; }
+.founderPill b { color: var(--paper); }
+.founderPill svg { width: 16px; height: 16px; color: var(--blue-2); }
+.founderPill:hover { border-color: var(--blue-2); }
+.quoteTag { background: transparent !important; border: 1px solid rgba(119, 158, 255, 0.5); color: var(--blue-2) !important; }
+.excludes { padding: 10px 12px; border-radius: 10px; background: rgba(245, 247, 251, 0.03); border: 1px dashed var(--line-2); color: var(--grey); font-size: 0.84rem; line-height: 1.5; }
+.addon { border-style: dashed; border-color: rgba(119, 158, 255, 0.35); }
+.note a { color: var(--blue-2); text-decoration: underline; text-underline-offset: 3px; }
+.soon { display: inline-block; margin-bottom: 12px; padding: 5px 12px; border-radius: 999px; font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.04em; color: #ffd666; background: rgba(255, 196, 0, 0.08); border: 1px solid rgba(255, 196, 0, 0.3); }
+.stores { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+@media (min-width: 900px) { .stores { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.previewLabel { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-2); }
+.price small + b + small, .price b + small { margin-top: 2px; }
+.addonsSection { padding-bottom: 16px; }
+.subTitle { margin-bottom: 14px; font-family: var(--font-display); font-weight: 600; font-size: 1.4rem; letter-spacing: -0.03em; }
+.addons { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+@media (min-width: 720px) { .addons { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1140px) { .addons { grid-template-columns: repeat(4, 1fr); } }
+.addons li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 16px 18px; border-radius: 14px; border: 1px solid var(--line); color: var(--grey); font-size: 0.94rem; }
+.addons b { color: var(--paper); font-family: var(--font-display); font-weight: 600; white-space: nowrap; }
+.addons small { color: var(--grey); font-weight: 400; font-family: var(--font-sans); }
+.founders { display: grid; gap: 28px; padding: clamp(24px, 4vw, 48px); border-radius: 28px; border: 1px solid rgba(119, 158, 255, 0.3); background: radial-gradient(70% 90% at 100% 0%, rgba(46, 125, 255, 0.18), transparent 60%), linear-gradient(180deg, rgba(245, 247, 251, 0.035), rgba(245, 247, 251, 0.01)); justify-items: start; }
+.foundersHead { display: grid; gap: 12px; }
+.benefits { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; width: 100%; }
+@media (min-width: 760px) { .benefits { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1140px) { .benefits { grid-template-columns: repeat(3, 1fr); } }
+.benefits li { display: grid; gap: 6px; align-content: start; padding: 18px; border-radius: 16px; border: 1px solid var(--line); background: rgba(5, 6, 9, 0.35); }
+.benefits span { font-family: var(--font-mono); font-size: 0.78rem; color: var(--blue-2); }
+.benefits b { font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; }
+.benefits p { color: var(--grey); font-size: 0.92rem; line-height: 1.55; }
+.small { color: var(--grey-2); font-size: 0.84rem; line-height: 1.55; max-width: 80ch; }
+.thPrice { display: block; margin-top: 2px; font-family: var(--font-sans); font-weight: 500; font-size: 0.84rem; color: var(--blue-2); }
+.foundersHead .soon { justify-self: start; }

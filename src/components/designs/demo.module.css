@@ -18,6 +18,8 @@
 .bar span b { color: #fff; }
 .barChoose { padding: 0 14px; border-radius: 999px; background: #1c64e6; color: #fff; }
 @media (max-width: 680px) { .bar span { display: none; } }
+:global(.en-visor) .bar { display: none; }
+:global(.en-visor) .s19 .header { top: 0; }
 
 .header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; padding: 16px clamp(16px, 5vw, 64px); border-bottom: 1px solid var(--line); background: var(--bg); }
 .brand { font-family: var(--head); font-weight: 700; font-size: 1.3rem; letter-spacing: -0.02em; margin-right: auto; }

@@ -94,6 +94,23 @@ export default function Projects() {
           </div>
         </article>
 
+        {/* E.F.O. — proyecto para un cliente */}
+        <article className={`spot ${styles.tilt} ${styles.second}`} data-reveal>
+          <div className={styles.featCopy}>
+            <h3 className={styles.secondTitle}>E.F.O. Ltda.</h3>
+            <span className={styles.tags}>Proyecto para cliente · Sitio corporativo · Energía</span>
+            <p className={styles.featText}>Web de una empresa boliviana de combustibles, energía y electromovilidad, pensada para recibir pedidos de cotización.</p>
+            <div className={styles.featCtas}>
+              <a href="https://efo.com.bo/" target="_blank" rel="noopener" className="btn btn-primary">Ver proyecto <ArrowUpRight /></a>
+              <a href="/catalogo/" className="btn btn-ghost">Quiero una web así <ArrowRight /></a>
+            </div>
+          </div>
+          <div className={styles.secondVisual}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/trabajos/efo-inicio-pc.webp" alt="Página de inicio del sitio de E.F.O. Ltda. en computadora" width={1200} height={750} loading="lazy" className={styles.shot} />
+          </div>
+        </article>
+
         {/* Business AI — línea de soluciones */}
         <article className={`spot ${styles.tilt} ${styles.second}`} data-reveal>
           <div className={styles.featCopy}>

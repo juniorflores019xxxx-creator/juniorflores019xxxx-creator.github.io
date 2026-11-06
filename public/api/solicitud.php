@@ -78,7 +78,17 @@ foreach ((array)($_POST['funciones'] ?? []) as $f) {
     if (isset($validas[$f]) && !in_array($f, $funciones, true)) $funciones[] = $f;
 }
 
+// Adicional de catálogo (solo con Empresa) y cantidad de productos (solo en tiendas).
+$conCatalogo = ($_POST['catalogo'] ?? '') === 'si';
+if ($conCatalogo && ($paquete['id'] ?? '') !== $cat['catalogo']['solo_con']) $err[] = 'catalogo';
+$d['catalogo'] = $conCatalogo ? 'si' : 'no';
+$d['productos'] = '';
+if (!empty($paquete['tienda'])) $d['productos'] = $one('productos', $cat['productos']);
+
 if ($err) fail('Revisa estos datos: ' . implode(', ', array_unique($err)) . '.');
+
+$precio = (int)$paquete['precio'] + ($conCatalogo ? (int)$cat['catalogo']['precio'] : 0);
+$paqueteNombre = $paquete['nombre'] . ($conCatalogo ? ' + ' . $cat['catalogo']['nombre'] : '');
 
 // Archivos: cantidad, tamaño, extensión y tipo real del contenido.
 $lim = $cat['archivos'];
@@ -125,7 +135,7 @@ try {
     $pdo->prepare('INSERT INTO solicitudes (numero, creado, actualizado, estado, nombre, empresa, correo, telefono, ciudad, diseno_id, diseno_nombre, paquete_id, paquete_nombre, precio_inicial, funciones, datos)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')->execute([
         $numero, $fecha, $fecha, $estado, $d['nombre'], $d['empresa'], $d['correo'], $d['telefono'], $d['ciudad'],
-        $diseno['id'], $diseno['n'] . ' ' . $diseno['nombre'], $paquete['id'], $paquete['nombre'], (int)$paquete['precio'],
+        $diseno['id'], $diseno['n'] . ' ' . $diseno['nombre'], $paquete['id'], $paqueteNombre, $precio,
         json_encode($funciones), json_encode($d, JSON_UNESCAPED_UNICODE),
     ]);
     $sid = (int)$pdo->lastInsertId();
@@ -150,7 +160,7 @@ try {
 }
 
 // Aviso al equipo: sin datos de contacto del cliente; el detalle está en la bandeja protegida.
-$body = "Nueva solicitud de página web\n\nNúmero: {$numero}\nFecha: {$fecha}\nDiseño: {$diseno['n']} {$diseno['nombre']}\nPaquete: {$paquete['nombre']} (desde Bs " . number_format((int)$paquete['precio'], 0, ',', '.') . ")\nCliente: {$d['nombre']}" . ($d['empresa'] ? " · {$d['empresa']}" : '') . "\nArchivos: " . count($files) . "\n\nRevísala en " . SITE_URL . "/admin/\n";
+$body = "Nueva solicitud de página web\n\nNúmero: {$numero}\nFecha: {$fecha}\nDiseño: {$diseno['n']} {$diseno['nombre']}\nPaquete: {$paqueteNombre} (" . (!empty($paquete['desde']) ? 'desde ' : '') . "Bs " . number_format($precio, 0, ',', '.') . ")\nCliente: {$d['nombre']}" . ($d['empresa'] ? " · {$d['empresa']}" : '') . "\nArchivos: " . count($files) . "\n\nRevísala en " . SITE_URL . "/admin/\n";
 @mail(NOTIFY_EMAIL, "=?UTF-8?B?" . base64_encode("Nueva solicitud {$numero}") . "?=", $body, "From: SIBNOVA <" . MAIL_FROM . ">\r\nContent-Type: text/plain; charset=UTF-8");
 
 json_out(['ok' => true, 'numero' => $numero]);

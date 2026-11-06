@@ -482,6 +482,7 @@ export const DESIGNS: Design[] = [
 
 export const getDesign = (slug: string) => DESIGNS.find((d) => d.slug === slug);
 export const designHref = (d: Design) => `/catalogo/disenos/${d.slug}/`;
+export const viewerHref = (d: Design) => `/catalogo/ver/${d.slug}/`;
 export const photoSrc = (key: string) => `/disenos/fotos/${key}.webp`;
 export const shotSrc = (d: Design) => `/disenos/capturas/${d.slug}.webp`;
 export const REQUEST_URL = "/catalogo/solicitud/";

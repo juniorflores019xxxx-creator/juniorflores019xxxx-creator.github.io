@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { CATEGORIES, DESIGNS, designHref, shotSrc, type Category } from "@/lib/designs";
+import { CATEGORIES, DESIGNS, shotSrc, viewerHref, type Category } from "@/lib/designs";
 import { norm } from "@/components/search/searchIndex";
 import { IconSearch } from "@/components/ui/icons";
 import ChooseDesign from "./ChooseDesign";
@@ -50,7 +50,7 @@ export default function DesignCatalog() {
         <ul className={styles.grid}>
           {list.map((d) => (
             <li key={d.slug} id={`diseno-${d.slug}`} className={styles.card}>
-              <Link href={designHref(d)} className={styles.thumb} tabIndex={-1} aria-hidden="true">
+              <Link href={viewerHref(d)} className={styles.thumb} tabIndex={-1} aria-hidden="true">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={shotSrc(d)} alt="" width={800} height={500} loading="lazy" decoding="async" />
               </Link>
@@ -62,8 +62,8 @@ export default function DesignCatalog() {
                 </ul>
                 <p className={styles.for}><b>Recomendado para:</b> {d.categories.join(", ")}</p>
                 <div className={styles.acts}>
-                  <Link href={designHref(d)} className="btn btn-ghost">Ver demostración</Link>
-                  <ChooseDesign slug={d.slug} className="btn btn-primary" label={`Elegir el diseño ${d.n} ${d.name}`}>Elegir este diseño</ChooseDesign>
+                  <Link href={viewerHref(d)} className="btn btn-ghost">Ver demostración</Link>
+                  <ChooseDesign slug={d.slug} className="btn btn-primary" label={`Seleccionar el diseño ${d.n} ${d.name}`}>Seleccionar este diseño</ChooseDesign>
                 </div>
               </div>
             </li>

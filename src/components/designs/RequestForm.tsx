@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { WEB_PLANS, formatBs } from "@/lib/catalog";
-import { CATEGORIES, DESIGNS, designHref, getDesign, shotSrc } from "@/lib/designs";
+import { PRODUCT_RANGES, REQUEST_PACKAGES, STORE_PLANS, WHATSAPP_CATALOG, formatBs } from "@/lib/catalog";
+import { CATEGORIES, DESIGNS, getDesign, shotSrc, viewerHref } from "@/lib/designs";
 import { BUDGETS, FEATURES, FILES, REQUEST_API } from "@/lib/request";
 import { clearSelection, readSelection, saveSelection } from "@/lib/selection";
 import { SITE, WHATSAPP_URL } from "@/lib/site";
@@ -20,6 +20,8 @@ export default function RequestForm() {
   const [step, setStep] = useState(0);
   const [slug, setSlug] = useState("");
   const [plan, setPlan] = useState("empresa");
+  const [catalog, setCatalog] = useState(false);
+  const [products, setProducts] = useState<string>(PRODUCT_RANGES[0]);
   const [fileError, setFileError] = useState("");
   const [status, setStatus] = useState<"" | "enviando" | "error">("");
   const [error, setError] = useState("");
@@ -29,14 +31,39 @@ export default function RequestForm() {
 
   // La selección llega por la URL (?diseno=) o desde el navegador; la URL manda.
   useEffect(() => {
-    const fromUrl = new URLSearchParams(window.location.search).get("diseno") ?? "";
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = params.get("diseno") ?? "";
     const initial = getDesign(fromUrl) ? fromUrl : readSelection()?.slug ?? "";
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // El paquete llega desde el botón del catálogo (?paquete=…&catalogo=1).
+    const p = params.get("paquete") ?? "";
+    if (REQUEST_PACKAGES.some((x) => x.id === p)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPlan(p);
+      const store = STORE_PLANS.findIndex((x) => x.slug === p);
+      if (store >= 0) setProducts(PRODUCT_RANGES[store]);
+    }
+    if (p === "empresa" && params.get("catalogo") === "1") setCatalog(true);
     if (initial) { setSlug(initial); saveSelection(initial); }
   }, []);
 
   const design = getDesign(slug);
-  const pkg = WEB_PLANS.find((p) => p.slug === plan)!;
+  const pkg = REQUEST_PACKAGES.find((p) => p.id === plan)!;
+  const withCatalog = plan === "empresa" && catalog;
+  const total = pkg.price + (withCatalog ? WHATSAPP_CATALOG.price : 0);
+  const priceText = `${pkg.from ? "Desde " : ""}${formatBs(total)}`;
+  const pkgText = `${pkg.name}${withCatalog ? " + catálogo con WhatsApp" : ""}`;
+
+  function pickPlan(id: string) {
+    setPlan(id);
+    const store = STORE_PLANS.findIndex((x) => x.slug === id);
+    if (store >= 0) setProducts(PRODUCT_RANGES[store]);
+  }
+
+  function pickProducts(range: string) {
+    setProducts(range);
+    const store = STORE_PLANS[PRODUCT_RANGES.indexOf(range as (typeof PRODUCT_RANGES)[number])];
+    if (store) setPlan(store.slug);
+  }
 
   function changeDesign(v: string) {
     setSlug(v);
@@ -107,7 +134,8 @@ export default function RequestForm() {
     const text = [
       "Hola SIBNOVA, quiero solicitar una página web.",
       design && `Diseño: ${design.n} ${design.name}`,
-      `Paquete: ${pkg.name} (desde ${formatBs(pkg.price)})`,
+      `Paquete: ${pkgText} (${priceText})`,
+      pkg.store && `Productos: ${products}`,
       `Nombre: ${g("nombre")}`, g("empresa") && `Empresa: ${g("empresa")}`, `Contacto: ${g("telefono")} · ${g("correo")}`,
       `Ciudad: ${g("ciudad")}, ${g("pais")}`, g("descripcion") && `Negocio: ${g("descripcion")}`,
     ].filter(Boolean).join("\n");
@@ -159,10 +187,10 @@ export default function RequestForm() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={shotSrc(design)} alt={`Vista del diseño ${design.n} ${design.name}`} width={800} height={500} />
               <div>
-                <span className={styles.tag}>Modelo seleccionado</span>
-                <b className={styles.sumName}>{design.n} · {design.name}</b>
+                <span className={styles.tag}>{design.n} · Demo de diseño SIBNOVA</span>
+                <b className={styles.sumName}>Diseño seleccionado: {design.name}</b>
                 <p>{design.short}</p>
-                <Link href={designHref(design)} className={styles.link}>Ver la demostración <ArrowRight /></Link>
+                <span className={styles.sumLinks}><Link href={viewerHref(design)} className={styles.link}>Ver la demostración <ArrowRight /></Link><Link href="/catalogo/#disenos" className={styles.link}>Cambiar diseño</Link></span>
               </div>
             </>
           ) : (
@@ -179,16 +207,31 @@ export default function RequestForm() {
         <div className={styles.field} role="radiogroup" aria-label="Paquete">
           <span>Paquete</span>
           <div className={styles.plans}>
-            {WEB_PLANS.map((p) => (
-              <label key={p.slug} className={styles.plan}>
-                <input type="radio" name="paquete" value={p.slug} checked={plan === p.slug} onChange={() => setPlan(p.slug)} required />
-                <span><b>{p.name}</b><small>{p.kind}</small><em>Desde {formatBs(p.price)}</em></span>
+            {REQUEST_PACKAGES.map((p) => (
+              <label key={p.id} className={styles.plan}>
+                <input type="radio" name="paquete" value={p.id} checked={plan === p.id} onChange={() => pickPlan(p.id)} required />
+                <span><b>{p.name}</b><small>{p.kind}</small><em>{p.from ? "Desde " : ""}{formatBs(p.price)}</em></span>
               </label>
             ))}
           </div>
         </div>
+        {plan === "empresa" && (
+          <label className={styles.consent}>
+            <input type="checkbox" name="catalogo" value="si" checked={catalog} onChange={(e) => setCatalog(e.target.checked)} />
+            <span>Agregar {WHATSAPP_CATALOG.name.toLowerCase()}: hasta 50 productos y pedidos por WhatsApp (+ {formatBs(WHATSAPP_CATALOG.price)}). Sin carrito ni pagos en línea.</span>
+          </label>
+        )}
+        {pkg.store && (
+          <div className={styles.field} role="radiogroup" aria-label="Cantidad aproximada de productos">
+            <span>Cantidad aproximada de productos</span>
+            <div className={styles.checks}>
+              {PRODUCT_RANGES.map((r) => <label key={r}><input type="radio" name="productos" value={r} checked={products === r} onChange={() => pickProducts(r)} /><span>{r}</span></label>)}
+            </div>
+            <p className={styles.help}>Las tiendas están en lanzamiento próximo: con tu solicitud reservas tu lugar y te enviamos la cotización y el plazo de entrega.</p>
+          </div>
+        )}
         <p className={styles.priceNote}>
-          <b>Precio inicial: {formatBs(pkg.price)}.</b> El estilo visual no cambia el precio. El presupuesto final depende de las funciones, el contenido y el alcance, y te lo enviamos en una proforma.
+          <b>Precio de referencia: {priceText}{pkg.from ? " (requiere cotización)" : ""}.</b> El estilo visual no cambia el precio. El presupuesto final depende de las funciones, el contenido y el alcance, y te lo enviamos en una proforma.
         </p>
       </fieldset>
 
@@ -201,7 +244,7 @@ export default function RequestForm() {
           <label className={styles.field}>NIT <small>(si corresponde)</small><input name="nit" inputMode="numeric" pattern="[0-9]{5,15}" maxLength={15} /></label>
           <label className={styles.field}>Cargo <small>(opcional)</small><input name="cargo" autoComplete="organization-title" maxLength={80} /></label>
           <label className={styles.field}>Correo electrónico<input name="correo" type="email" autoComplete="email" required maxLength={120} /></label>
-          <label className={styles.field}>Teléfono y WhatsApp<input name="telefono" type="tel" autoComplete="tel" required pattern="[+0-9 ()-]{7,20}" placeholder="+591 …" maxLength={20} /></label>
+          <label className={styles.field}>Teléfono y WhatsApp<input name="telefono" type="tel" autoComplete="tel" required pattern="[0-9 +\(\)\-]{7,20}" placeholder="+591 …" maxLength={20} /></label>
           <label className={styles.field}>Ciudad<input name="ciudad" autoComplete="address-level2" required maxLength={60} /></label>
           <label className={styles.field}>País<input name="pais" autoComplete="country-name" required defaultValue="Bolivia" maxLength={60} /></label>
         </div>
@@ -229,7 +272,7 @@ export default function RequestForm() {
       {/* 4. Diseño */}
       <fieldset ref={(el) => { stepRefs.current[3] = el; }} hidden={step !== 3} className={styles.step}>
         <legend tabIndex={-1}>Diseño</legend>
-        <p className={styles.help}>Modelo seleccionado: <b>{design ? `${design.n} · ${design.name}` : "sin elegir"}</b></p>
+        <p className={styles.help}>Diseño seleccionado: <b>{design ? `${design.n} · ${design.name}` : "sin elegir"}</b> · <Link href="/catalogo/#disenos" className={styles.link}>Cambiar diseño</Link></p>
         <label className={styles.field}>Colores preferidos <small>(opcional)</small><input name="colores" maxLength={200} placeholder="Por ejemplo: los colores de mi logo, azul y blanco" /></label>
         <div className={styles.grid}>
           <label className={styles.field}>¿Tienes logo?
@@ -294,7 +337,8 @@ export default function RequestForm() {
         <div className={styles.recap}>
           <b>Resumen</b>
           <span>Diseño: {design ? `${design.n} · ${design.name}` : "sin elegir"}</span>
-          <span>Paquete: {pkg.name} · desde {formatBs(pkg.price)}</span>
+          <span>Paquete: {pkgText} · {priceText}</span>
+          {pkg.store && <span>Productos: {products}</span>}
         </div>
       </fieldset>
 

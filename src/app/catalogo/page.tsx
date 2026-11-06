@@ -11,7 +11,7 @@ import { CATALOG_FAQ, CATALOG_URL, WEB_PLANS, formatBs } from "@/lib/catalog";
 import { SITE } from "@/lib/site";
 
 const title = `Catálogo de páginas web | ${SITE.name}`;
-const description = `Cuatro paquetes de páginas web en Bolivia, desde ${formatBs(WEB_PLANS[0].price)}: página de presentación, sitio corporativo, tienda en línea y plataforma a medida.`;
+const description = `Páginas web en Bolivia desde ${formatBs(WEB_PLANS[0].price)}: página de presentación, sitio corporativo, catálogo con WhatsApp y desarrollo a medida. 20 diseños con demostración.`;
 
 export const metadata: Metadata = {
   title,

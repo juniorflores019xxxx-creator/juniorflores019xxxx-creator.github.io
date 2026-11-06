@@ -199,3 +199,6 @@
   100% { color: var(--grey); border-color: var(--line-2); background: rgba(245, 247, 251, 0.03); }
 }
 .featCtas { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Captura de un proyecto para cliente */
+.shot { width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--line-2); box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.8); }

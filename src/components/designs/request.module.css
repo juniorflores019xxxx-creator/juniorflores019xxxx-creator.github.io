@@ -78,3 +78,4 @@
 .done p { color: var(--grey); max-width: 60ch; }
 .done b { color: var(--paper); font-family: var(--font-mono); }
 .doneActs { display: flex; flex-wrap: wrap; gap: 10px; }
+.sumLinks { display: flex; flex-wrap: wrap; gap: 4px 18px; }

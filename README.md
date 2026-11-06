@@ -113,9 +113,11 @@ Alternativa sin configuración: Vercel o Netlify detectan Next.js y publican dir
 ## Catálogo de diseños y solicitudes
 
 - **`/catalogo/`**: paquetes, trabajos reales y los 20 diseños con buscador y filtro por rubro (`src/components/designs/DesignCatalog.tsx`).
+- **`/catalogo/ver/<estilo>/`**: visor de la demo con vista escritorio, tablet y celular, flechas al estilo anterior o siguiente y botón «Seleccionar este diseño» (`DemoViewer.tsx`).
 - **`/catalogo/disenos/<estilo>/`**: una demo por estilo (`src/components/designs/DesignDemo.tsx` + `demo.module.css`). Negocios ficticios; fotos de Unsplash.
 - **`/catalogo/solicitud/`**: formulario de 7 pasos (`RequestForm.tsx`). El diseño elegido se guarda en el navegador y viaja en `?diseno=`.
-- El **estilo no cambia el precio**: el precio inicial sale del paquete (`src/lib/catalog.ts`). En cada build se genera `/api/catalogo.json`, que el servidor usa para validar paquetes, diseños y precios.
+- **Paquetes y promociones** en `src/lib/catalog.ts`: Presencia, Empresa, catálogo con WhatsApp, tiendas (lanzamiento próximo), A medida, adicionales y el programa de Clientes Fundadores. Es la única fuente de precios: el catálogo, el formulario y el servidor la leen.
+- El **estilo no cambia el precio**: el precio inicial sale del paquete. En cada build se genera `/api/catalogo.json`, que el servidor usa para validar paquetes, diseños y precios.
 
 ### Servidor de solicitudes (PHP en Hostinger)
 

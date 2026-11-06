@@ -120,10 +120,12 @@ function Body({ d }: { d: Design }) {
 export default function DesignDemo({ d }: { d: Design }) {
   return (
     <div className={`${styles.root} ${styles[`s${d.n}`]}`}>
+      {/* Dentro del visor del catálogo, la barra de la demo se oculta: el visor tiene la suya */}
+      <script dangerouslySetInnerHTML={{ __html: "if(window.self!==window.top)document.documentElement.classList.add('en-visor')" }} />
       <div className={styles.bar} role="note">
         <Link href={`${CATALOG_URL}#disenos`}>← Catálogo</Link>
         <span><b>Demo de diseño SIBNOVA</b> · {d.n} {d.name} · Negocio ficticio</span>
-        <ChooseDesign slug={d.slug} className={styles.barChoose}>Elegir este diseño</ChooseDesign>
+        <ChooseDesign slug={d.slug} className={styles.barChoose}>Seleccionar este diseño</ChooseDesign>
       </div>
       <header className={styles.header}>
         <a href="#" className={styles.brand}>{d.demo.brand}</a>

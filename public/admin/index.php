@@ -128,7 +128,7 @@ if (isset($_GET['ver'])) {
     $labels = ['nombre' => 'Nombre', 'empresa' => 'Empresa', 'nit' => 'NIT', 'cargo' => 'Cargo', 'correo' => 'Correo', 'telefono' => 'Teléfono / WhatsApp', 'ciudad' => 'Ciudad', 'pais' => 'País',
         'nombre_comercial' => 'Nombre comercial', 'rubro' => 'Rubro', 'descripcion' => 'Descripción', 'servicios' => 'Servicios o productos', 'publico' => 'Público objetivo', 'objetivos' => 'Objetivos',
         'colores' => 'Colores', 'logo' => 'Logo', 'manual' => 'Manual de marca', 'referencias' => 'Referencias', 'cambios' => 'Conservar o cambiar',
-        'dominio' => 'Dominio propio', 'hosting' => 'Hosting propio', 'adicionales' => 'Funciones adicionales', 'fecha_entrega' => 'Fecha deseada', 'presupuesto' => 'Presupuesto', 'aprobador' => 'Aprueba', 'observaciones' => 'Observaciones'];
+        'catalogo' => 'Catálogo con WhatsApp', 'productos' => 'Cantidad de productos', 'dominio' => 'Dominio propio', 'hosting' => 'Hosting propio', 'adicionales' => 'Funciones adicionales', 'fecha_entrega' => 'Fecha deseada', 'presupuesto' => 'Presupuesto', 'aprobador' => 'Aprueba', 'observaciones' => 'Observaciones'];
     $rows = '';
     foreach ($labels as $k => $l) if (($d[$k] ?? '') !== '') $rows .= '<dt>' . h($l) . '</dt><dd>' . h((string)$d[$k]) . '</dd>';
     $fn = array_map(fn($x) => h($FUNC[$x] ?? $x), json_decode($s['funciones'], true) ?: []);
@@ -140,7 +140,7 @@ if (isset($_GET['ver'])) {
     foreach ($hi->fetchAll() as $x) $hist .= '<tr><td>' . h($x['fecha']) . '</td><td><span class="tag">' . h($x['estado']) . '</span></td><td>' . h($x['nota']) . '</td></tr>';
     $opts = implode('', array_map(fn($e) => '<option' . ($e === $s['estado'] ? ' selected' : '') . '>' . h($e) . '</option>', $ESTADOS));
     page($s['numero'], $top . '<main class="wrap"><p><a href="/admin/">← Volver</a></p><h1>' . h($s['numero']) . ' <span class="tag">' . h($s['estado']) . '</span></h1>
-    <div class="grid two"><section class="card"><h2 style="margin-top:0">Proyecto</h2><dl><dt>Fecha</dt><dd>' . h($s['creado']) . '</dd><dt>Diseño</dt><dd>' . h($s['diseno_nombre']) . '</dd><dt>Paquete</dt><dd>' . h($s['paquete_nombre']) . '</dd><dt>Precio inicial</dt><dd>' . bs((int)$s['precio_inicial']) . ' (calculado en el servidor)</dd><dt>Funciones pedidas</dt><dd>' . ($fn ? implode(', ', $fn) : '—') . '</dd></dl>
+    <div class="grid two"><section class="card"><h2 style="margin-top:0">Proyecto</h2><dl><dt>Fecha</dt><dd>' . h($s['creado']) . '</dd><dt>Diseño</dt><dd>' . h($s['diseno_nombre']) . '</dd><dt>Paquete</dt><dd>' . h($s['paquete_nombre']) . '</dd><dt>Precio de referencia</dt><dd>' . bs((int)$s['precio_inicial']) . ' (calculado en el servidor)</dd><dt>Funciones pedidas</dt><dd>' . ($fn ? implode(', ', $fn) : '—') . '</dd></dl>
     <h2>Cambiar estado</h2><form method="post" class="inline">' . $tok . '<input type="hidden" name="accion" value="estado"><input type="hidden" name="id" value="' . (int)$s['id'] . '"><select name="estado">' . $opts . '</select><input name="nota" maxlength="500" placeholder="Nota (opcional)"><button>Guardar</button></form>
     <h2>Archivos</h2>' . ($files ? '<ul>' . $files . '</ul>' : '<p class="muted">Sin archivos.</p>') . '</section>
     <section class="card"><h2 style="margin-top:0">Cliente y negocio</h2><dl>' . $rows . '</dl></section></div>

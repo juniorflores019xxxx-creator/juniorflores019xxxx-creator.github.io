@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { requestHref, saveSelection } from "@/lib/selection";
 
-// Botón «Elegir este diseño»: guarda la selección y abre el formulario de solicitud.
+// Botón «Seleccionar este diseño»: guarda la selección y abre el formulario de solicitud.
 export default function ChooseDesign({ slug, className, children, label }: { slug: string; className?: string; children: React.ReactNode; label?: string }) {
   const router = useRouter();
   return (

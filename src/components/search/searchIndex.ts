@@ -19,8 +19,8 @@ export const INDEX: Entry[] = [
     k: "diagnostico diagnóstico test evaluacion evaluación formulario encuesta cuestionario gratis gratuito por donde empezar madurez digital analisis análisis" },
 
   // Catálogo
-  { t: "Catálogo de páginas web", d: "Cuatro paquetes con precio de partida, desde una página hasta una plataforma", type: "Acción", icon: "grid", href: "/catalogo/",
-    k: "catalogo paquetes planes precios precio costo cuanto cuesta pagina web sitio landing tienda online comprar opciones" },
+  { t: "Catálogo de páginas web", d: "Paquetes con precio, catálogo con WhatsApp, tiendas y programa de clientes fundadores", type: "Acción", icon: "grid", href: "/catalogo/",
+    k: "catalogo paquetes planes precios precio costo cuanto cuesta pagina web sitio landing tienda online comprar opciones fundadores promocion oferta whatsapp productos" },
   { t: "Catálogo de diseños web", d: "20 estilos con demostración para elegir el de tu página", type: "Acción", icon: "spark", href: "/catalogo/#disenos",
     k: "diseno disenos estilo estilos modelo modelos plantilla plantillas demo demostracion minimalista moderno corporativo lujo futurista oscuro dark glass 3d editorial brutalista bento retro natural creativo one page animado" },
 
