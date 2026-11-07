@@ -56,6 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             db()->prepare('INSERT INTO historial (solicitud_id, fecha, estado, nota) VALUES (?, ?, ?, ?)')->execute([$id, $f, $e, $nota]);
         }
         go('?ver=' . $id);
+    } elseif ($logged && $a === 'revisado') {
+        $id = (int)($_POST['id'] ?? 0);
+        db()->prepare('UPDATE entregas SET revisado = CASE revisado WHEN 1 THEN 0 ELSE 1 END WHERE id = ?')->execute([$id]);
+        go('?entrega=' . $id);
     } elseif ($logged && $a === 'clave') {
         $nueva = (string)($_POST['clave'] ?? '');
         if (!password_verify((string)($_POST['actual'] ?? ''), (string)$hash)) $msg = 'La contraseña actual no es correcta.';
@@ -77,6 +81,31 @@ if ($logged && isset($_GET['archivo'])) {
     header('Content-Length: ' . filesize($path));
     readfile($path);
     exit;
+}
+if ($logged && isset($_GET['archivo_dp'])) {
+    $st = db()->prepare('SELECT a.*, e.numero FROM entregas_archivos a JOIN entregas e ON e.id = a.entrega_id WHERE a.id = ?');
+    $st->execute([(int)$_GET['archivo_dp']]);
+    $f = $st->fetch();
+    $path = $f ? data_dir() . '/archivos/' . $f['numero'] . '/' . basename($f['guardado']) : '';
+    if (!$f || !is_file($path)) { http_response_code(404); exit('Archivo no encontrado.'); }
+    header('Content-Type: application/octet-stream');
+    header('Content-Disposition: attachment; filename="' . preg_replace('/[^A-Za-z0-9._ -]/', '_', $f['nombre']) . '"; filename*=UTF-8\'\'' . rawurlencode($f['nombre']));
+    header('Content-Length: ' . filesize($path));
+    readfile($path);
+    exit;
+}
+// Abre WhatsApp con el enlace del formulario ya escrito para el cliente
+if ($logged && isset($_GET['enviar'])) {
+    $fm = find_by_id(formularios()['formularios'], (string)$_GET['enviar']);
+    $tel = preg_replace('/\D/', '', (string)($_GET['tel'] ?? ''));
+    if (strlen($tel) === 8) $tel = '591' . $tel;
+    if ($fm && strlen($tel) >= 8) {
+        $nombre = clean($_GET['nombre'] ?? '', 60);
+        $url = SITE_URL . '/datos-proyecto/?f=' . rawurlencode($fm['id']);
+        $txt = 'Hola' . ($nombre !== '' ? ' ' . $nombre : '') . ', te saluda SIBNOVA. Para avanzar con tu proyecto necesitamos algunos datos. Puedes completarlos aquí: ' . $url . "\n\nSi tienes dudas, respóndenos por este chat.";
+        header('Location: https://wa.me/' . $tel . '?text=' . rawurlencode($txt), true, 303);
+        exit;
+    }
 }
 
 function page(string $title, string $body): never {
@@ -110,7 +139,54 @@ if (!$logged) {
     <label class="grid">Contraseña<input type="password" name="clave" required autocomplete="current-password" autofocus></label><button>Entrar</button></form></main>');
 }
 
-$top = '<header><b>SIBNOVA · Solicitudes</b><form method="post" class="inline">' . $tok . '<a href="/admin/">Todas</a> <a href="/admin/?cuenta=1">Contraseña</a><input type="hidden" name="accion" value="salir"><button class="ghost">Salir</button></form></header>';
+$top = '<header><b>SIBNOVA · Solicitudes</b><form method="post" class="inline">' . $tok . '<a href="/admin/">Solicitudes</a> · <a href="/admin/?datos=1">Datos recibidos</a> · <a href="/admin/?formularios=1">Formularios</a> · <a href="/admin/?cuenta=1">Contraseña</a><input type="hidden" name="accion" value="salir"><button class="ghost">Salir</button></form></header>';
+
+if (isset($_GET['formularios'])) {
+    try { $fs = formularios()['formularios']; } catch (Throwable $e) { $fs = []; }
+    $cards = '';
+    foreach ($fs as $fm) {
+        $url = SITE_URL . '/datos-proyecto/?f=' . rawurlencode($fm['id']);
+        $cards .= '<section class="card grid"><div><b style="font-size:1.1rem">' . h($fm['titulo']) . '</b><p class="muted" style="margin:4px 0 0">' . h($fm['resumen']) . '</p></div>
+        <label class="grid">Enlace para el cliente<input readonly value="' . h($url) . '"></label>
+        <form method="get" class="inline"><input type="hidden" name="enviar" value="' . h($fm['id']) . '"><input name="nombre" placeholder="Nombre del cliente (opcional)" maxlength="60"><input name="tel" required placeholder="WhatsApp del cliente: 7xxxxxxx" inputmode="tel" maxlength="20"><button>Enviar por WhatsApp</button><a href="' . h($url) . '" target="_blank" rel="noopener">Ver formulario</a></form></section>';
+    }
+    page('Formularios', $top . '<main class="wrap"><h1>Formularios para clientes</h1><p class="muted">Escribe el WhatsApp del cliente y pulsa «Enviar por WhatsApp»: se abre el chat con el mensaje y el enlace listos. Las respuestas llegan a «Datos recibidos». ¿Necesitas un formulario para otro trabajo? Pídeselo a Claude.</p><div class="grid">' . ($cards ?: '<p class="muted">No hay formularios publicados.</p>') . '</div></main>');
+}
+
+if (isset($_GET['entrega'])) {
+    $st = db()->prepare('SELECT * FROM entregas WHERE id = ?');
+    $st->execute([(int)$_GET['entrega']]);
+    $e = $st->fetch();
+    if (!$e) go('?datos=1');
+    $d = json_decode($e['datos'], true) ?: [];
+    try { $def = find_by_id(formularios()['formularios'], $e['formulario']); } catch (Throwable $x) { $def = null; }
+    $rows = ''; $sec = '';
+    foreach (($def['campos'] ?? []) as $c) {
+        if ($c['type'] === 'file') continue;
+        $v = $d[$c['name']] ?? '';
+        if ($v === '' || $v === []) continue;
+        if ($c['seccion'] !== $sec) { $sec = $c['seccion']; $rows .= '<dt style="grid-column:1/-1;color:#779eff;margin-top:12px">' . h($sec) . '</dt>'; }
+        $val = $c['type'] === 'colors'
+            ? implode(' ', array_map(fn($x) => '<span class="tag"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;background:' . h($x) . '"></span> ' . h($x) . '</span>', (array)$v))
+            : h(is_array($v) ? implode(', ', $v) : (string)$v);
+        $rows .= '<dt>' . h($c['label']) . '</dt><dd>' . $val . '</dd>';
+    }
+    $fa = db()->prepare('SELECT * FROM entregas_archivos WHERE entrega_id = ? ORDER BY campo, id'); $fa->execute([$e['id']]);
+    $files = '';
+    foreach ($fa->fetchAll() as $f) $files .= '<li><span class="muted">' . h($f['campo']) . ':</span> <a href="/admin/?archivo_dp=' . (int)$f['id'] . '">' . h($f['nombre']) . '</a> <span class="muted">(' . round($f['bytes'] / 1048576, 1) . ' MB)</span></li>';
+    page($e['numero'], $top . '<main class="wrap"><p><a href="/admin/?datos=1">← Volver</a></p><h1>' . h($e['numero']) . ' <span class="tag">' . ($e['revisado'] ? 'Revisado' : 'Nuevo') . '</span></h1>
+    <p class="muted">' . h($e['titulo']) . ' · ' . h($e['creado']) . '</p>
+    <form method="post" class="inline" style="margin-bottom:14px">' . $tok . '<input type="hidden" name="accion" value="revisado"><input type="hidden" name="id" value="' . (int)$e['id'] . '"><button class="ghost">' . ($e['revisado'] ? 'Marcar como nuevo' : 'Marcar como revisado') . '</button></form>
+    <div class="grid two"><section class="card"><h2 style="margin-top:0">Datos</h2><dl>' . $rows . '</dl></section>
+    <section class="card"><h2 style="margin-top:0">Archivos</h2>' . ($files ? '<ul>' . $files . '</ul>' : '<p class="muted">Sin archivos.</p>') . '</section></div></main>');
+}
+
+if (isset($_GET['datos'])) {
+    $trs = '';
+    foreach (db()->query('SELECT e.id, e.numero, e.creado, e.titulo, e.nombre, e.empresa, e.revisado, (SELECT COUNT(*) FROM entregas_archivos a WHERE a.entrega_id = e.id) n FROM entregas e ORDER BY e.id DESC LIMIT 300') as $e)
+        $trs .= '<tr><td><a href="/admin/?entrega=' . (int)$e['id'] . '">' . h($e['numero']) . '</a></td><td>' . h($e['creado']) . '</td><td>' . h($e['nombre']) . ($e['empresa'] ? '<br><span class="muted">' . h($e['empresa']) . '</span>' : '') . '</td><td>' . h($e['titulo']) . '</td><td>' . (int)$e['n'] . '</td><td><span class="tag">' . ($e['revisado'] ? 'Revisado' : 'Nuevo') . '</span></td></tr>';
+    page('Datos recibidos', $top . '<main class="wrap"><h1>Datos recibidos de clientes</h1><div class="card scroll"><table><thead><tr><th>Número</th><th>Fecha</th><th>Cliente</th><th>Formulario</th><th>Archivos</th><th>Estado</th></tr></thead><tbody>' . ($trs ?: '<tr><td colspan="6" class="muted">Todavía no hay datos recibidos.</td></tr>') . '</tbody></table></div></main>');
+}
 
 if (isset($_GET['cuenta'])) {
     page('Contraseña', $top . '<main class="wrap" style="max-width:460px"><h1>Cambiar contraseña</h1>' . $m . '<form method="post" class="card grid">' . $tok . '<input type="hidden" name="accion" value="clave">

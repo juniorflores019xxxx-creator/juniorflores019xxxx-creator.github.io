@@ -172,6 +172,15 @@ legend{padding:0}
 .pkg-n{font:600 1.3rem/1.2 var(--display);color:var(--ink);letter-spacing:-.02em}
 .pkg-p{font:600 1.05rem/1.2 var(--display);color:var(--blue)}
 .pkg-btn{margin-top:8px}
+.addons{margin-top:28px;padding:22px;border:1px solid var(--line);border-radius:20px;background:#fff}
+.addons h3{font-size:1.1rem;letter-spacing:-.02em;margin:0 0 10px}
+.addons h3+ul{margin-bottom:18px}
+.scope{margin:0;padding-left:20px;display:grid;gap:4px;color:var(--text)}
+.add-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.add-list li{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:12px;background:var(--soft);font-size:.95rem}
+.add-list b{color:var(--blue-ink);white-space:nowrap}
+.addons+h2{margin-top:32px}
+.fund{margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--blue-soft);color:var(--blue-ink);font-size:.92rem}
 .recs{margin-top:40px}
 .recs h2{font-size:clamp(1.4rem,3vw,1.8rem)}
 .rec-list{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px}
@@ -478,7 +487,8 @@ const SERVICE_RESULT = {
   },
   apps(a) {
     const idea = a.app_etapa === "Solo tengo la idea";
-    return { title: "Tu proyecto de aplicación", pkg: { id: "a-medida" }, items: [
+    const scope = [...(a.app_func || []).map((x) => "Función: " + x), a.app_para && "Usuarios: " + a.app_para, a.app_plataforma && "Plataforma: " + a.app_plataforma, a.app_etapa && "Etapa: " + a.app_etapa].filter(Boolean);
+    return { title: "Tu proyecto de aplicación", pkg: { id: "a-medida" }, scope, items: [
       idea ? { title: "Empieza con un prototipo", tag: "Primer paso", text: "Validamos la idea con un prototipo navegable antes de invertir en todo el desarrollo." }
         : { title: "Una primera versión con lo esencial", tag: "Primer paso", text: "Priorizamos las funciones que más valor dan para lanzar antes y crecer con datos reales." },
       has(a.app_func, "Panel de administración") || a.app_para !== "Para mis clientes"
@@ -490,7 +500,8 @@ const SERVICE_RESULT = {
     ] };
   },
   ia(a) {
-    return { title: "Tu proyecto de inteligencia artificial", pkg: { id: "a-medida", note: "El consumo de IA y los mensajes de WhatsApp los cobra cada proveedor según el uso." }, items: [
+    const scope = [...(a.ia_uso || []).map((x) => "Uso: " + x), (a.canales || []).length && "Canales: " + a.canales.join(", "), a.ia_volumen && "Mensajes por día: " + a.ia_volumen, a.ia_horario && "Horario: " + a.ia_horario].filter(Boolean);
+    return { title: "Tu proyecto de inteligencia artificial", pkg: { id: "a-medida", note: "El consumo de IA y los mensajes de WhatsApp los cobra cada proveedor según el uso." }, scope, items: [
       has(a.ia_uso, "Responder consultas por WhatsApp") || has(a.ia_uso, "Tomar pedidos o reservas") ? SOLUTIONS.ia
         : { title: "Agente de IA que ejecuta tareas", tag: "Inteligencia artificial", text: "No solo conversa: registra, clasifica y prepara información para tu equipo." },
       a.ia_info === "Sí, en documentos"
@@ -503,7 +514,8 @@ const SERVICE_RESULT = {
   },
   auto(a) {
     const p = a.auto_proceso || [];
-    return { title: "Tu proyecto de automatización", pkg: { id: "a-medida" }, items: [
+    const scope = [...p.map((x) => "Proceso: " + x), (a.herramientas || []).length && "Herramientas: " + a.herramientas.join(", "), a.auto_horas && "Horas por semana en tareas repetitivas: " + a.auto_horas].filter(Boolean);
+    return { title: "Tu proyecto de automatización", pkg: { id: "a-medida" }, scope, items: [
       p.includes("Ventas y seguimiento") ? SOLUTIONS.ventas : p.includes("Agenda y reservas") ? SOLUTIONS.reservas : SOLUTIONS.procesos,
       (a.herramientas || []).length > 1 ? SOLUTIONS.integra : { title: "Un registro ordenado", tag: "Primer paso", text: "Llevamos la información a un solo lugar para que pueda moverse sola entre tus procesos." },
       p.includes("Reportes") ? SOLUTIONS.datos : { title: "Alertas cuando algo falla", tag: "Monitoreo", text: "Cada ejecución queda registrada y recibes un aviso si algo necesita atención." },
@@ -784,7 +796,7 @@ function renderResult() {
         ${r.pkg.note ? `<small>${esc(r.pkg.note)}</small>` : `<small>Precio de referencia; el monto final queda en tu proforma.</small>`}
         ${info ? `<a class="btn btn-blue pkg-btn" href="${info.href}">Solicitar este paquete ${ARROW}</a>` : ""}
       </div>`;
-    body = recList("Recomendaciones para tu proyecto", r.items) + (key === "web" ? `<p class="note"><a href="/catalogo/#disenos">Ver los 20 diseños disponibles</a></p>` : "");
+    body = addonsHtml(key, r) + recList("Recomendaciones para tu proyecto", r.items) + (key === "web" ? `<p class="note"><a href="/catalogo/#disenos">Ver los 20 diseños disponibles</a></p>` : "");
     summaryLines = [`Resultado: ${a.servicio} · paquete sugerido: ${pkgText}`, `Soluciones sugeridas: ${r.items.map((x, i) => `${i + 1}) ${x.title}`).join("  ")}`];
   }
 
@@ -836,6 +848,22 @@ function renderResult() {
     }
   }
   requestAnimationFrame(() => document.getElementById("t-result")?.focus({ preventScroll: true }));
+}
+
+function addonsHtml(key, r) {
+  const ad = catalogData?.adicionales || [];
+  const items = [];
+  if (key === "web") {
+    if (!r.pkg.catalogo && r.pkg.id !== "tienda-basica" && catalogData?.catalogo) items.push([catalogData.catalogo.nombre + " (hasta 50 productos)", "+ " + bs(catalogData.catalogo.precio)]);
+    for (const x of ad) items.push([x.t, bs(x.precio) + (x.unidad ? " " + x.unidad : "")]);
+  } else {
+    items.push(["Módulos o funciones adicionales", "Bajo cotización"], ["Integraciones con otros sistemas", "Bajo cotización"]);
+    const sop = ad.find((x) => /soporte/i.test(x.t));
+    if (sop) items.push([sop.t, bs(sop.precio) + (sop.unidad ? " " + sop.unidad : "")]);
+  }
+  const scope = r.scope && r.scope.length ? `<h3>Lo que incluiremos en tu cotización</h3><ul class="scope">${r.scope.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : "";
+  const fund = catalogData?.fundadores && ["presencia", "empresa"].includes(r.pkg.id) ? `<p class="fund"><b>Cliente Fundador:</b> ${esc(catalogData.fundadores.texto)}</p>` : "";
+  return `<div class="addons">${scope}<h3>Puedes sumar a tu proyecto</h3><ul class="add-list">${items.map(([t, p]) => `<li><span>${esc(t)}</span><b>${esc(p)}</b></li>`).join("")}</ul>${fund}</div>`;
 }
 
 function recList(title, recs) {

@@ -132,3 +132,11 @@ Alternativa sin configuración: Vercel o Netlify detectan Next.js y publican dir
 - **Primer uso:** abre `https://sibnova.com.bo/admin/`, escribe la clave de activación (se entrega aparte, nunca va en Git) y crea tu contraseña de 12 caracteres o más. La clave de activación deja de servir después.
 - **Protección:** campo trampa y tiempo mínimo contra robots, 30 intentos y 5 solicitudes válidas por hora y conexión, verificación del tipo real de cada archivo, límite de 10 archivos (10 MB cada uno, 40 MB en total), bloqueo de 15 minutos tras 5 contraseñas incorrectas, sesiones con cookie segura y token contra falsificación de formularios.
 - Si el servidor no responde, el formulario ofrece enviar la solicitud por WhatsApp (sin archivos).
+
+## Formularios de datos para clientes
+
+- **`/datos-proyecto/?f=<formulario>`**: formularios privados (fuera del menú y de Google) para que el cliente envíe los datos, textos, colores y archivos de su proyecto.
+- Formularios disponibles: `pagina-web`, `catalogo-whatsapp`, `logo`, `redes-sociales`, `logo-redes`, `aplicacion`, `inteligencia-artificial` y `automatizacion`.
+- **Uso diario:** bandeja `/admin/` → **Formularios**: escribes el WhatsApp del cliente y se abre el chat con el enlace listo. Las respuestas y archivos llegan a **Datos recibidos**.
+- **Crear un formulario nuevo para otro trabajo:** agrega una entrada en `FORMS` de `src/lib/forms.ts` reutilizando los bloques (contacto, empresa, colores, archivos, cierre). Se valida en el servidor con `/api/formularios.json`, que se genera en cada build. Nunca pedir contraseñas.
+- Servidor: `public/api/datos.php` (mismas protecciones que las solicitudes; archivos fuera de `public_html`).

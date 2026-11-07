@@ -79,3 +79,7 @@
 .done b { color: var(--paper); font-family: var(--font-mono); }
 .doneActs { display: flex; flex-wrap: wrap; gap: 10px; }
 .sumLinks { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.colors { display: flex; flex-wrap: wrap; gap: 10px; }
+.color { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 12px; border-radius: 12px; border: 1px solid var(--line); font-weight: 400; cursor: pointer; }
+.color input[type=checkbox] { width: 18px; height: 18px; accent-color: #1c64e6; }
+.color input[type=color] { width: 42px; height: 34px; padding: 0; border: 1px solid var(--line-2); border-radius: 8px; background: none; cursor: pointer; }

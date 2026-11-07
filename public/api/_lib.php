@@ -44,6 +44,13 @@ function db(): PDO {
     $pdo->exec('CREATE TABLE IF NOT EXISTS intentos (clave TEXT NOT NULL, momento INTEGER NOT NULL)');
     $pdo->exec('CREATE INDEX IF NOT EXISTS intentos_clave ON intentos (clave, momento)');
     $pdo->exec('CREATE TABLE IF NOT EXISTS ajustes (clave TEXT PRIMARY KEY, valor TEXT NOT NULL)');
+    // Formularios de datos que SIBNOVA envía a sus clientes (/datos-proyecto/)
+    $pdo->exec('CREATE TABLE IF NOT EXISTS entregas (
+        id INTEGER PRIMARY KEY, numero TEXT UNIQUE NOT NULL, creado TEXT NOT NULL, formulario TEXT NOT NULL, titulo TEXT NOT NULL,
+        nombre TEXT NOT NULL, empresa TEXT, telefono TEXT, correo TEXT, revisado INTEGER NOT NULL DEFAULT 0, datos TEXT NOT NULL)');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS entregas_archivos (
+        id INTEGER PRIMARY KEY, entrega_id INTEGER NOT NULL REFERENCES entregas(id) ON DELETE CASCADE,
+        campo TEXT NOT NULL, nombre TEXT NOT NULL, guardado TEXT NOT NULL, tipo TEXT NOT NULL, bytes INTEGER NOT NULL)');
     return $pdo;
 }
 
@@ -59,6 +66,15 @@ function set_setting(string $k, string $v): void {
 }
 
 // Precios y opciones válidas: el archivo lo genera el build del sitio y vive en el servidor.
+function formularios(): array {
+    static $c = null;
+    if ($c === null) {
+        $c = json_decode((string)@file_get_contents(__DIR__ . '/formularios.json'), true);
+        if (!is_array($c)) throw new RuntimeException('formularios no disponibles');
+    }
+    return $c;
+}
+
 function catalogo(): array {
     static $c = null;
     if ($c === null) {

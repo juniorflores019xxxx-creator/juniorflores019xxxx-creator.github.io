@@ -73,6 +73,7 @@ export default function Privacidad() {
                   <tr><td>Formulario «Hablemos de tu proyecto»</td><td>Nombre, WhatsApp o correo, el tema que te interesa y tu mensaje.</td></tr>
                   <tr><td>Diagnóstico digital</td><td>Tus respuestas sobre el negocio (rubro, tamaño, herramientas, problemas, objetivos, plazo y presupuesto aproximado) y tus datos de contacto: nombre, WhatsApp y, si quieres, empresa, ciudad y correo.</td></tr>
                   <tr><td>Solicitud de página web (catálogo)</td><td>Tus datos de contacto (nombre, correo, teléfono, ciudad y, si quieres, empresa, NIT y cargo), la información de tu negocio, el diseño y el paquete que elegiste, las funciones que necesitas, tus plazos y presupuesto aproximado, y los archivos que subas (logo, fotos, videos o documentos).</td></tr>
+                  <tr><td>Formulario de datos de tu proyecto (enlace que te envía SIBNOVA)</td><td>Los datos de tu empresa, contacto, marca y contenido que necesitamos para tu proyecto, y los archivos que subas (logo, fotos, videos o documentos).</td></tr>
                   <tr><td>WhatsApp y correo</td><td>Lo que nos escribas, tu número o dirección y tu nombre de perfil.</td></tr>
                 </tbody>
               </table>
@@ -80,8 +81,8 @@ export default function Privacidad() {
             <p>
               El formulario «Hablemos de tu proyecto» y el diagnóstico <strong>no guardan tus datos en nuestros servidores</strong>: al
               enviarlos se abre WhatsApp con el mensaje ya escrito y nos llega solo si tú lo envías. La <strong>solicitud de página web</strong> del
-              catálogo, en cambio, sí se guarda en nuestro servidor de Hostinger, junto con los archivos que subas, para que nuestro equipo
-              la revise; te damos un número de solicitud para seguirla. Las respuestas del diagnóstico se
+              catálogo y el <strong>formulario de datos de tu proyecto</strong>, en cambio, sí se guardan en nuestro servidor de Hostinger, junto con los archivos que subas, para que nuestro equipo
+              los revise; te damos un número para seguirlos. Las respuestas del diagnóstico se
               guardan en tu propio navegador para que no las pierdas si recargas la página; puedes borrarlas con «Hacer el
               diagnóstico de nuevo» o limpiando los datos del navegador.
             </p>
