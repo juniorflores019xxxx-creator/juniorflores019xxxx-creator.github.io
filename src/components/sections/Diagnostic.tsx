@@ -2,7 +2,7 @@ import { ArrowRight } from "@/components/ui/icons";
 import styles from "./diagnostic.module.css";
 
 // Invitación al diagnóstico digital gratuito (formulario en /diagnostico/).
-const POINTS = ["10 preguntas", "2 minutos", "Resultado al instante", "Gratis y sin compromiso"];
+const POINTS = ["Web, apps, IA o automatización", "2 minutos", "Paquete sugerido al instante", "Gratis y sin compromiso"];
 
 export default function Diagnostic() {
   return (
@@ -13,7 +13,7 @@ export default function Diagnostic() {
             <span className="num">Diagnóstico digital gratuito</span>
             <h2 id="diag-titulo" className={`display ${styles.title}`}>¿No sabes por dónde empezar?</h2>
             <p className={styles.text}>
-              Responde unas preguntas sobre tu negocio y descubre qué procesos puedes digitalizar y automatizar primero.
+              Elige el servicio que te interesa y responde unas preguntas pensadas para ese trabajo: te sugerimos el paquete y los primeros pasos.
               Recibes tu resultado en pantalla y puedes enviárnoslo por WhatsApp para preparar una propuesta.
             </p>
             <ul className={styles.points}>
