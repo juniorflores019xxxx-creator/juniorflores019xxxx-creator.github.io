@@ -9,10 +9,44 @@ import styles from "@/components/designs/request.module.css";
 
 // Formulario de datos para clientes. Lee el formulario de ?f=<id>, lo muestra por pasos
 // y lo envía a /api/datos.php. Si el servidor no responde, ofrece mandar los textos por WhatsApp.
+// Lo escrito se guarda en el navegador del cliente (no los archivos), para que pueda ir a WhatsApp y volver.
 const API = "/api/datos.php";
 const MAX_MB = 10;
+const SKIP = new Set(["t0", "formulario", "sitio_web", "archivos_whatsapp[]"]);
+type Control = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+
+// Qué preguntas condicionales se ven según lo respondido (los controles ocultos no entran en FormData)
+function visibility(form: DataForm, el: HTMLFormElement | null) {
+  const fd = el ? new FormData(el) : null;
+  const vis: Record<string, boolean> = {};
+  for (const s of form.sections) for (const f of s.fields) {
+    const w = f.when;
+    if (!w) { vis[f.name] = true; continue; }
+    const vals = fd ? [...fd.getAll(w.field), ...fd.getAll(`${w.field}[]`)].map(String) : [];
+    vis[f.name] = (vis[w.field] ?? true) && vals.some((v) => w.in.includes(v));
+  }
+  return vis;
+}
+
+// Recorre los controles en orden; la clave lleva el número de aparición porque varios comparten nombre
+function controls(el: HTMLFormElement) {
+  const seen: Record<string, number> = {};
+  return ([...el.elements] as Control[]).filter((c) => c.name && !SKIP.has(c.name) && c.type !== "file" && c.type !== "hidden").map((c) => {
+    const i = (seen[c.name] = (seen[c.name] ?? -1) + 1);
+    return [`${c.name}#${i}`, c] as const;
+  });
+}
 
 function FieldInput({ f, context }: { f: Field; context: string }) {
+  if (f.type === "note") {
+    return (
+      <div className={styles.note} role="note">
+        <b>{f.label}</b>
+        <p>{f.help}</p>
+        {f.wa && <a className="btn btn-ghost" href={`${WHATSAPP_URL}?text=${encodeURIComponent(f.wa)}`} target="_blank" rel="noopener"><IconWhatsApp width={18} height={18} /> Enviar por WhatsApp</a>}
+      </div>
+    );
+  }
   const id = `c-${f.name}`;
   const label = <span>{f.label}{!f.required && <small> (opcional)</small>}</span>;
   const help = f.help && <small className={styles.help}>{f.help}</small>;
@@ -64,13 +98,43 @@ export default function ClientDataForm() {
   const [sent, setSent] = useState("");
   const [waHref, setWaHref] = useState(WHATSAPP_URL);
   const [t0] = useState(() => String(Date.now()));
+  const [vis, setVis] = useState<Record<string, boolean>>({});
+  const [restored, setRestored] = useState(false);
   const ref = useRef<HTMLFormElement>(null);
   const steps = useRef<(HTMLFieldSetElement | null)[]>([]);
+  const draftKey = form ? `sibnova:datos:${form.id}` : "";
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm(getForm(new URLSearchParams(window.location.search).get("f") ?? "") ?? null);
   }, []);
+
+  // Recupera lo que el cliente ya había escrito en este dispositivo
+  useEffect(() => {
+    if (!form || !ref.current) return;
+    let saved: { step?: number; v?: Record<string, string | boolean> } | null = null;
+    try { saved = JSON.parse(localStorage.getItem(`sibnova:datos:${form.id}`) || "null"); } catch { saved = null; }
+    if (saved?.v) {
+      for (const [k, c] of controls(ref.current)) {
+        const v = saved.v[k];
+        if (v === undefined) continue;
+        if (c instanceof HTMLInputElement && (c.type === "checkbox" || c.type === "radio")) c.checked = v === true;
+        else c.value = String(v);
+      }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRestored(true);
+    }
+    setVis(visibility(form, ref.current));
+    if (typeof saved?.step === "number" && saved.step > 0 && saved.step < form.sections.length) setStep(saved.step);
+  }, [form]);
+
+  function remember(nextStep = step) {
+    if (!form || !ref.current) return;
+    setVis(visibility(form, ref.current));
+    const v: Record<string, string | boolean> = {};
+    for (const [k, c] of controls(ref.current)) v[k] = c instanceof HTMLInputElement && (c.type === "checkbox" || c.type === "radio") ? c.checked : c.value;
+    try { localStorage.setItem(draftKey, JSON.stringify({ step: nextStep, v })); } catch { /* sin almacenamiento: el formulario sigue funcionando */ }
+  }
 
   if (form === undefined) return null;
   if (form === null) {
@@ -87,8 +151,9 @@ export default function ClientDataForm() {
   function validStep(i: number) {
     const fs = steps.current[i];
     if (!fs) return true;
-    for (const name of new Set([...fs.querySelectorAll<HTMLInputElement>("[data-required]")].map((x) => x.dataset.required!))) {
-      const boxes = [...fs.querySelectorAll<HTMLInputElement>(`input[data-required="${name}"]`)];
+    const active = (x: HTMLInputElement) => !x.matches(":disabled");
+    for (const name of new Set([...fs.querySelectorAll<HTMLInputElement>("[data-required]")].filter(active).map((x) => x.dataset.required!))) {
+      const boxes = [...fs.querySelectorAll<HTMLInputElement>(`input[data-required="${name}"]`)].filter(active);
       if (!boxes.some((b) => b.checked)) { boxes[0].setCustomValidity("Elige al menos una opción."); boxes[0].reportValidity(); boxes[0].setCustomValidity(""); return false; }
     }
     const bad = [...fs.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input, select, textarea")].find((x) => !x.checkValidity());
@@ -98,14 +163,14 @@ export default function ClientDataForm() {
 
   function go(to: number) {
     if (to > step && !validStep(step)) return;
-    setStatus(""); setStep(to);
+    setStatus(""); setStep(to); remember(to);
     requestAnimationFrame(() => { document.getElementById("datos")?.scrollIntoView({ behavior: "smooth" }); steps.current[to]?.querySelector<HTMLElement>("legend")?.focus(); });
   }
 
   function whatsappText(fd: FormData) {
     const lines = [`Hola SIBNOVA, completé el formulario «${form!.title}».`, ""];
     for (const s of form!.sections) for (const f of s.fields) {
-      if (f.type === "file" || f.type === "colors") continue;
+      if (f.type === "file" || f.type === "colors" || f.type === "note") continue;
       const v = f.type === "multi" ? fd.getAll(`${f.name}[]`).join(", ") : String(fd.get(f.name) ?? "").trim();
       if (v) lines.push(`${f.label}: ${v}`);
     }
@@ -123,6 +188,7 @@ export default function ClientDataForm() {
       const json = await res.json().catch(() => null);
       if (!res.ok || !json?.ok) throw new Error(json?.error || "No pudimos recibir tus datos.");
       setSent(json.numero); setStatus("");
+      try { localStorage.removeItem(draftKey); } catch { /* nada que borrar */ }
     } catch (err) {
       setWaHref(whatsappText(fd));
       setStatus("error");
@@ -145,10 +211,11 @@ export default function ClientDataForm() {
     <>
       <h1 className="display h2">{form.title}</h1>
       <p className="lead" style={{ margin: "12px 0 28px" }}>{form.intro}</p>
-      <form ref={ref} id="datos" className={styles.form} onSubmit={onSubmit} noValidate encType="multipart/form-data" style={{ scrollMarginTop: "calc(var(--header-h) + 16px)" }}>
+      <form ref={ref} id="datos" className={styles.form} onSubmit={onSubmit} onChange={() => remember()} noValidate encType="multipart/form-data" style={{ scrollMarginTop: "calc(var(--header-h) + 16px)" }}>
         <div className={styles.progress}>
           <p>Paso {step + 1} de {total}: <b>{form.sections[step].title}</b></p>
           <div className={styles.bar} role="progressbar" aria-valuemin={1} aria-valuemax={total} aria-valuenow={step + 1} aria-label="Avance"><i style={{ width: `${((step + 1) / total) * 100}%` }} /></div>
+          <small className={styles.help}>{restored ? "Recuperamos lo que ya habías escrito. " : ""}Lo que escribes se guarda solo en este dispositivo: puedes ir a WhatsApp y volver. Lo que no sepas, déjalo en blanco.</small>
         </div>
         <div className={styles.hp} aria-hidden="true"><label>No completar <input name="sitio_web" tabIndex={-1} autoComplete="off" /></label></div>
         <input type="hidden" name="t0" value={t0} />
@@ -157,7 +224,12 @@ export default function ClientDataForm() {
           <fieldset key={s.title + i} ref={(el) => { steps.current[i] = el; }} hidden={step !== i} className={styles.step}>
             <legend tabIndex={-1}>{s.title}</legend>
             {s.intro && <p className={styles.help}>{s.intro}</p>}
-            {s.fields.map((f) => <FieldInput key={f.name} f={f} context={`formulario «${form.title}»`} />)}
+            {s.fields.map((f) => {
+              const input = <FieldInput key={f.name} f={f} context={`formulario «${form.title}»`} />;
+              if (!f.when) return input;
+              const on = !!vis[f.name];
+              return <fieldset key={f.name} className={styles.cond} disabled={!on} hidden={!on}>{input}</fieldset>;
+            })}
             {i === total - 1 && (
               <label className={styles.consent}>
                 <input type="checkbox" name="acepto" value="si" required />
@@ -166,7 +238,7 @@ export default function ClientDataForm() {
             )}
           </fieldset>
         ))}
-        <p className={styles.warn}>Nunca te pediremos contraseñas de tu correo, tus redes sociales, tu banco o tu hosting. No las escribas aquí.</p>
+        <p className={styles.warn}>No escribas contraseñas en este formulario. Si hace falta un acceso, te pediremos enviarlo solo por WhatsApp privado.</p>
         <div className={styles.nav}>
           {step > 0 && <button type="button" className="btn btn-ghost" onClick={() => go(step - 1)}>Atrás</button>}
           {step < total - 1

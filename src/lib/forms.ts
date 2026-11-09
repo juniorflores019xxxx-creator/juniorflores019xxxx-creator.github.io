@@ -1,9 +1,12 @@
 // Formularios de datos para clientes (/datos-proyecto/?f=<id>). No aparecen en el menú ni en Google:
 // SIBNOVA envía el enlace desde la bandeja (/admin/ → Formularios). Las respuestas llegan a la bandeja.
 // Para crear un formulario nuevo: agrega una entrada en FORMS reutilizando los bloques de abajo.
-// Nunca pedir contraseñas de correo, redes sociales, banco u hosting.
-export type FieldType = "text" | "textarea" | "email" | "tel" | "url" | "date" | "select" | "multi" | "colors" | "file";
-export type Field = { name: string; label: string; type: FieldType; required?: boolean; help?: string; placeholder?: string; options?: string[]; accept?: "imagenes" | "videos" | "documentos" | "todo"; max?: number };
+// Nunca pedir contraseñas en un formulario: si hace falta un acceso, el cliente lo manda por WhatsApp privado.
+// «note» es un aviso sin respuesta (con botón de WhatsApp si tiene «wa»). «when» muestra la pregunta solo si
+// otra pregunta anterior tiene alguno de esos valores; si está oculta no se pide ni se guarda.
+export type FieldType = "text" | "textarea" | "email" | "tel" | "url" | "date" | "select" | "multi" | "colors" | "file" | "note";
+export type When = { field: string; in: string[] };
+export type Field = { name: string; label: string; type: FieldType; required?: boolean; help?: string; placeholder?: string; options?: string[]; accept?: "imagenes" | "videos" | "documentos" | "todo"; max?: number; when?: When; wa?: string };
 export type Section = { title: string; intro?: string; fields: Field[] };
 export type DataForm = { id: string; title: string; short: string; intro: string; sections: Section[] };
 
@@ -39,9 +42,10 @@ const REDES_ACTUALES: Field = { name: "redes_actuales", label: "Enlaces de tus r
 const COLORES: Section = {
   title: "Colores y estilo",
   fields: [
-    { name: "colores_origen", label: "¿Cómo definimos los colores?", type: "select", required: true, options: ["Los de mi logo", "Tengo colores definidos", "Quiero que SIBNOVA me proponga"] },
-    { name: "colores", label: "Tus colores (hasta 3)", type: "colors", help: "Si ya los tienes, elígelos aquí." },
-    { name: "colores_texto", label: "Describe los colores o códigos que usas", type: "text", max: 200, placeholder: "Por ejemplo: azul marino y dorado, #0B2A5B" },
+    { name: "colores_origen", label: "¿Cómo definimos los colores?", type: "select", required: true, options: ["Los de mi logo actual", "Tengo colores definidos", "No tengo logo ni colores: que SIBNOVA me proponga", "Todavía no sé"] },
+    { name: "colores", label: "Tus colores (hasta 3)", type: "colors", help: "Elige los que ya usas.", when: { field: "colores_origen", in: ["Los de mi logo actual", "Tengo colores definidos"] } },
+    { name: "colores_texto", label: "Describe los colores o códigos que usas", type: "text", max: 200, placeholder: "Por ejemplo: azul marino y dorado, #0B2A5B", when: { field: "colores_origen", in: ["Los de mi logo actual", "Tengo colores definidos"] } },
+    { name: "colores_gusto", label: "¿Algún color que te guste para tu marca?", type: "text", max: 200, placeholder: "Por ejemplo: verde y blanco", when: { field: "colores_origen", in: ["No tengo logo ni colores: que SIBNOVA me proponga", "Todavía no sé"] } },
     { name: "colores_evitar", label: "Colores que NO quieres", type: "text", max: 200 },
     { name: "estilo", label: "¿Cómo quieres que se sienta tu marca?", type: "multi", options: ["Moderna", "Elegante", "Seria y confiable", "Juvenil", "Divertida", "Minimalista", "Tecnológica", "Natural", "Lujosa"] },
     { name: "referencias", label: "Marcas o páginas que te gustan", type: "textarea", max: 800, placeholder: "Pega enlaces y cuéntanos qué te gusta de cada una" },
@@ -52,6 +56,8 @@ const ARCHIVOS_MARCA: Field = { name: "archivos_marca", label: "Logo actual y ma
 const FOTOS: Field = { name: "fotos", label: "Fotos", type: "file", accept: "imagenes", help: "De tu local, equipo, productos o trabajos. Mejor si son horizontales y nítidas." };
 const VIDEOS: Field = { name: "videos", label: "Videos cortos", type: "file", accept: "videos" };
 const DOCUMENTOS: Field = { name: "documentos", label: "Documentos", type: "file", accept: "documentos", help: "Catálogo, lista de precios, presentación de la empresa, etc." };
+const REF_LOGO: Field = { name: "referencias_logo", label: "Logos o diseños que te gustan", type: "file", accept: "imagenes", help: "Capturas o fotos de logos que te inspiran. Si no tienes, sáltalo." };
+const PESADOS = "Si un archivo pesa mucho, usa «Enviar por WhatsApp» y vuelve a esta página: lo que ya escribiste se queda guardado.";
 const DRIVE: Field = { name: "enlace_archivos", label: "Enlace a Google Drive o Dropbox", type: "text", help: "Para videos o carpetas que pesan mucho. Si los mandaste por WhatsApp, escríbelo aquí.", max: 500 };
 const CIERRE: Section = {
   title: "Para terminar",
@@ -118,6 +124,7 @@ export const FORMS: DataForm[] = [
         fields: [
           { name: "nombre_logo", label: "Nombre exacto como debe aparecer en el logo", type: "text", required: true, max: 80 },
           { name: "eslogan", label: "Eslogan (si tiene)", type: "text", max: 120 },
+          { name: "historia", label: "¿Qué significa el nombre o cómo nació tu marca?", type: "textarea", max: 1000, help: "Nos da ideas para el logo. Si no tiene una historia, déjalo en blanco." },
           { name: "rubro", label: "¿A qué se dedica tu marca?", type: "textarea", required: true, max: 1500 },
           { name: "publico", label: "¿A quién le vendes?", type: "textarea", max: 800 },
           { name: "tipo_trabajo", label: "¿Qué necesitas?", type: "select", required: true, options: ["Logo nuevo", "Rediseñar mi logo actual"] },
@@ -128,7 +135,7 @@ export const FORMS: DataForm[] = [
         ],
       },
       COLORES,
-      { title: "Archivos", fields: [{ ...ARCHIVOS_MARCA, label: "Logo actual (si es rediseño)" }, { ...FOTOS, label: "Imágenes de referencia" }] },
+      { title: "Archivos", intro: PESADOS, fields: [REF_LOGO, { ...ARCHIVOS_MARCA, label: "Logo actual (si es rediseño)" }] },
       CIERRE,
     ],
   },
@@ -143,19 +150,25 @@ export const FORMS: DataForm[] = [
         title: "Tus redes",
         fields: [
           { name: "redes", label: "¿Qué redes quieres?", type: "multi", required: true, options: ["Facebook", "Instagram", "TikTok", "LinkedIn", "WhatsApp Business", "Perfil de Google (Maps)", "YouTube"] },
+          { name: "objetivo", label: "¿Para qué quieres tus redes?", type: "multi", options: ["Vender más", "Recibir pedidos o consultas por WhatsApp", "Que más gente conozca mi marca", "Mostrar mis productos o trabajos", "Dar confianza a mis clientes"] },
           { name: "trabajo_redes", label: "¿Qué necesitas?", type: "select", required: true, options: ["Crear las redes desde cero", "Mejorar las que ya tengo", "Crear algunas y mejorar otras"] },
-          REDES_ACTUALES,
-          { name: "usuario_deseado", label: "Nombre de usuario que te gustaría", type: "text", max: 80, placeholder: "@miempresa" },
-          { name: "correo_cuentas", label: "Correo con el que se crearán las cuentas", type: "email", max: 120, help: "Las cuentas quedan a tu nombre. Nunca te pediremos tu contraseña por aquí." },
-          { name: "quien_crea", label: "¿Quién crea las cuentas?", type: "select", required: true, options: ["Las creo yo y les doy acceso a SIBNOVA", "Que SIBNOVA las cree por mí, con mi correo y mi número"], help: "Si eliges que las creemos nosotros, lo hacemos contigo en una llamada corta para los códigos de verificación." },
-          { name: "autorizacion_cuentas", label: "Autorización", type: "multi", options: ["Autorizo a SIBNOVA a crear y configurar a mi nombre las cuentas indicadas, con mi correo y mi número, solo para este proyecto. Las cuentas son mías y SIBNOVA me entregará el control total al terminar."], help: "Márcala solo si elegiste que SIBNOVA cree las cuentas." },
+          { ...REDES_ACTUALES, when: { field: "trabajo_redes", in: ["Mejorar las que ya tengo", "Crear algunas y mejorar otras"] } },
+          { name: "usuario_deseado", label: "Nombre de usuario que te gustaría", type: "text", max: 80, placeholder: "@miempresa", help: "Si no sabes, te proponemos uno." },
+          { name: "quien_crea", label: "¿Quién crea las cuentas?", type: "select", required: true, options: ["Todavía no tengo cuentas: que SIBNOVA las cree por mí, con mi correo y mi número", "Las creo yo y les doy acceso a SIBNOVA", "Ya tengo las cuentas: solo les doy acceso"] },
+          { name: "correo_cuentas", label: "Correo con el que se crearán las cuentas", type: "email", max: 120, help: "Las cuentas quedan a tu nombre." },
+          { name: "telefono_cuentas", label: "Número con el que se crearán las cuentas", type: "tel", max: 20, placeholder: "+591 …", help: "A este número llegan los códigos de verificación. Puede ser tu mismo WhatsApp." },
+          { name: "aviso_seguridad", label: "Tu seguridad primero", type: "note", help: "Nunca escribas contraseñas en este formulario. Creamos las cuentas a tu nombre, con tu correo y tu número, y al terminar te entregamos el control total. Tu información es confidencial: solo la usamos para tu proyecto, no la vendemos ni la usamos con fines de lucro.", when: { field: "quien_crea", in: ["Todavía no tengo cuentas: que SIBNOVA las cree por mí, con mi correo y mi número"] } },
+          { name: "verificacion", label: "¿Cómo verificamos tu correo al crear las cuentas?", type: "select", required: true, options: ["Con una llamada corta: les dicto los códigos que me lleguen (recomendado)", "Les envío la contraseña de mi correo por WhatsApp privado"], when: { field: "quien_crea", in: ["Todavía no tengo cuentas: que SIBNOVA las cree por mí, con mi correo y mi número"] } },
+          { name: "aviso_whatsapp", label: "Envíanos el acceso solo por WhatsApp privado", type: "note", help: "No la escribas aquí. Mándala solo al WhatsApp oficial de SIBNOVA con el botón de abajo y luego vuelve a esta página para seguir: lo que ya escribiste se queda guardado. La usamos solo para crear tus cuentas, no la guardamos en ningún sistema y al terminar te avisamos para que la cambies.", wa: "Hola SIBNOVA, por este chat privado les envío el acceso de mi correo para crear mis redes sociales. Avísenme al terminar para cambiar la contraseña.", when: { field: "verificacion", in: ["Les envío la contraseña de mi correo por WhatsApp privado"] } },
+          { name: "autorizacion_cuentas", label: "Autorización", type: "multi", required: true, options: ["Autorizo a SIBNOVA a crear y configurar a mi nombre las cuentas indicadas, con mi correo y mi número, solo para este proyecto. Las cuentas son mías, SIBNOVA me entregará el control total al terminar y no usará mi información con fines de lucro."], when: { field: "quien_crea", in: ["Todavía no tengo cuentas: que SIBNOVA las cree por mí, con mi correo y mi número"] } },
         ],
       },
       {
         title: "Información del perfil",
         fields: [
-          { name: "descripcion_perfil", label: "Descripción corta del negocio para la biografía", type: "textarea", required: true, max: 500 },
-          { name: "direccion", label: "Dirección", type: "text", max: 200 },
+          { name: "descripcion_perfil", label: "Descripción corta del negocio para la biografía", type: "textarea", max: 500, help: "Si prefieres, la escribimos nosotros con lo que nos cuentes." },
+          { name: "ciudad", label: "Ciudad", type: "text", max: 60 },
+          { name: "direccion", label: "Dirección", type: "text", max: 200, help: "Déjalo en blanco si no atiendes en un local." },
           { name: "horarios", label: "Horarios de atención", type: "text", max: 200 },
           { name: "telefonos", label: "Teléfonos y WhatsApp para mostrar", type: "text", max: 200 },
           { name: "web", label: "Página web (si tiene)", type: "url", max: 200 },
@@ -167,14 +180,18 @@ export const FORMS: DataForm[] = [
           { name: "servicios", label: "Productos o servicios que quieres mostrar", type: "textarea", required: true, max: 3000 },
           { name: "promociones", label: "Promociones u ofertas actuales", type: "textarea", max: 1500 },
           { name: "tono", label: "¿Cómo quieres hablarle a tus clientes?", type: "select", options: ["Cercano y amigable", "Profesional", "Divertido", "Elegante"] },
-          { name: "frecuencia", label: "¿Cada cuánto quieres publicar?", type: "select", options: ["2 veces por semana", "3 veces por semana", "Todos los días", "Lo que me recomienden"] },
+          { name: "frecuencia", label: "¿Cuántas publicaciones al mes te gustaría?", type: "select", options: ["Las que incluye mi paquete", "8 al mes (2 por semana)", "12 al mes (3 por semana)", "Lo que me recomienden"], help: "Antes de empezar te confirmamos cuántas incluye tu paquete." },
+          { name: "precios", label: "¿Mostramos precios en tus publicaciones?", type: "select", options: ["Sí", "No", "Solo algunos", "Lo que me recomienden"] },
+          { name: "responde", label: "¿Quién responderá los mensajes y comentarios?", type: "select", options: ["Yo o mi equipo", "Quiero que SIBNOVA me ayude (se cotiza aparte)", "Todavía no sé"] },
+          { name: "publicidad", label: "¿Piensas invertir en publicidad pagada (Facebook, Instagram, TikTok)?", type: "select", options: ["Sí", "No por ahora", "Quiero que me asesoren"] },
+          { name: "monto_publicidad", label: "¿Cuánto más o menos al mes?", type: "text", max: 80, placeholder: "Por ejemplo: Bs 300", when: { field: "publicidad", in: ["Sí"] } },
           { name: "temas", label: "Temas o mensajes importantes para publicar", type: "textarea", max: 1500 },
           { name: "competencia", label: "Cuentas que te gustan o de tu competencia", type: "textarea", max: 800 },
           { name: "imagenes_referencia", label: "¿Usamos imágenes de referencia de bancos libres para tus publicaciones?", type: "select", options: ["Sí, combínalas con mis fotos", "Sí, cuando no tenga fotos propias", "No, solo mis fotos"] },
           { name: "tipo_imagenes", label: "¿Qué imágenes de referencia te gustarían?", type: "textarea", max: 800, placeholder: "Por ejemplo: pan recién horneado, clientes felices, el local por dentro…" },
         ],
       },
-      { title: "Archivos", intro: "Todo lo que podamos usar en tus publicaciones.", fields: [ARCHIVOS_MARCA, FOTOS, VIDEOS, DRIVE] },
+      { title: "Archivos", intro: "Todo lo que podamos usar en tus publicaciones. " + PESADOS, fields: [ARCHIVOS_MARCA, FOTOS, VIDEOS, DRIVE] },
       CIERRE,
     ],
   },
@@ -182,7 +199,7 @@ export const FORMS: DataForm[] = [
     id: "logo-redes",
     title: "Datos para tu logo y redes sociales",
     short: "Logo nuevo y creación de redes con su contenido, en un solo formulario.",
-    intro: "Primero diseñamos tu logo y con él creamos tus redes sociales. No escribas contraseñas: te explicamos cómo darnos acceso de forma segura.",
+    intro: "Primero diseñamos tu logo y con él creamos tus redes sociales. Lo que no sepas, déjalo en blanco o elige «que me propongan». Tu información es confidencial: solo la usamos para tu proyecto, nunca con fines de lucro.",
     sections: [] as Section[], // se completa abajo combinando los formularios de logo y redes
   },
   {
@@ -265,7 +282,7 @@ export const FORMS: DataForm[] = [
     CONTACTO,
     ...middle(logo),
     ...middle(redes),
-    { title: "Archivos", intro: "Logo actual (si existe), referencias, fotos y videos para tus publicaciones.", fields: [ARCHIVOS_MARCA, FOTOS, VIDEOS, DRIVE] },
+    { title: "Archivos", intro: "Logos que te gustan, tu logo actual (si existe), fotos y videos para tus publicaciones. " + PESADOS, fields: [REF_LOGO, { ...ARCHIVOS_MARCA, label: "Logo actual (si tienes)" }, FOTOS, VIDEOS, DRIVE] },
     CIERRE,
   ];
 }

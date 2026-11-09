@@ -39,9 +39,15 @@ if (($_POST['acepto'] ?? '') !== 'si') fail('Debes aceptar el uso de tus datos p
 $datos = [];
 $err = [];
 $fileFields = [];
+$visible = [];
 foreach ($form['campos'] as $c) {
     $n = $c['name'];
     $max = max(1, (int)$c['max']);
+    // Preguntas condicionales: si la pregunta de la que dependen no tiene ese valor, no se piden ni se guardan
+    $w = $c['when'] ?? null;
+    $visible[$n] = !$w || (($visible[$w['field']] ?? true) && array_intersect((array)($datos[$w['field']] ?? ''), (array)$w['in']));
+    if ($c['type'] === 'note') continue;
+    if (!$visible[$n]) { $datos[$n] = $c['type'] === 'multi' || $c['type'] === 'colors' ? [] : ''; continue; }
     switch ($c['type']) {
         case 'file':
             $fileFields[] = $c;

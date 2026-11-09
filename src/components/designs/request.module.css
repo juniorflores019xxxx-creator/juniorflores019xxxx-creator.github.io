@@ -63,6 +63,13 @@
 
 .help { color: var(--grey); font-size: 0.9rem; line-height: 1.55; }
 .help b { color: var(--paper); }
+.note { min-width: 0; overflow-wrap: anywhere; display: grid; gap: 10px; justify-items: start; padding: 16px; border-radius: 14px; border: 1px solid rgba(119, 158, 255, 0.35); background: rgba(46, 125, 255, 0.08); }
+.note b { color: var(--paper); }
+.note .btn { max-width: 100%; white-space: normal; text-align: left; }
+.cond > * { min-width: 0; }
+.note p { color: var(--grey); font-size: 0.92rem; line-height: 1.55; }
+.cond { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: inherit; }
+.cond[hidden] { display: none; }
 .warn { padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(255, 196, 0, 0.35); background: rgba(255, 196, 0, 0.06); color: #ffd666; font-size: 0.9rem; }
 .err { color: #ff9a9a; font-size: 0.9rem; }
 .recap { display: grid; gap: 4px; padding: 14px 16px; border-radius: 14px; background: rgba(245, 247, 251, 0.04); color: var(--grey); font-size: 0.92rem; }

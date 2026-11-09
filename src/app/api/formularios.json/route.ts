@@ -12,7 +12,7 @@ export function GET() {
       titulo: f.title,
       resumen: f.short,
       campos: f.sections.flatMap((s) => s.fields.map((x) => ({
-        name: x.name, label: x.label, type: x.type, required: !!x.required, max: x.max ?? 1000, options: x.options ?? [], ext: x.accept ? ACCEPT[x.accept] : [], seccion: s.title,
+        name: x.name, label: x.label, type: x.type, required: !!x.required, max: x.max ?? 1000, options: x.options ?? [], ext: x.accept ? ACCEPT[x.accept] : [], seccion: s.title, when: x.when ?? null,
       }))),
     })),
     archivos: { maxFiles: 20, maxFileMB: FILES.maxFileMB, maxTotalMB: 80 },

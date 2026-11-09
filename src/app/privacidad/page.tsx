@@ -147,7 +147,7 @@ export default function Privacidad() {
               <li><strong>No lo vendemos, no lo alquilamos ni lo usamos con fines comerciales propios</strong> ni para obtener ganancias con tu información.</li>
               <li>No lo compartimos con terceros, salvo los proveedores necesarios para tu servicio (por ejemplo, el hosting) o cuando la ley lo exija.</li>
               <li>Tus cuentas, dominios y redes sociales <strong>quedan a tu nombre</strong>. Si nos autorizas a crearlas por ti, lo hacemos con tu correo y tu número, y te entregamos el control total al terminar.</li>
-              <li><strong>No te pedimos ni guardamos contraseñas</strong> en nuestros formularios. Preferimos que nos des acceso como administradores; si en algún caso necesitas compartir una contraseña, te recomendamos cambiarla al terminar el trabajo.</li>
+              <li><strong>No te pedimos contraseñas en nuestros formularios ni las guardamos en nuestros sistemas.</strong> Preferimos que nos des acceso como administradores. Si para crear tus cuentas eliges compartir el acceso de tu correo, te pedimos enviarlo solo por WhatsApp privado; lo usamos únicamente para tu proyecto y al terminar te avisamos para que cambies la contraseña.</li>
               <li>Al terminar el proyecto, dejamos de usar los accesos que nos hayas dado y puedes retirarlos cuando quieras.</li>
               <li>Solo mostramos tu proyecto en nuestro portafolio <strong>si nos das tu permiso</strong>.</li>
             </ul>
