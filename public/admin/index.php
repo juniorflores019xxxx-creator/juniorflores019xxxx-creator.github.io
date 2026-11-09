@@ -4,7 +4,7 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/api/_lib.php';
 
 $https = ($_SERVER['HTTPS'] ?? '') === 'on' || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
-header("Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
+header("Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; form-action 'self' https://wa.me https://api.whatsapp.com https://web.whatsapp.com; frame-ancestors 'none'; base-uri 'none'");
 header('X-Robots-Tag: noindex, nofollow');
 header('Cache-Control: no-store');
 header('Referrer-Policy: no-referrer');
@@ -340,7 +340,7 @@ if (isset($_GET['formularios'])) {
         $n = count(array_filter($ents, fn($e) => $e['titulo'] === $fm['titulo']));
         $cards .= '<section class="card"><div><h2 style="margin:0">' . h($fm['titulo']) . '</h2><p class="sub">' . h($fm['resumen']) . '</p><small class="muted">' . $n . ' envío' . ($n === 1 ? '' : 's') . ' recibido' . ($n === 1 ? '' : 's') . '</small></div>
         <input class="url" readonly value="' . h($url) . '" aria-label="Enlace del formulario">
-        <form method="get" class="inline"><input type="hidden" name="enviar" value="' . h($fm['id']) . '"><input name="nombre" placeholder="Nombre del cliente" maxlength="60" style="flex:1;min-width:140px"><input name="tel" required placeholder="WhatsApp: 7xxxxxxx" inputmode="tel" maxlength="20" style="flex:1;min-width:140px"><button class="wa">Enviar por WhatsApp</button></form>
+        <form method="get" class="inline" target="_blank"><input type="hidden" name="enviar" value="' . h($fm['id']) . '"><input name="nombre" placeholder="Nombre del cliente" maxlength="60" style="flex:1;min-width:140px"><input name="tel" required placeholder="WhatsApp: 7xxxxxxx" inputmode="tel" maxlength="20" style="flex:1;min-width:140px"><button class="wa">Enviar por WhatsApp</button></form>
         <a href="' . h($url) . '" target="_blank" rel="noopener">Ver el formulario como el cliente ↗</a></section>';
     }
     page('Formularios', '<div class="top"><div><h1>Formularios para clientes</h1><p class="sub">Escribe el WhatsApp del cliente y pulsa «Enviar por WhatsApp»: se abre el chat con el mensaje y el enlace listos. Las respuestas llegan a «Datos recibidos». ¿Necesitas otro formulario? Pídeselo a Claude.</p></div></div><div class="forms">' . ($cards ?: empty_state('No hay formularios publicados')) . '</div>', 'formularios');
