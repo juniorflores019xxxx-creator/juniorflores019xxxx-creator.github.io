@@ -147,6 +147,8 @@ export const FORMS: DataForm[] = [
           REDES_ACTUALES,
           { name: "usuario_deseado", label: "Nombre de usuario que te gustaría", type: "text", max: 80, placeholder: "@miempresa" },
           { name: "correo_cuentas", label: "Correo con el que se crearán las cuentas", type: "email", max: 120, help: "Las cuentas quedan a tu nombre. Nunca te pediremos tu contraseña por aquí." },
+          { name: "quien_crea", label: "¿Quién crea las cuentas?", type: "select", required: true, options: ["Las creo yo y les doy acceso a SIBNOVA", "Que SIBNOVA las cree por mí, con mi correo y mi número"], help: "Si eliges que las creemos nosotros, lo hacemos contigo en una llamada corta para los códigos de verificación." },
+          { name: "autorizacion_cuentas", label: "Autorización", type: "multi", options: ["Autorizo a SIBNOVA a crear y configurar a mi nombre las cuentas indicadas, con mi correo y mi número, solo para este proyecto. Las cuentas son mías y SIBNOVA me entregará el control total al terminar."], help: "Márcala solo si elegiste que SIBNOVA cree las cuentas." },
         ],
       },
       {

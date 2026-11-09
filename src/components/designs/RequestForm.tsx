@@ -332,7 +332,7 @@ export default function RequestForm() {
         <label className={styles.field}>Observaciones <small>(opcional)</small><textarea name="observaciones" rows={3} maxLength={1500} /></label>
         <label className={styles.consent}>
           <input type="checkbox" name="acepto" value="si" required />
-          <span>Acepto que SIBNOVA use estos datos para responder mi solicitud, según la <a href="/privacidad/" target="_blank">Política de privacidad</a>.</span>
+          <span>Acepto que SIBNOVA use estos datos para responder mi solicitud. Mi información es confidencial y no se usará con otros fines (<a href="/privacidad/#confidencialidad" target="_blank">Política de privacidad</a>).</span>
         </label>
         <div className={styles.recap}>
           <b>Resumen</b>

@@ -170,7 +170,7 @@ export default function ClientDataForm() {
             {i === total - 1 && (
               <label className={styles.consent}>
                 <input type="checkbox" name="acepto" value="si" required />
-                <span>Acepto que SIBNOVA use estos datos y archivos para realizar mi proyecto, según la <a href="/privacidad/" target="_blank">Política de privacidad</a>.</span>
+                <span>Acepto que SIBNOVA use estos datos y archivos solo para realizar mi proyecto. SIBNOVA los trata como confidenciales: no los vende, no los comparte ni los usa con fines comerciales propios (<a href="/privacidad/#confidencialidad" target="_blank">Política de privacidad</a>).</span>
               </label>
             )}
           </fieldset>

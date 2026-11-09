@@ -27,6 +27,7 @@ const SECCIONES = [
   ["cookies", "Cookies y medición"],
   ["seguridad", "Seguridad"],
   ["proyectos", "Datos de proyectos de clientes"],
+  ["confidencialidad", "Confidencialidad de tu información"],
   ["cambios", "Cambios a esta política"],
 ] as const;
 
@@ -42,7 +43,7 @@ export default function Privacidad() {
             <span className="num">Legal</span>
             <h1 id="priv-titulo" className="display h2">Política de privacidad</h1>
             <p className="lead">Te explicamos qué datos nos envías, para qué los usamos y cómo puedes pedir que los corrijamos o eliminemos.</p>
-            <p className={styles.meta}><span>Versión <b>1.1</b></span><span>Vigente desde <b>noviembre de 2026</b></span></p>
+            <p className={styles.meta}><span>Versión <b>1.2</b></span><span>Vigente desde <b>noviembre de 2026</b></span></p>
           </div>
         </section>
 
@@ -137,6 +138,22 @@ export default function Privacidad() {
             <p>
               Cuando desarrollamos un sistema para tu empresa, la información de tu negocio y de tus clientes se maneja según
               el contrato y el acuerdo de confidencialidad que firmemos para ese proyecto.
+            </p>
+
+            <h2 id="confidencialidad"><span>{n("confidencialidad")}</span>Confidencialidad de tu información</h2>
+            <p>Todo lo que nos confías para tu proyecto (datos de tu empresa, textos, fotos, videos, documentos y accesos) es <strong>confidencial</strong>:</p>
+            <ul>
+              <li>Lo usamos <strong>solo para el proyecto que contrataste</strong>.</li>
+              <li><strong>No lo vendemos, no lo alquilamos ni lo usamos con fines comerciales propios</strong> ni para obtener ganancias con tu información.</li>
+              <li>No lo compartimos con terceros, salvo los proveedores necesarios para tu servicio (por ejemplo, el hosting) o cuando la ley lo exija.</li>
+              <li>Tus cuentas, dominios y redes sociales <strong>quedan a tu nombre</strong>. Si nos autorizas a crearlas por ti, lo hacemos con tu correo y tu número, y te entregamos el control total al terminar.</li>
+              <li><strong>No te pedimos ni guardamos contraseñas</strong> en nuestros formularios. Preferimos que nos des acceso como administradores; si en algún caso necesitas compartir una contraseña, te recomendamos cambiarla al terminar el trabajo.</li>
+              <li>Al terminar el proyecto, dejamos de usar los accesos que nos hayas dado y puedes retirarlos cuando quieras.</li>
+              <li>Solo mostramos tu proyecto en nuestro portafolio <strong>si nos das tu permiso</strong>.</li>
+            </ul>
+            <p>
+              Si tu empresa lo necesita, firmamos un <strong>acuerdo de confidencialidad y no divulgación (NDA)</strong> antes de empezar.
+              Pídelo por <a href={WHATSAPP_URL} target="_blank" rel="noopener">WhatsApp</a> o a <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
             </p>
 
             <h2 id="cambios"><span>{n("cambios")}</span>Cambios a esta política</h2>
