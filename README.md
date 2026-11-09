@@ -139,4 +139,5 @@ Alternativa sin configuración: Vercel o Netlify detectan Next.js y publican dir
 - Formularios disponibles: `pagina-web`, `catalogo-whatsapp`, `logo`, `redes-sociales`, `logo-redes`, `aplicacion`, `inteligencia-artificial` y `automatizacion`.
 - **Uso diario:** bandeja `/admin/` → **Formularios**: escribes el WhatsApp del cliente y se abre el chat con el enlace listo. Las respuestas y archivos llegan a **Datos recibidos**.
 - **Crear un formulario nuevo para otro trabajo:** agrega una entrada en `FORMS` de `src/lib/forms.ts` reutilizando los bloques (contacto, empresa, colores, archivos, cierre). Se valida en el servidor con `/api/formularios.json`, que se genera en cada build. Nunca pedir contraseñas.
+- **Pasar el trabajo a Claude:** en el detalle de cada solicitud o dato recibido, «Descargar para Claude» baja un ZIP con `brief.md` y los archivos del cliente. Abre la carpeta en Claude Code y pide «haz el proyecto con el brief» (habilidad `crear-proyecto-cliente`).
 - Servidor: `public/api/datos.php` (mismas protecciones que las solicitudes; archivos fuera de `public_html`).

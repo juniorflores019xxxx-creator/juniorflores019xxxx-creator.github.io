@@ -29,6 +29,46 @@ if ($logged) $_SESSION['vence'] = time() + 7200;
 $hash = setting('admin_hash');
 $msg = '';
 
+function solicitud_labels(): array {
+    return ['nombre' => 'Nombre', 'empresa' => 'Empresa', 'nit' => 'NIT', 'cargo' => 'Cargo', 'correo' => 'Correo', 'telefono' => 'Teléfono / WhatsApp', 'ciudad' => 'Ciudad', 'pais' => 'País',
+        'nombre_comercial' => 'Nombre comercial', 'rubro' => 'Rubro', 'descripcion' => 'Descripción', 'servicios' => 'Servicios o productos', 'publico' => 'Público objetivo', 'objetivos' => 'Objetivos',
+        'colores' => 'Colores', 'logo' => 'Logo', 'manual' => 'Manual de marca', 'referencias' => 'Referencias', 'cambios' => 'Conservar o cambiar',
+        'catalogo' => 'Catálogo con WhatsApp', 'productos' => 'Cantidad de productos', 'dominio' => 'Dominio propio', 'hosting' => 'Hosting propio', 'adicionales' => 'Funciones adicionales',
+        'fecha_entrega' => 'Fecha deseada', 'presupuesto' => 'Presupuesto', 'aprobador' => 'Aprueba', 'observaciones' => 'Observaciones'];
+}
+
+// Nombre de carpeta seguro para el ZIP (sin tildes ni símbolos)
+function slug(string $t): string {
+    $t = strtr(mb_strtolower($t), ['á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ñ' => 'n', 'ü' => 'u']);
+    return trim(preg_replace('/[^a-z0-9]+/', '-', $t) ?? '', '-') ?: 'archivo';
+}
+
+// ZIP sin compresión, sin depender de la extensión zip de PHP. $entries: [ruta dentro del ZIP => ['data' => texto] | ['file' => ruta]]
+function send_zip(string $name, array $entries): never {
+    $tmp = tempnam(sys_get_temp_dir(), 'sbz');
+    $out = fopen($tmp, 'wb');
+    $central = ''; $offset = 0; $n = 0;
+    $dt = getdate();
+    $time = ($dt['hours'] << 11) | ($dt['minutes'] << 5) | intdiv($dt['seconds'], 2);
+    $date = (($dt['year'] - 1980) << 9) | ($dt['mon'] << 5) | $dt['mday'];
+    foreach ($entries as $path => $e) {
+        $data = isset($e['data']) ? $e['data'] : (is_file($e['file']) ? file_get_contents($e['file']) : null);
+        if ($data === null || $data === false) continue;
+        $crc = crc32($data); $len = strlen($data);
+        $head = pack('vvvvvVVVvv', 20, 0x0800, 0, $time, $date, $crc, $len, $len, strlen($path), 0);
+        fwrite($out, "PK\x03\x04" . $head . $path); fwrite($out, $data);
+        $central .= "PK\x01\x02" . pack('vvvvvvVVVvvvvvVV', 20, 20, 0x0800, 0, $time, $date, $crc, $len, $len, strlen($path), 0, 0, 0, 0, 0, $offset) . $path;
+        $offset += 30 + strlen($path) + $len; $n++;
+    }
+    fwrite($out, $central . "PK\x05\x06" . pack('vvvvVVv', 0, 0, $n, $n, strlen($central), $offset, 0));
+    fclose($out);
+    header('Content-Type: application/zip');
+    header('Content-Disposition: attachment; filename="' . $name . '"');
+    header('Content-Length: ' . filesize($tmp));
+    readfile($tmp); @unlink($tmp);
+    exit;
+}
+
 function csrf_ok(): bool { return hash_equals($_SESSION['csrf'] ?? '', (string)($_POST['csrf'] ?? '')); }
 function go(string $q = ''): never { header('Location: /admin/' . $q, true, 303); exit; }
 function bs(int $n): string { return 'Bs ' . number_format($n, 0, ',', '.'); }
@@ -93,6 +133,58 @@ if ($logged && isset($_GET['archivo_dp'])) {
     header('Content-Length: ' . filesize($path));
     readfile($path);
     exit;
+}
+// «Descargar para Claude»: ZIP con brief.md (todos los datos ordenados) y los archivos del cliente
+if ($logged && (isset($_GET['brief_dp']) || isset($_GET['brief_sw']))) {
+    $md = []; $entries = []; $files = []; $dir = '';
+    if (isset($_GET['brief_dp'])) {
+        $st = db()->prepare('SELECT * FROM entregas WHERE id = ?'); $st->execute([(int)$_GET['brief_dp']]); $e = $st->fetch();
+        if (!$e) { http_response_code(404); exit('No encontrado.'); }
+        $d = json_decode($e['datos'], true) ?: [];
+        $def = find_by_id(formularios()['formularios'], $e['formulario']);
+        $dir = slug(($e['empresa'] ?: $e['nombre']) . '-' . $e['numero']);
+        $md[] = '# Brief: ' . $e['titulo'];
+        $md[] = ''; $md[] = '- Número: ' . $e['numero']; $md[] = '- Formulario: `' . $e['formulario'] . '`'; $md[] = '- Recibido: ' . $e['creado']; $md[] = '- Cliente: ' . $e['nombre'] . ($e['empresa'] ? ' · ' . $e['empresa'] : '');
+        $sec = '';
+        foreach (($def['campos'] ?? []) as $c) {
+            if ($c['type'] === 'file') continue;
+            $v = $d[$c['name']] ?? '';
+            if ($v === '' || $v === []) continue;
+            if ($c['seccion'] !== $sec) { $sec = $c['seccion']; $md[] = ''; $md[] = '## ' . $sec; }
+            $val = is_array($v) ? implode(', ', $v) : (string)$v;
+            $md[] = str_contains($val, "\n") ? '**' . $c['label'] . ':**' . "\n\n" . $val : '- **' . $c['label'] . ':** ' . $val;
+        }
+        $fa = db()->prepare('SELECT * FROM entregas_archivos WHERE entrega_id = ? ORDER BY campo, id'); $fa->execute([$e['id']]);
+        foreach ($fa->fetchAll() as $f) $files[] = ['campo' => $f['campo'], 'nombre' => $f['nombre'], 'path' => data_dir() . '/archivos/' . $e['numero'] . '/' . basename($f['guardado'])];
+        $tipo = $e['formulario'];
+    } else {
+        $st = db()->prepare('SELECT * FROM solicitudes WHERE id = ?'); $st->execute([(int)$_GET['brief_sw']]); $s = $st->fetch();
+        if (!$s) { http_response_code(404); exit('No encontrado.'); }
+        $d = json_decode($s['datos'], true) ?: [];
+        $dir = slug(($s['empresa'] ?: $s['nombre']) . '-' . $s['numero']);
+        $md[] = '# Brief: solicitud de página web';
+        $md[] = ''; $md[] = '- Número: ' . $s['numero']; $md[] = '- Recibido: ' . $s['creado']; $md[] = '- Diseño elegido: ' . $s['diseno_nombre'] . ' (`' . $s['diseno_id'] . '` en el catálogo de SIBNOVA)'; $md[] = '- Paquete: ' . $s['paquete_nombre'] . ' · precio de referencia ' . bs((int)$s['precio_inicial']);
+        $fn = array_map(fn($x) => $FUNC[$x] ?? $x, json_decode($s['funciones'], true) ?: []);
+        if ($fn) $md[] = '- Funciones pedidas: ' . implode(', ', $fn);
+        $md[] = ''; $md[] = '## Datos del cliente y del negocio';
+        foreach (solicitud_labels() as $k => $l) { $v = (string)($d[$k] ?? ''); if ($v !== '' && $v !== 'no') $md[] = str_contains($v, "\n") ? '**' . $l . ':**' . "\n\n" . $v : '- **' . $l . ':** ' . $v; }
+        $fa = db()->prepare('SELECT * FROM archivos WHERE solicitud_id = ?'); $fa->execute([$s['id']]);
+        foreach ($fa->fetchAll() as $f) $files[] = ['campo' => 'Materiales', 'nombre' => $f['nombre'], 'path' => data_dir() . '/archivos/' . $s['numero'] . '/' . basename($f['guardado'])];
+        $tipo = 'solicitud-' . $s['paquete_id'];
+    }
+    $used = [];
+    if ($files) { $md[] = ''; $md[] = '## Archivos del cliente'; }
+    foreach ($files as $f) {
+        $p = 'archivos/' . slug($f['campo']) . '/' . preg_replace('/[^A-Za-z0-9._-]/', '_', $f['nombre']);
+        while (isset($used[$p])) $p = preg_replace('/(\.[a-z0-9]+)?$/i', '-2$1', $p, 1);
+        $used[$p] = true;
+        $entries[$dir . '/' . $p] = ['file' => $f['path']];
+        $md[] = '- `' . $p . '` (' . $f['campo'] . ')';
+    }
+    $md[] = ''; $md[] = '## Para Claude';
+    $md[] = 'Proyecto de SIBNOVA de tipo `' . $tipo . '`. Usa la habilidad **crear-proyecto-cliente**: trabaja con estos datos y archivos, no inventes información del cliente y marca lo que falte como «Dato pendiente de confirmación». Muestra la vista previa y no publiques nada sin la aprobación de SIBNOVA.';
+    $entries = [$dir . '/brief.md' => ['data' => implode("\n", $md) . "\n"]] + $entries;
+    send_zip($dir . '.zip', $entries);
 }
 // Abre WhatsApp con el enlace del formulario ya escrito para el cliente
 if ($logged && isset($_GET['enviar'])) {
@@ -176,6 +268,7 @@ if (isset($_GET['entrega'])) {
     foreach ($fa->fetchAll() as $f) $files .= '<li><span class="muted">' . h($f['campo']) . ':</span> <a href="/admin/?archivo_dp=' . (int)$f['id'] . '">' . h($f['nombre']) . '</a> <span class="muted">(' . round($f['bytes'] / 1048576, 1) . ' MB)</span></li>';
     page($e['numero'], $top . '<main class="wrap"><p><a href="/admin/?datos=1">← Volver</a></p><h1>' . h($e['numero']) . ' <span class="tag">' . ($e['revisado'] ? 'Revisado' : 'Nuevo') . '</span></h1>
     <p class="muted">' . h($e['titulo']) . ' · ' . h($e['creado']) . '</p>
+    <p><a class="tag" style="padding:8px 14px" href="/admin/?brief_dp=' . (int)$e['id'] . '">Descargar para Claude (ZIP con brief y archivos)</a></p>
     <form method="post" class="inline" style="margin-bottom:14px">' . $tok . '<input type="hidden" name="accion" value="revisado"><input type="hidden" name="id" value="' . (int)$e['id'] . '"><button class="ghost">' . ($e['revisado'] ? 'Marcar como nuevo' : 'Marcar como revisado') . '</button></form>
     <div class="grid two"><section class="card"><h2 style="margin-top:0">Datos</h2><dl>' . $rows . '</dl></section>
     <section class="card"><h2 style="margin-top:0">Archivos</h2>' . ($files ? '<ul>' . $files . '</ul>' : '<p class="muted">Sin archivos.</p>') . '</section></div></main>');
@@ -201,10 +294,7 @@ if (isset($_GET['ver'])) {
     $s = $st->fetch();
     if (!$s) go();
     $d = json_decode($s['datos'], true) ?: [];
-    $labels = ['nombre' => 'Nombre', 'empresa' => 'Empresa', 'nit' => 'NIT', 'cargo' => 'Cargo', 'correo' => 'Correo', 'telefono' => 'Teléfono / WhatsApp', 'ciudad' => 'Ciudad', 'pais' => 'País',
-        'nombre_comercial' => 'Nombre comercial', 'rubro' => 'Rubro', 'descripcion' => 'Descripción', 'servicios' => 'Servicios o productos', 'publico' => 'Público objetivo', 'objetivos' => 'Objetivos',
-        'colores' => 'Colores', 'logo' => 'Logo', 'manual' => 'Manual de marca', 'referencias' => 'Referencias', 'cambios' => 'Conservar o cambiar',
-        'catalogo' => 'Catálogo con WhatsApp', 'productos' => 'Cantidad de productos', 'dominio' => 'Dominio propio', 'hosting' => 'Hosting propio', 'adicionales' => 'Funciones adicionales', 'fecha_entrega' => 'Fecha deseada', 'presupuesto' => 'Presupuesto', 'aprobador' => 'Aprueba', 'observaciones' => 'Observaciones'];
+    $labels = solicitud_labels();
     $rows = '';
     foreach ($labels as $k => $l) if (($d[$k] ?? '') !== '') $rows .= '<dt>' . h($l) . '</dt><dd>' . h((string)$d[$k]) . '</dd>';
     $fn = array_map(fn($x) => h($FUNC[$x] ?? $x), json_decode($s['funciones'], true) ?: []);
@@ -217,6 +307,7 @@ if (isset($_GET['ver'])) {
     $opts = implode('', array_map(fn($e) => '<option' . ($e === $s['estado'] ? ' selected' : '') . '>' . h($e) . '</option>', $ESTADOS));
     page($s['numero'], $top . '<main class="wrap"><p><a href="/admin/">← Volver</a></p><h1>' . h($s['numero']) . ' <span class="tag">' . h($s['estado']) . '</span></h1>
     <div class="grid two"><section class="card"><h2 style="margin-top:0">Proyecto</h2><dl><dt>Fecha</dt><dd>' . h($s['creado']) . '</dd><dt>Diseño</dt><dd>' . h($s['diseno_nombre']) . '</dd><dt>Paquete</dt><dd>' . h($s['paquete_nombre']) . '</dd><dt>Precio de referencia</dt><dd>' . bs((int)$s['precio_inicial']) . ' (calculado en el servidor)</dd><dt>Funciones pedidas</dt><dd>' . ($fn ? implode(', ', $fn) : '—') . '</dd></dl>
+    <p><a class="tag" style="padding:8px 14px" href="/admin/?brief_sw=' . (int)$s['id'] . '">Descargar para Claude (ZIP con brief y archivos)</a></p>
     <h2>Cambiar estado</h2><form method="post" class="inline">' . $tok . '<input type="hidden" name="accion" value="estado"><input type="hidden" name="id" value="' . (int)$s['id'] . '"><select name="estado">' . $opts . '</select><input name="nota" maxlength="500" placeholder="Nota (opcional)"><button>Guardar</button></form>
     <h2>Archivos</h2>' . ($files ? '<ul>' . $files . '</ul>' : '<p class="muted">Sin archivos.</p>') . '</section>
     <section class="card"><h2 style="margin-top:0">Cliente y negocio</h2><dl>' . $rows . '</dl></section></div>
