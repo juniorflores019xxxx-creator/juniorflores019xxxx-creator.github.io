@@ -168,6 +168,8 @@ export const FORMS: DataForm[] = [
           { name: "frecuencia", label: "¿Cada cuánto quieres publicar?", type: "select", options: ["2 veces por semana", "3 veces por semana", "Todos los días", "Lo que me recomienden"] },
           { name: "temas", label: "Temas o mensajes importantes para publicar", type: "textarea", max: 1500 },
           { name: "competencia", label: "Cuentas que te gustan o de tu competencia", type: "textarea", max: 800 },
+          { name: "imagenes_referencia", label: "¿Usamos imágenes de referencia de bancos libres para tus publicaciones?", type: "select", options: ["Sí, combínalas con mis fotos", "Sí, cuando no tenga fotos propias", "No, solo mis fotos"] },
+          { name: "tipo_imagenes", label: "¿Qué imágenes de referencia te gustarían?", type: "textarea", max: 800, placeholder: "Por ejemplo: pan recién horneado, clientes felices, el local por dentro…" },
         ],
       },
       { title: "Archivos", intro: "Todo lo que podamos usar en tus publicaciones.", fields: [ARCHIVOS_MARCA, FOTOS, VIDEOS, DRIVE] },
