@@ -1,5 +1,5 @@
 <?php
-// Bandeja de solicitudes de SIBNOVA: solo para el equipo, protegida con clave.
+// CRM de SIBNOVA (bandeja): solicitudes, clientes y datos de proyectos. Solo para el equipo, protegido con contraseña.
 declare(strict_types=1);
 require dirname(__DIR__) . '/api/_lib.php';
 
@@ -201,51 +201,152 @@ if ($logged && isset($_GET['enviar'])) {
     }
 }
 
-function page(string $title, string $body): never {
-    echo '<!doctype html><html lang="es-BO"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>' . h($title) . ' · SIBNOVA</title><style>
-    :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#050609;color:#f5f7fb;font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
-    a{color:#779eff}.wrap{max-width:1180px;margin:0 auto;padding:24px 16px}header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #1d2130}
-    h1{font-size:1.5rem;margin:0 0 16px}h2{font-size:1.1rem;margin:24px 0 10px}.card{background:#0b0d12;border:1px solid #1d2130;border-radius:14px;padding:18px}
-    table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{text-align:left;padding:10px;border-bottom:1px solid #1d2130;vertical-align:top}th{color:#8e96a8;font-weight:600}
-    .scroll{overflow-x:auto}input,select,textarea,button{font:inherit;color:inherit;background:#11141b;border:1px solid #2a3040;border-radius:10px;padding:10px 12px;min-height:44px}
-    button{background:#1c64e6;border-color:#1c64e6;color:#fff;font-weight:600;cursor:pointer}.ghost{background:transparent;border-color:#2a3040}
-    form.inline{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.grid{display:grid;gap:10px}@media(min-width:800px){.two{grid-template-columns:1fr 1fr}}
-    dl{display:grid;grid-template-columns:minmax(140px,220px) 1fr;gap:6px 14px;margin:0}dt{color:#8e96a8}dd{margin:0;white-space:pre-wrap;word-break:break-word}
-    .tag{display:inline-block;padding:2px 9px;border-radius:999px;background:rgba(46,125,255,.15);border:1px solid rgba(119,158,255,.3);font-size:.82rem;white-space:nowrap}
-    .msg{padding:10px 14px;border-radius:10px;background:rgba(255,196,0,.08);border:1px solid rgba(255,196,0,.3);margin-bottom:14px}.muted{color:#8e96a8}
-    </style></head><body>' . $body . '</body></html>';
+/* ============================================================
+   Interfaz del CRM (HTML sin JavaScript: la política de seguridad no permite scripts)
+   ============================================================ */
+const COLOR = [
+    'Nueva solicitud' => '#4c8dff', 'Pendiente de revisión' => '#f5b700', 'Contactado' => '#22c3ee', 'Cotización enviada' => '#a78bfa',
+    'En negociación' => '#fb923c', 'Aprobado' => '#34d399', 'En desarrollo' => '#2dd4bf', 'Entregado' => '#22c55e', 'Cancelado' => '#ef4444',
+];
+const NUEVAS = ['Nueva solicitud', 'Pendiente de revisión'];
+const EN_PROCESO = ['Contactado', 'Cotización enviada', 'En negociación'];
+const GANADAS = ['Aprobado', 'En desarrollo', 'Entregado'];
+
+function badge(string $estado): string {
+    return '<span class="badge" style="--c:' . (COLOR[$estado] ?? '#8e96a8') . '">' . h($estado) . '</span>';
+}
+function fecha(string $iso): string {
+    $t = strtotime($iso);
+    if (!$t) return h($iso);
+    $m = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][(int)date('n', $t) - 1];
+    return date('j', $t) . ' ' . $m . ' ' . date('Y · H:i', $t);
+}
+// Clave de cliente: últimos 8 dígitos del teléfono (Bolivia) o el correo
+function cliente_key(string $tel, string $correo): string {
+    $d = preg_replace('/\D/', '', $tel);
+    return strlen($d) >= 7 ? substr($d, -8) : strtolower(trim($correo));
+}
+function wa_link(string $tel): string {
+    $d = preg_replace('/\D/', '', $tel);
+    if (strlen($d) === 8) $d = '591' . $d;
+    return 'https://wa.me/' . $d;
+}
+function kpi(string $label, string $value, string $sub = '', string $href = ''): string {
+    $in = '<span class="k">' . h($label) . '</span><b>' . $value . '</b>' . ($sub ? '<small>' . $sub . '</small>' : '');
+    return $href ? '<a class="stat" href="' . h($href) . '">' . $in . '</a>' : '<div class="stat">' . $in . '</div>';
+}
+function tamano(int $b): string { return $b < 1048576 ? max(1, (int)round($b / 1024)) . ' KB' : round($b / 1048576, 1) . ' MB'; }
+function empty_state(string $t, string $d = ''): string { return '<div class="empty"><b>' . h($t) . '</b>' . ($d ? '<p>' . $d . '</p>' : '') . '</div>'; }
+
+function page(string $title, string $body, string $active = '', bool $bare = false): never {
+    global $tok;
+    $nav = [['inicio', '/admin/', 'Inicio', 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['clientes', '/admin/?clientes=1', 'Clientes', 'M16 19a4 4 0 0 0-8 0M12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM20 19a3 3 0 0 0-3-3M17 11a2.5 2.5 0 1 0 0-5M4 19a3 3 0 0 1 3-3M7 11a2.5 2.5 0 1 1 0-5'],
+        ['solicitudes', '/admin/?solicitudes=1', 'Solicitudes', 'M4 5h16v14H4zM4 9h16M8 13h5'], ['datos', '/admin/?datos=1', 'Datos recibidos', 'M12 3v12M7 10l5 5 5-5M4 21h16'],
+        ['formularios', '/admin/?formularios=1', 'Formularios', 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5'], ['cuenta', '/admin/?cuenta=1', 'Cuenta', 'M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0']];
+    $links = implode('', array_map(fn($n) => '<a href="' . $n[1] . '"' . ($n[0] === $active ? ' aria-current="page"' : '') . '><svg viewBox="0 0 24 24" aria-hidden="true"><path d="' . $n[3] . '"/></svg>' . $n[2] . '</a>', $nav));
+    $side = $bare ? '' : '<aside class="side"><a class="brand" href="/admin/"><img src="/brand/sn-logo-256.webp" alt="" width="40" height="19"><span>SIBNOVA<small>CRM</small></span></a><nav>' . $links . '</nav>
+        <form method="post" class="logout">' . $tok . '<input type="hidden" name="accion" value="salir"><button class="ghost sm">Salir</button></form><a class="site" href="/" target="_blank" rel="noopener">Ver sibnova.com.bo ↗</a></aside>';
+    echo '<!doctype html><html lang="es-BO"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>' . h($title) . ' · CRM SIBNOVA</title><link rel="icon" href="/icon.png"><style>
+:root{color-scheme:dark;--bg:#06070a;--panel:#0d1016;--panel2:#12161e;--line:#1e2430;--line2:#2a3242;--text:#e9edf5;--muted:#8a93a6;--blue:#2e7dff;--blue2:#7aa2ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+a{color:var(--blue2);text-decoration:none}a:hover{text-decoration:underline}
+.app{display:grid;grid-template-columns:minmax(0,1fr);min-height:100vh}@media(min-width:960px){.app{grid-template-columns:240px 1fr}}
+.side{min-width:0;display:flex;flex-direction:column;gap:6px;padding:16px;border-right:1px solid var(--line);background:linear-gradient(180deg,#0a0d13,#07090d)}
+@media(min-width:960px){.side{position:sticky;top:0;height:100vh}}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 8px 14px;color:var(--text);text-decoration:none!important}.brand img{background:#fff;border-radius:8px;padding:4px 6px;width:52px;height:auto}
+.brand span{font-weight:700;letter-spacing:.04em}.brand small{display:block;font-size:.68rem;font-weight:600;color:var(--blue2);letter-spacing:.2em}
+.side nav{display:flex;gap:4px;overflow-x:auto}@media(min-width:960px){.side nav{flex-direction:column;overflow:visible}}
+.side nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--muted);font-weight:600;font-size:.92rem;white-space:nowrap;text-decoration:none}
+.side nav a:hover{background:var(--panel2);color:var(--text)}.side nav a[aria-current]{background:rgba(46,125,255,.14);color:#fff;box-shadow:inset 3px 0 0 var(--blue)}
+.side svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.logout{margin-top:auto}.site{font-size:.82rem;color:var(--muted);padding:4px 8px}@media(max-width:959px){.logout,.site{display:none}}
+main{min-width:0;padding:24px clamp(16px,3vw,36px) 60px;max-width:1320px;width:100%}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:22px}
+h1{font-size:1.6rem;margin:0;letter-spacing:-.02em}h2{font-size:1.05rem;margin:0 0 12px}.sub{color:var(--muted);margin:4px 0 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+.grid{display:grid;gap:14px}@media(min-width:900px){.two{grid-template-columns:1fr 1fr}.main-side{grid-template-columns:1.6fr 1fr}}
+.stats{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:18px}
+.stat{display:grid;gap:2px;padding:16px;border-radius:16px;background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);color:var(--text);text-decoration:none!important}
+a.stat:hover{border-color:var(--line2)}.stat .k{color:var(--muted);font-size:.82rem;font-weight:600}.stat b{font-size:1.7rem;letter-spacing:-.02em}.stat small{color:var(--muted);font-size:.82rem}
+.board{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(220px,1fr);gap:12px;overflow-x:auto;padding-bottom:6px}
+.col{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;min-height:120px}
+.col h3{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px;font-size:.85rem;color:var(--muted)}.col h3 i{font-style:normal;background:var(--panel2);border-radius:999px;padding:1px 9px;color:var(--text)}
+.col h3 span{display:flex;align-items:center;gap:8px}.dot{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.mini{display:block;padding:10px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);margin-bottom:8px;color:var(--text);text-decoration:none!important}
+.mini:hover{border-color:var(--line2)}.mini b{display:block;font-size:.88rem}.mini small{color:var(--muted);font-size:.78rem}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:.78rem;font-weight:600;white-space:nowrap;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);border:1px solid color-mix(in srgb,var(--c) 35%,transparent)}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--c)}
+table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em}tbody tr:hover{background:rgba(255,255,255,.02)}tbody tr:last-child td{border-bottom:0}
+.scroll{overflow-x:auto}.muted{color:var(--muted)}.who b{display:block}.who small{color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}.chip{display:inline-flex;gap:6px;align-items:center;padding:7px 12px;border-radius:999px;border:1px solid var(--line2);color:var(--muted);font-size:.85rem;font-weight:600;text-decoration:none!important}
+.chip:hover{color:var(--text)}.chip[aria-current]{background:rgba(46,125,255,.16);border-color:var(--blue);color:#fff}.chip i{font-style:normal;opacity:.75}
+input,select,textarea,button{font:inherit;color:inherit;background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:10px 12px;min-height:42px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue)}
+button,.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--blue);border:1px solid var(--blue);color:#fff;font-weight:600;cursor:pointer;border-radius:10px;padding:9px 14px;min-height:42px;text-decoration:none!important}
+.ghost{background:transparent;border-color:var(--line2);color:var(--text)}.wa{background:#1fa855;border-color:#1fa855}.sm{min-height:36px;padding:6px 12px;font-size:.88rem}
+form.inline{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.search{display:flex;gap:8px;flex-wrap:wrap}.search input{min-width:240px}
+dl{display:grid;grid-template-columns:minmax(130px,210px) 1fr;gap:8px 14px;margin:0}dt{color:var(--muted);font-size:.9rem}dd{margin:0;white-space:pre-wrap;word-break:break-word}
+.sec{grid-column:1/-1;margin-top:10px;padding-top:12px;border-top:1px solid var(--line);color:var(--blue2);font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em}
+.sec:first-child{margin-top:0;padding-top:0;border-top:0}
+.head-card{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.head-card .id{font-family:ui-monospace,Consolas,monospace;color:var(--blue2);font-size:.85rem}.actions{display:flex;flex-wrap:wrap;gap:8px}
+.files{list-style:none;margin:0;padding:0;display:grid;gap:8px}.files li{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}
+.timeline{list-style:none;margin:0;padding:0 0 0 18px;border-left:2px solid var(--line2);display:grid;gap:14px}.timeline li{position:relative}
+.timeline li::before{content:"";position:absolute;left:-25px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--c,var(--blue));box-shadow:0 0 0 3px var(--bg)}
+.timeline small{color:var(--muted)}.feed{list-style:none;margin:0;padding:0;display:grid;gap:10px}.feed li{display:flex;gap:10px;align-items:flex-start;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.feed li:last-child{border-bottom:0}.feed .dot{margin-top:7px;flex:none}.feed small{display:block;color:var(--muted)}
+.msg{padding:12px 14px;border-radius:12px;background:rgba(245,183,0,.08);border:1px solid rgba(245,183,0,.3);margin-bottom:14px}
+.warn{color:#ffd666}.empty{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--line2);border-radius:14px}.empty b{display:block;color:var(--text);margin-bottom:4px}
+.forms{display:grid;gap:14px}@media(min-width:900px){.forms{grid-template-columns:1fr 1fr}}.forms .card{display:grid;gap:12px}.forms .url{font-family:ui-monospace,Consolas,monospace;font-size:.82rem;width:100%}
+.auth{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(60% 60% at 50% 0%,rgba(46,125,255,.18),transparent 70%),var(--bg)}
+.auth .card{width:min(100%,420px);display:grid;gap:14px;padding:28px}.auth .brand{justify-content:center}.auth label{display:grid;gap:6px;font-size:.9rem}
+.swatch{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;border:1px solid rgba(255,255,255,.2)}
+</style></head><body>' . ($bare ? $body : '<div class="app">' . $side . '<main>' . $body . '</main></div>') . '</body></html>';
     exit;
 }
 
 $m = $msg ? '<p class="msg" role="alert">' . h($msg) . '</p>' : '';
 $tok = '<input type="hidden" name="csrf" value="' . h($csrf) . '">';
 
+/* ---------- Acceso ---------- */
 if (!$logged) {
+    $brand = '<a class="brand" href="/admin/"><img src="/brand/sn-logo-256.webp" alt="" width="52" height="25"><span>SIBNOVA<small>CRM</small></span></a>';
     if ($hash === null) {
-        page('Activar bandeja', '<main class="wrap" style="max-width:460px"><h1>Activar la bandeja de solicitudes</h1>' . $m . '<form method="post" class="card grid">' . $tok . '<input type="hidden" name="accion" value="crear">
-        <label class="grid">Clave de activación<input name="token" required autocomplete="off"></label>
-        <label class="grid">Nueva contraseña (12 caracteres o más)<input type="password" name="clave" required minlength="12" autocomplete="new-password"></label>
-        <label class="grid">Repite la contraseña<input type="password" name="clave2" required minlength="12" autocomplete="new-password"></label>
-        <button>Activar</button><p class="muted">La clave de activación sirve una sola vez.</p></form></main>');
+        page('Activar', '<div class="auth"><form method="post" class="card">' . $brand . '<h1 style="text-align:center">Activar el CRM</h1>' . $m . $tok . '<input type="hidden" name="accion" value="crear">
+        <label>Clave de activación<input name="token" required autocomplete="off"></label>
+        <label>Nueva contraseña (12 caracteres o más)<input type="password" name="clave" required minlength="12" autocomplete="new-password"></label>
+        <label>Repite la contraseña<input type="password" name="clave2" required minlength="12" autocomplete="new-password"></label>
+        <button>Activar</button><p class="muted" style="margin:0;text-align:center">La clave de activación sirve una sola vez.</p></form></div>', '', true);
     }
-    page('Ingresar', '<main class="wrap" style="max-width:420px"><h1>Bandeja de solicitudes</h1>' . $m . '<form method="post" class="card grid">' . $tok . '<input type="hidden" name="accion" value="entrar">
-    <label class="grid">Contraseña<input type="password" name="clave" required autocomplete="current-password" autofocus></label><button>Entrar</button></form></main>');
+    page('Ingresar', '<div class="auth"><form method="post" class="card">' . $brand . '<h1 style="text-align:center">Ingresar</h1><p class="sub" style="text-align:center;margin-top:-8px">Solicitudes, clientes y datos de proyectos</p>' . $m . $tok . '<input type="hidden" name="accion" value="entrar">
+    <label>Contraseña<input type="password" name="clave" required autocomplete="current-password" autofocus></label><button>Entrar</button></form></div>', '', true);
 }
 
-$top = '<header><b>SIBNOVA · Solicitudes</b><form method="post" class="inline">' . $tok . '<a href="/admin/">Solicitudes</a> · <a href="/admin/?datos=1">Datos recibidos</a> · <a href="/admin/?formularios=1">Formularios</a> · <a href="/admin/?cuenta=1">Contraseña</a><input type="hidden" name="accion" value="salir"><button class="ghost">Salir</button></form></header>';
+/* ---------- Datos comunes ---------- */
+$sols = db()->query('SELECT id, numero, creado, actualizado, estado, nombre, empresa, telefono, correo, diseno_nombre, paquete_nombre, precio_inicial FROM solicitudes ORDER BY id DESC')->fetchAll();
+$ents = db()->query('SELECT e.id, e.numero, e.creado, e.titulo, e.nombre, e.empresa, e.telefono, e.correo, e.revisado, (SELECT COUNT(*) FROM entregas_archivos a WHERE a.entrega_id = e.id) n FROM entregas e ORDER BY e.id DESC')->fetchAll();
+$porEstado = array_fill_keys($ESTADOS, []);
+foreach ($sols as $s) $porEstado[$s['estado']][] = $s;
+$suma = fn(array $estados) => array_sum(array_map(fn($s) => (int)$s['precio_inicial'], array_merge(...array_map(fn($e) => $porEstado[$e] ?? [], $estados))));
+$cuenta = fn(array $estados) => array_sum(array_map(fn($e) => count($porEstado[$e] ?? []), $estados));
 
+/* ---------- Formularios ---------- */
 if (isset($_GET['formularios'])) {
     try { $fs = formularios()['formularios']; } catch (Throwable $e) { $fs = []; }
     $cards = '';
     foreach ($fs as $fm) {
         $url = SITE_URL . '/datos-proyecto/?f=' . rawurlencode($fm['id']);
-        $cards .= '<section class="card grid"><div><b style="font-size:1.1rem">' . h($fm['titulo']) . '</b><p class="muted" style="margin:4px 0 0">' . h($fm['resumen']) . '</p></div>
-        <label class="grid">Enlace para el cliente<input readonly value="' . h($url) . '"></label>
-        <form method="get" class="inline"><input type="hidden" name="enviar" value="' . h($fm['id']) . '"><input name="nombre" placeholder="Nombre del cliente (opcional)" maxlength="60"><input name="tel" required placeholder="WhatsApp del cliente: 7xxxxxxx" inputmode="tel" maxlength="20"><button>Enviar por WhatsApp</button><a href="' . h($url) . '" target="_blank" rel="noopener">Ver formulario</a></form></section>';
+        $n = count(array_filter($ents, fn($e) => $e['titulo'] === $fm['titulo']));
+        $cards .= '<section class="card"><div><h2 style="margin:0">' . h($fm['titulo']) . '</h2><p class="sub">' . h($fm['resumen']) . '</p><small class="muted">' . $n . ' envío' . ($n === 1 ? '' : 's') . ' recibido' . ($n === 1 ? '' : 's') . '</small></div>
+        <input class="url" readonly value="' . h($url) . '" aria-label="Enlace del formulario">
+        <form method="get" class="inline"><input type="hidden" name="enviar" value="' . h($fm['id']) . '"><input name="nombre" placeholder="Nombre del cliente" maxlength="60" style="flex:1;min-width:140px"><input name="tel" required placeholder="WhatsApp: 7xxxxxxx" inputmode="tel" maxlength="20" style="flex:1;min-width:140px"><button class="wa">Enviar por WhatsApp</button></form>
+        <a href="' . h($url) . '" target="_blank" rel="noopener">Ver el formulario como el cliente ↗</a></section>';
     }
-    page('Formularios', $top . '<main class="wrap"><h1>Formularios para clientes</h1><p class="muted">Escribe el WhatsApp del cliente y pulsa «Enviar por WhatsApp»: se abre el chat con el mensaje y el enlace listos. Las respuestas llegan a «Datos recibidos». ¿Necesitas un formulario para otro trabajo? Pídeselo a Claude.</p><div class="grid">' . ($cards ?: '<p class="muted">No hay formularios publicados.</p>') . '</div></main>');
+    page('Formularios', '<div class="top"><div><h1>Formularios para clientes</h1><p class="sub">Escribe el WhatsApp del cliente y pulsa «Enviar por WhatsApp»: se abre el chat con el mensaje y el enlace listos. Las respuestas llegan a «Datos recibidos». ¿Necesitas otro formulario? Pídeselo a Claude.</p></div></div><div class="forms">' . ($cards ?: empty_state('No hay formularios publicados')) . '</div>', 'formularios');
 }
 
+/* ---------- Detalle de datos recibidos ---------- */
 if (isset($_GET['entrega'])) {
     $st = db()->prepare('SELECT * FROM entregas WHERE id = ?');
     $st->execute([(int)$_GET['entrega']]);
@@ -258,74 +359,154 @@ if (isset($_GET['entrega'])) {
         if ($c['type'] === 'file') continue;
         $v = $d[$c['name']] ?? '';
         if ($v === '' || $v === []) continue;
-        if ($c['seccion'] !== $sec) { $sec = $c['seccion']; $rows .= '<dt style="grid-column:1/-1;color:#779eff;margin-top:12px">' . h($sec) . '</dt>'; }
+        if ($c['seccion'] !== $sec) { $sec = $c['seccion']; $rows .= '<div class="sec">' . h($sec) . '</div>'; }
         $val = $c['type'] === 'colors'
-            ? implode(' ', array_map(fn($x) => '<span class="tag"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;background:' . h($x) . '"></span> ' . h($x) . '</span>', (array)$v))
+            ? implode(' ', array_map(fn($x) => '<span class="swatch" style="background:' . h($x) . '"></span> ' . h($x) . ' ', (array)$v))
             : h(is_array($v) ? implode(', ', $v) : (string)$v);
         $rows .= '<dt>' . h($c['label']) . '</dt><dd>' . $val . '</dd>';
     }
-    if (!empty($d['archivos_whatsapp'])) $rows .= '<dt style="grid-column:1/-1;color:#ffd666;margin-top:12px">Enviados por WhatsApp (revisa el chat)</dt><dd style="grid-column:1/-1">' . h(implode('; ', (array)$d['archivos_whatsapp'])) . '</dd>';
     $fa = db()->prepare('SELECT * FROM entregas_archivos WHERE entrega_id = ? ORDER BY campo, id'); $fa->execute([$e['id']]);
     $files = '';
-    foreach ($fa->fetchAll() as $f) $files .= '<li><span class="muted">' . h($f['campo']) . ':</span> <a href="/admin/?archivo_dp=' . (int)$f['id'] . '">' . h($f['nombre']) . '</a> <span class="muted">(' . round($f['bytes'] / 1048576, 1) . ' MB)</span></li>';
-    page($e['numero'], $top . '<main class="wrap"><p><a href="/admin/?datos=1">← Volver</a></p><h1>' . h($e['numero']) . ' <span class="tag">' . ($e['revisado'] ? 'Revisado' : 'Nuevo') . '</span></h1>
-    <p class="muted">' . h($e['titulo']) . ' · ' . h($e['creado']) . '</p>
-    <p><a class="tag" style="padding:8px 14px" href="/admin/?brief_dp=' . (int)$e['id'] . '">Descargar para Claude (ZIP con brief y archivos)</a></p>
-    <form method="post" class="inline" style="margin-bottom:14px">' . $tok . '<input type="hidden" name="accion" value="revisado"><input type="hidden" name="id" value="' . (int)$e['id'] . '"><button class="ghost">' . ($e['revisado'] ? 'Marcar como nuevo' : 'Marcar como revisado') . '</button></form>
-    <div class="grid two"><section class="card"><h2 style="margin-top:0">Datos</h2><dl>' . $rows . '</dl></section>
-    <section class="card"><h2 style="margin-top:0">Archivos</h2>' . ($files ? '<ul>' . $files . '</ul>' : '<p class="muted">Sin archivos.</p>') . '</section></div></main>');
+    foreach ($fa->fetchAll() as $f) $files .= '<li><span><small class="muted">' . h($f['campo']) . '</small><br><a href="/admin/?archivo_dp=' . (int)$f['id'] . '">' . h($f['nombre']) . '</a></span><span class="muted">' . tamano((int)$f['bytes']) . '</span></li>';
+    $wa = !empty($d['archivos_whatsapp']) ? '<p class="warn" style="margin:12px 0 0"><b>Enviados por WhatsApp (revisa el chat):</b> ' . h(implode('; ', (array)$d['archivos_whatsapp'])) . '</p>' : '';
+    $key = cliente_key((string)$e['telefono'], (string)$e['correo']);
+    page($e['numero'], '<p><a href="/admin/?datos=1">← Datos recibidos</a></p>
+    <div class="head-card"><div><span class="id">' . h($e['numero']) . '</span><h1>' . h($e['nombre']) . ($e['empresa'] ? ' <span class="muted" style="font-weight:400">· ' . h($e['empresa']) . '</span>' : '') . '</h1><p class="sub">' . h($e['titulo']) . ' · ' . fecha($e['creado']) . ' · ' . badge($e['revisado'] ? 'Entregado' : 'Nueva solicitud') . '</p></div>
+    <div class="actions"><a class="btn" href="/admin/?brief_dp=' . (int)$e['id'] . '">Descargar para Claude</a>' . ($e['telefono'] ? '<a class="btn wa" href="' . h(wa_link((string)$e['telefono'])) . '" target="_blank" rel="noopener">WhatsApp</a>' : '') . '<a class="btn ghost" href="/admin/?cliente=' . h(rawurlencode($key)) . '">Ficha del cliente</a>
+    <form method="post">' . $tok . '<input type="hidden" name="accion" value="revisado"><input type="hidden" name="id" value="' . (int)$e['id'] . '"><button class="ghost">' . ($e['revisado'] ? 'Marcar como pendiente' : 'Marcar como revisado') . '</button></form></div></div>
+    <div class="grid main-side"><section class="card"><h2>Datos del formulario</h2><dl>' . ($rows ?: '<dd class="muted">Sin datos.</dd>') . '</dl></section>
+    <section class="card"><h2>Archivos</h2>' . ($files ? '<ul class="files">' . $files . '</ul>' : '<p class="muted">Sin archivos adjuntos.</p>') . $wa . '</section></div>', 'datos');
 }
 
+/* ---------- Lista de datos recibidos ---------- */
 if (isset($_GET['datos'])) {
     $trs = '';
-    foreach (db()->query('SELECT e.id, e.numero, e.creado, e.titulo, e.nombre, e.empresa, e.revisado, (SELECT COUNT(*) FROM entregas_archivos a WHERE a.entrega_id = e.id) n FROM entregas e ORDER BY e.id DESC LIMIT 300') as $e)
-        $trs .= '<tr><td><a href="/admin/?entrega=' . (int)$e['id'] . '">' . h($e['numero']) . '</a></td><td>' . h($e['creado']) . '</td><td>' . h($e['nombre']) . ($e['empresa'] ? '<br><span class="muted">' . h($e['empresa']) . '</span>' : '') . '</td><td>' . h($e['titulo']) . '</td><td>' . (int)$e['n'] . '</td><td><span class="tag">' . ($e['revisado'] ? 'Revisado' : 'Nuevo') . '</span></td></tr>';
-    page('Datos recibidos', $top . '<main class="wrap"><h1>Datos recibidos de clientes</h1><div class="card scroll"><table><thead><tr><th>Número</th><th>Fecha</th><th>Cliente</th><th>Formulario</th><th>Archivos</th><th>Estado</th></tr></thead><tbody>' . ($trs ?: '<tr><td colspan="6" class="muted">Todavía no hay datos recibidos.</td></tr>') . '</tbody></table></div></main>');
+    foreach ($ents as $e) $trs .= '<tr><td><a href="/admin/?entrega=' . (int)$e['id'] . '" class="who"><b>' . h($e['nombre']) . '</b><small>' . h($e['empresa'] ?: $e['numero']) . '</small></a></td><td>' . h($e['titulo']) . '</td><td class="muted">' . fecha($e['creado']) . '</td><td>' . (int)$e['n'] . '</td><td>' . ($e['revisado'] ? badge('Entregado') : badge('Nueva solicitud')) . '</td></tr>';
+    $sin = count(array_filter($ents, fn($e) => !$e['revisado']));
+    page('Datos recibidos', '<div class="top"><div><h1>Datos recibidos</h1><p class="sub">Lo que tus clientes envían desde los formularios de datos. ' . $sin . ' sin revisar.</p></div><a class="btn" href="/admin/?formularios=1">Enviar un formulario</a></div>
+    <div class="card scroll">' . ($trs ? '<table><thead><tr><th>Cliente</th><th>Formulario</th><th>Recibido</th><th>Archivos</th><th>Estado</th></tr></thead><tbody>' . $trs . '</tbody></table>' : empty_state('Todavía no hay datos recibidos', 'Envía un formulario a tu cliente desde «Formularios».')) . '</div>', 'datos');
 }
 
+/* ---------- Cuenta ---------- */
 if (isset($_GET['cuenta'])) {
-    page('Contraseña', $top . '<main class="wrap" style="max-width:460px"><h1>Cambiar contraseña</h1>' . $m . '<form method="post" class="card grid">' . $tok . '<input type="hidden" name="accion" value="clave">
+    page('Cuenta', '<div class="top"><div><h1>Cuenta</h1><p class="sub">Cambia la contraseña de acceso al CRM.</p></div></div>' . $m . '<form method="post" class="card grid" style="max-width:460px">' . $tok . '<input type="hidden" name="accion" value="clave">
     <label class="grid">Contraseña actual<input type="password" name="actual" required autocomplete="current-password"></label>
-    <label class="grid">Nueva contraseña<input type="password" name="clave" required minlength="12" autocomplete="new-password"></label>
-    <label class="grid">Repite la nueva<input type="password" name="clave2" required minlength="12" autocomplete="new-password"></label><button>Guardar</button></form></main>');
+    <label class="grid">Nueva contraseña (12 caracteres o más)<input type="password" name="clave" required minlength="12" autocomplete="new-password"></label>
+    <label class="grid">Repite la nueva<input type="password" name="clave2" required minlength="12" autocomplete="new-password"></label><button>Guardar contraseña</button></form>', 'cuenta');
 }
 
+/* ---------- Detalle de solicitud ---------- */
 if (isset($_GET['ver'])) {
     $st = db()->prepare('SELECT * FROM solicitudes WHERE id = ?');
     $st->execute([(int)$_GET['ver']]);
     $s = $st->fetch();
-    if (!$s) go();
+    if (!$s) go('?solicitudes=1');
     $d = json_decode($s['datos'], true) ?: [];
-    $labels = solicitud_labels();
-    $rows = '';
-    foreach ($labels as $k => $l) if (($d[$k] ?? '') !== '') $rows .= '<dt>' . h($l) . '</dt><dd>' . h((string)$d[$k]) . '</dd>';
+    $grupos = ['Cliente' => ['nombre', 'empresa', 'nit', 'cargo', 'correo', 'telefono', 'ciudad', 'pais'], 'Negocio' => ['nombre_comercial', 'rubro', 'descripcion', 'servicios', 'publico', 'objetivos'],
+        'Diseño' => ['colores', 'logo', 'manual', 'referencias', 'cambios'], 'Proyecto' => ['catalogo', 'productos', 'dominio', 'hosting', 'adicionales', 'fecha_entrega', 'presupuesto', 'aprobador', 'observaciones', 'archivos_whatsapp']];
+    $labels = solicitud_labels(); $rows = '';
+    foreach ($grupos as $g => $keys) {
+        $part = '';
+        foreach ($keys as $k) if (($d[$k] ?? '') !== '' && ($d[$k] ?? '') !== 'no') $part .= '<dt>' . h($labels[$k]) . '</dt><dd' . ($k === 'archivos_whatsapp' ? ' class="warn"' : '') . '>' . h((string)$d[$k]) . '</dd>';
+        if ($part) $rows .= '<div class="sec">' . $g . '</div>' . $part;
+    }
     $fn = array_map(fn($x) => h($FUNC[$x] ?? $x), json_decode($s['funciones'], true) ?: []);
     $fa = db()->prepare('SELECT * FROM archivos WHERE solicitud_id = ?'); $fa->execute([$s['id']]);
     $files = '';
-    foreach ($fa->fetchAll() as $f) $files .= '<li><a href="/admin/?archivo=' . (int)$f['id'] . '">' . h($f['nombre']) . '</a> <span class="muted">(' . round($f['bytes'] / 1048576, 1) . ' MB)</span></li>';
+    foreach ($fa->fetchAll() as $f) $files .= '<li><a href="/admin/?archivo=' . (int)$f['id'] . '">' . h($f['nombre']) . '</a><span class="muted">' . tamano((int)$f['bytes']) . '</span></li>';
     $hi = db()->prepare('SELECT * FROM historial WHERE solicitud_id = ? ORDER BY id DESC'); $hi->execute([$s['id']]);
     $hist = '';
-    foreach ($hi->fetchAll() as $x) $hist .= '<tr><td>' . h($x['fecha']) . '</td><td><span class="tag">' . h($x['estado']) . '</span></td><td>' . h($x['nota']) . '</td></tr>';
+    foreach ($hi->fetchAll() as $x) $hist .= '<li style="--c:' . (COLOR[$x['estado']] ?? '#8e96a8') . '"><b>' . h($x['estado']) . '</b><br><small>' . fecha($x['fecha']) . '</small>' . ($x['nota'] ? '<p style="margin:4px 0 0">' . h($x['nota']) . '</p>' : '') . '</li>';
     $opts = implode('', array_map(fn($e) => '<option' . ($e === $s['estado'] ? ' selected' : '') . '>' . h($e) . '</option>', $ESTADOS));
-    page($s['numero'], $top . '<main class="wrap"><p><a href="/admin/">← Volver</a></p><h1>' . h($s['numero']) . ' <span class="tag">' . h($s['estado']) . '</span></h1>
-    <div class="grid two"><section class="card"><h2 style="margin-top:0">Proyecto</h2><dl><dt>Fecha</dt><dd>' . h($s['creado']) . '</dd><dt>Diseño</dt><dd>' . h($s['diseno_nombre']) . '</dd><dt>Paquete</dt><dd>' . h($s['paquete_nombre']) . '</dd><dt>Precio de referencia</dt><dd>' . bs((int)$s['precio_inicial']) . ' (calculado en el servidor)</dd><dt>Funciones pedidas</dt><dd>' . ($fn ? implode(', ', $fn) : '—') . '</dd></dl>
-    <p><a class="tag" style="padding:8px 14px" href="/admin/?brief_sw=' . (int)$s['id'] . '">Descargar para Claude (ZIP con brief y archivos)</a></p>
-    <h2>Cambiar estado</h2><form method="post" class="inline">' . $tok . '<input type="hidden" name="accion" value="estado"><input type="hidden" name="id" value="' . (int)$s['id'] . '"><select name="estado">' . $opts . '</select><input name="nota" maxlength="500" placeholder="Nota (opcional)"><button>Guardar</button></form>
-    <h2>Archivos</h2>' . ($files ? '<ul>' . $files . '</ul>' : '<p class="muted">Sin archivos.</p>') . '</section>
-    <section class="card"><h2 style="margin-top:0">Cliente y negocio</h2><dl>' . $rows . '</dl></section></div>
-    <h2>Historial</h2><div class="card scroll"><table><thead><tr><th>Fecha</th><th>Estado</th><th>Nota</th></tr></thead><tbody>' . $hist . '</tbody></table></div></main>');
+    $key = cliente_key((string)$s['telefono'], (string)$s['correo']);
+    page($s['numero'], '<p><a href="/admin/?solicitudes=1">← Solicitudes</a></p>
+    <div class="head-card"><div><span class="id">' . h($s['numero']) . '</span><h1>' . h($s['nombre']) . ($s['empresa'] ? ' <span class="muted" style="font-weight:400">· ' . h($s['empresa']) . '</span>' : '') . '</h1><p class="sub">' . fecha($s['creado']) . ' · ' . badge($s['estado']) . '</p></div>
+    <div class="actions"><a class="btn" href="/admin/?brief_sw=' . (int)$s['id'] . '">Descargar para Claude</a><a class="btn wa" href="' . h(wa_link((string)$s['telefono'])) . '" target="_blank" rel="noopener">WhatsApp</a><a class="btn ghost" href="/admin/?cliente=' . h(rawurlencode($key)) . '">Ficha del cliente</a></div></div>
+    <div class="stats">' . kpi('Paquete', h($s['paquete_nombre']), 'Precio de referencia ' . bs((int)$s['precio_inicial'])) . kpi('Diseño elegido', h($s['diseno_nombre'])) . kpi('Funciones pedidas', (string)count($fn), $fn ? implode(', ', $fn) : 'Ninguna') . '</div>
+    <div class="grid main-side"><section class="card"><h2>Información de la solicitud</h2><dl>' . $rows . '</dl></section>
+    <div class="grid" style="align-content:start"><section class="card"><h2>Cambiar estado</h2><form method="post" class="grid">' . $tok . '<input type="hidden" name="accion" value="estado"><input type="hidden" name="id" value="' . (int)$s['id'] . '"><select name="estado">' . $opts . '</select><input name="nota" maxlength="500" placeholder="Nota (opcional): llamé, envié proforma…"><button>Guardar</button></form></section>
+    <section class="card"><h2>Archivos</h2>' . ($files ? '<ul class="files">' . $files . '</ul>' : '<p class="muted">Sin archivos adjuntos.</p>') . '</section>
+    <section class="card"><h2>Historial</h2><ul class="timeline">' . $hist . '</ul></section></div></div>', 'solicitudes');
 }
 
-$fe = (string)($_GET['estado'] ?? '');
-$q = clean($_GET['q'] ?? '', 80);
-$sql = 'SELECT id, numero, creado, estado, nombre, empresa, diseno_nombre, paquete_nombre, precio_inicial FROM solicitudes WHERE 1';
-$args = [];
-if (in_array($fe, $ESTADOS, true)) { $sql .= ' AND estado = ?'; $args[] = $fe; }
-if ($q !== '') { $sql .= ' AND (numero LIKE ? OR nombre LIKE ? OR empresa LIKE ?)'; array_push($args, "%$q%", "%$q%", "%$q%"); }
-$st = db()->prepare($sql . ' ORDER BY id DESC LIMIT 300');
-$st->execute($args);
-$trs = '';
-foreach ($st->fetchAll() as $s) $trs .= '<tr><td><a href="/admin/?ver=' . (int)$s['id'] . '">' . h($s['numero']) . '</a></td><td>' . h($s['creado']) . '</td><td>' . h($s['nombre']) . ($s['empresa'] ? '<br><span class="muted">' . h($s['empresa']) . '</span>' : '') . '</td><td>' . h($s['diseno_nombre']) . '</td><td>' . h($s['paquete_nombre']) . '<br><span class="muted">' . bs((int)$s['precio_inicial']) . '</span></td><td><span class="tag">' . h($s['estado']) . '</span></td></tr>';
-$opts = '<option value="">Todos los estados</option>' . implode('', array_map(fn($e) => '<option' . ($e === $fe ? ' selected' : '') . '>' . h($e) . '</option>', $ESTADOS));
-page('Solicitudes', $top . '<main class="wrap"><h1>Solicitudes de páginas web</h1>' . $m . '<form method="get" class="inline" style="margin-bottom:14px"><select name="estado">' . $opts . '</select><input name="q" value="' . h($q) . '" placeholder="Buscar número, nombre o empresa"><button>Filtrar</button></form>
-<div class="card scroll"><table><thead><tr><th>Número</th><th>Fecha</th><th>Cliente</th><th>Diseño</th><th>Paquete</th><th>Estado</th></tr></thead><tbody>' . ($trs ?: '<tr><td colspan="6" class="muted">Todavía no hay solicitudes.</td></tr>') . '</tbody></table></div></main>');
+/* ---------- Ficha de cliente ---------- */
+if (isset($_GET['cliente'])) {
+    $key = (string)$_GET['cliente'];
+    $mis = array_values(array_filter($sols, fn($s) => cliente_key((string)$s['telefono'], (string)$s['correo']) === $key));
+    $misE = array_values(array_filter($ents, fn($e) => cliente_key((string)$e['telefono'], (string)$e['correo']) === $key));
+    if (!$mis && !$misE) go('?clientes=1');
+    $ref = $mis[0] ?? $misE[0];
+    $items = [];
+    foreach ($mis as $s) $items[] = [$s['creado'], '<tr><td><a href="/admin/?ver=' . (int)$s['id'] . '">' . h($s['numero']) . '</a></td><td>Solicitud · ' . h($s['paquete_nombre']) . '</td><td class="muted">' . fecha($s['creado']) . '</td><td>' . badge($s['estado']) . '</td></tr>'];
+    foreach ($misE as $e) $items[] = [$e['creado'], '<tr><td><a href="/admin/?entrega=' . (int)$e['id'] . '">' . h($e['numero']) . '</a></td><td>' . h($e['titulo']) . '</td><td class="muted">' . fecha($e['creado']) . '</td><td>' . badge($e['revisado'] ? 'Entregado' : 'Nueva solicitud') . '</td></tr>'];
+    usort($items, fn($a, $b) => strcmp($b[0], $a[0]));
+    $valor = array_sum(array_map(fn($s) => in_array($s['estado'], GANADAS, true) ? (int)$s['precio_inicial'] : 0, $mis));
+    page($ref['nombre'], '<p><a href="/admin/?clientes=1">← Clientes</a></p>
+    <div class="head-card"><div><h1>' . h($ref['nombre']) . '</h1><p class="sub">' . h($ref['empresa'] ?: 'Sin empresa') . ' · ' . h($ref['telefono'] ?: '—') . ($ref['correo'] ? ' · <a href="mailto:' . h($ref['correo']) . '">' . h($ref['correo']) . '</a>' : '') . '</p></div>
+    <div class="actions">' . ($ref['telefono'] ? '<a class="btn wa" href="' . h(wa_link((string)$ref['telefono'])) . '" target="_blank" rel="noopener">Escribir por WhatsApp</a>' : '') . '<a class="btn ghost" href="/admin/?formularios=1">Enviarle un formulario</a></div></div>
+    <div class="stats">' . kpi('Solicitudes', (string)count($mis)) . kpi('Formularios enviados', (string)count($misE)) . kpi('Ventas ganadas', bs($valor), 'Aprobado, en desarrollo o entregado') . '</div>
+    <section class="card scroll"><h2>Todo lo de este cliente</h2><table><thead><tr><th>Número</th><th>Qué es</th><th>Fecha</th><th>Estado</th></tr></thead><tbody>' . implode('', array_column($items, 1)) . '</tbody></table></section>', 'clientes');
+}
+
+/* ---------- Lista de clientes ---------- */
+if (isset($_GET['clientes'])) {
+    $cl = [];
+    foreach ($sols as $s) { $k = cliente_key((string)$s['telefono'], (string)$s['correo']); $cl[$k] ??= ['n' => $s['nombre'], 'emp' => $s['empresa'], 'tel' => $s['telefono'], 'mail' => $s['correo'], 's' => 0, 'e' => 0, 'ult' => '', 'estado' => $s['estado']]; $cl[$k]['s']++; $cl[$k]['ult'] = max($cl[$k]['ult'], $s['creado']); }
+    foreach ($ents as $e) { $k = cliente_key((string)$e['telefono'], (string)$e['correo']); $cl[$k] ??= ['n' => $e['nombre'], 'emp' => $e['empresa'], 'tel' => $e['telefono'], 'mail' => $e['correo'], 's' => 0, 'e' => 0, 'ult' => '', 'estado' => '']; $cl[$k]['e']++; $cl[$k]['ult'] = max($cl[$k]['ult'], $e['creado']); }
+    $q = mb_strtolower(clean($_GET['q'] ?? '', 80));
+    if ($q !== '') $cl = array_filter($cl, fn($c) => str_contains(mb_strtolower($c['n'] . ' ' . $c['emp'] . ' ' . $c['tel'] . ' ' . $c['mail']), $q));
+    uasort($cl, fn($a, $b) => strcmp($b['ult'], $a['ult']));
+    $trs = '';
+    foreach ($cl as $k => $c) $trs .= '<tr><td><a class="who" href="/admin/?cliente=' . h(rawurlencode((string)$k)) . '"><b>' . h($c['n']) . '</b><small>' . h($c['emp'] ?: '—') . '</small></a></td><td>' . h($c['tel']) . '<br><small class="muted">' . h($c['mail']) . '</small></td><td>' . $c['s'] . '</td><td>' . $c['e'] . '</td><td class="muted">' . fecha($c['ult']) . '</td><td>' . ($c['estado'] ? badge($c['estado']) : '<span class="muted">Solo formularios</span>') . '</td></tr>';
+    page('Clientes', '<div class="top"><div><h1>Clientes</h1><p class="sub">Cada cliente con todas sus solicitudes y formularios. Se agrupan por teléfono o correo.</p></div>
+    <form method="get" class="search"><input type="hidden" name="clientes" value="1"><input name="q" value="' . h($q) . '" placeholder="Buscar nombre, empresa, teléfono o correo"><button class="ghost">Buscar</button></form></div>
+    <div class="card scroll">' . ($trs ? '<table><thead><tr><th>Cliente</th><th>Contacto</th><th>Solicitudes</th><th>Formularios</th><th>Último contacto</th><th>Estado actual</th></tr></thead><tbody>' . $trs . '</tbody></table>' : empty_state('Todavía no hay clientes', 'Aparecen cuando alguien envía una solicitud o un formulario.')) . '</div>', 'clientes');
+}
+
+/* ---------- Lista de solicitudes ---------- */
+if (isset($_GET['solicitudes'])) {
+    $fe = (string)($_GET['estado'] ?? '');
+    $q = mb_strtolower(clean($_GET['q'] ?? '', 80));
+    $lista = array_filter($sols, fn($s) => (!in_array($fe, $ESTADOS, true) || $s['estado'] === $fe) && ($q === '' || str_contains(mb_strtolower($s['numero'] . ' ' . $s['nombre'] . ' ' . $s['empresa']), $q)));
+    $chips = '<a class="chip" href="/admin/?solicitudes=1"' . ($fe === '' ? ' aria-current="page"' : '') . '>Todas <i>' . count($sols) . '</i></a>';
+    foreach ($ESTADOS as $e) $chips .= '<a class="chip" href="/admin/?solicitudes=1&amp;estado=' . rawurlencode($e) . '"' . ($fe === $e ? ' aria-current="page"' : '') . '><span class="dot" style="--c:' . COLOR[$e] . '"></span>' . h($e) . ' <i>' . count($porEstado[$e]) . '</i></a>';
+    $trs = '';
+    foreach ($lista as $s) $trs .= '<tr><td><a class="who" href="/admin/?ver=' . (int)$s['id'] . '"><b>' . h($s['nombre']) . '</b><small>' . h($s['empresa'] ?: $s['numero']) . '</small></a></td><td>' . h($s['paquete_nombre']) . '<br><small class="muted">' . h($s['diseno_nombre']) . '</small></td><td>' . bs((int)$s['precio_inicial']) . '</td><td class="muted">' . fecha($s['creado']) . '</td><td>' . badge($s['estado']) . '</td></tr>';
+    page('Solicitudes', '<div class="top"><div><h1>Solicitudes</h1><p class="sub">Pedidos de páginas web y proyectos que llegan desde el catálogo.</p></div>
+    <form method="get" class="search"><input type="hidden" name="solicitudes" value="1">' . ($fe !== '' ? '<input type="hidden" name="estado" value="' . h($fe) . '">' : '') . '<input name="q" value="' . h($q) . '" placeholder="Buscar número, nombre o empresa"><button class="ghost">Buscar</button></form></div>
+    <div class="chips">' . $chips . '</div>
+    <div class="card scroll">' . ($trs ? '<table><thead><tr><th>Cliente</th><th>Paquete y diseño</th><th>Referencia</th><th>Recibida</th><th>Estado</th></tr></thead><tbody>' . $trs . '</tbody></table>' : empty_state('No hay solicitudes con este filtro')) . '</div>', 'solicitudes');
+}
+
+/* ---------- Inicio: panel ---------- */
+$mes = date('Y-m');
+$delMes = count(array_filter($sols, fn($s) => str_starts_with($s['creado'], $mes)));
+$sinRevisar = count(array_filter($ents, fn($e) => !$e['revisado']));
+$stats = kpi('Solicitudes nuevas', (string)$cuenta(NUEVAS), 'Por atender', '/admin/?solicitudes=1&estado=' . rawurlencode('Nueva solicitud'))
+    . kpi('En proceso', (string)$cuenta(EN_PROCESO), bs($suma(EN_PROCESO)) . ' en juego')
+    . kpi('Ganadas', (string)$cuenta(GANADAS), bs($suma(GANADAS)) . ' en ventas')
+    . kpi('Datos sin revisar', (string)$sinRevisar, 'De formularios de clientes', '/admin/?datos=1')
+    . kpi('Este mes', (string)$delMes, 'Solicitudes recibidas');
+$cols = '';
+foreach (array_diff($ESTADOS, ['Cancelado']) as $e) {
+    $cards = '';
+    foreach (array_slice($porEstado[$e], 0, 6) as $s) $cards .= '<a class="mini" href="/admin/?ver=' . (int)$s['id'] . '"><b>' . h($s['nombre']) . '</b><small>' . h($s['paquete_nombre']) . ' · ' . bs((int)$s['precio_inicial']) . '</small></a>';
+    $more = count($porEstado[$e]) > 6 ? '<a class="muted" href="/admin/?solicitudes=1&amp;estado=' . rawurlencode($e) . '">Ver las ' . count($porEstado[$e]) . ' →</a>' : '';
+    $cols .= '<div class="col"><h3><span><span class="dot" style="--c:' . COLOR[$e] . '"></span>' . h($e) . '</span><i>' . count($porEstado[$e]) . '</i></h3>' . ($cards ?: '<small class="muted">Sin solicitudes</small>') . $more . '</div>';
+}
+$feed = [];
+foreach (db()->query('SELECT h.fecha, h.estado, h.nota, s.id, s.nombre, s.numero FROM historial h JOIN solicitudes s ON s.id = h.solicitud_id ORDER BY h.id DESC LIMIT 12') as $x)
+    $feed[] = [$x['fecha'], '<li><span class="dot" style="--c:' . (COLOR[$x['estado']] ?? '#8e96a8') . '"></span><div><a href="/admin/?ver=' . (int)$x['id'] . '">' . h($x['nombre']) . '</a> · ' . h($x['estado']) . ($x['nota'] ? ' — ' . h($x['nota']) : '') . '<small>' . fecha($x['fecha']) . '</small></div></li>'];
+foreach (array_slice($ents, 0, 12) as $e) $feed[] = [$e['creado'], '<li><span class="dot" style="--c:#7aa2ff"></span><div><a href="/admin/?entrega=' . (int)$e['id'] . '">' . h($e['nombre']) . '</a> envió «' . h($e['titulo']) . '»<small>' . fecha($e['creado']) . '</small></div></li>'];
+usort($feed, fn($a, $b) => strcmp($b[0], $a[0]));
+$feedHtml = implode('', array_column(array_slice($feed, 0, 12), 1));
+page('Inicio', '<div class="top"><div><h1>Hola, equipo SIBNOVA</h1><p class="sub">Resumen de solicitudes, clientes y datos de proyectos.</p></div><div class="actions"><a class="btn" href="/admin/?formularios=1">Enviar un formulario</a><a class="btn ghost" href="/catalogo/" target="_blank" rel="noopener">Ver catálogo ↗</a></div></div>
+' . $m . '<div class="stats">' . $stats . '</div>
+<section style="margin-bottom:18px"><h2>Embudo de ventas</h2><div class="board">' . $cols . '</div></section>
+<div class="grid two"><section class="card"><h2>Actividad reciente</h2>' . ($feedHtml ? '<ul class="feed">' . $feedHtml . '</ul>' : empty_state('Sin actividad todavía')) . '</section>
+<section class="card"><h2>Accesos rápidos</h2><ul class="feed">
+<li><span class="dot" style="--c:#1fa855"></span><div><a href="/admin/?formularios=1">Enviar un formulario a un cliente</a><small>Página web, logo, redes, apps, IA o automatización</small></div></li>
+<li><span class="dot" style="--c:#4c8dff"></span><div><a href="/admin/?solicitudes=1&amp;estado=' . rawurlencode('Nueva solicitud') . '">Atender solicitudes nuevas</a><small>' . $cuenta(NUEVAS) . ' por atender</small></div></li>
+<li><span class="dot" style="--c:#a78bfa"></span><div><a href="/admin/?clientes=1">Ver todos los clientes</a><small>Historial completo de cada cliente</small></div></li>
+<li><span class="dot" style="--c:#f5b700"></span><div><a href="/diagnostico/" target="_blank" rel="noopener">Abrir el diagnóstico gratuito ↗</a><small>Para compartir con prospectos</small></div></li>
+</ul></section></div>', 'inicio');

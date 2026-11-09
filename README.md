@@ -125,7 +125,7 @@ Alternativa sin configuración: Vercel o Netlify detectan Next.js y publican dir
 |---|---|
 | `public/api/solicitud.php` | Recibe la solicitud, valida todo, calcula el precio desde `catalogo.json`, guarda archivos y avisa por correo a `sibnovaltda@gmail.com` |
 | `public/api/_lib.php` | Funciones comunes (no se puede abrir por URL) |
-| `public/admin/index.php` | Bandeja protegida: lista, detalle, cambio de estado con historial y descarga de archivos |
+| `public/admin/index.php` | CRM protegido con contraseña: panel con indicadores y embudo de ventas, clientes, solicitudes, datos recibidos, formularios y cuenta |
 
 - **Dónde se guardan los datos:** en `sibnova-datos/`, al lado de `public_html/` (fuera de la parte pública). Es una base SQLite más la carpeta `archivos/`. Publicar una versión nueva del sitio **no los borra**. Haz copia de esa carpeta cada mes desde el Administrador de archivos de Hostinger.
 - **Requisitos:** PHP 8.1 o superior con `pdo_sqlite`, `fileinfo` y `mbstring` (vienen activos en Hostinger), y `upload_max_filesize` de 12 MB o más.
