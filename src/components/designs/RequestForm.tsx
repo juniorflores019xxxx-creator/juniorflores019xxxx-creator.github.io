@@ -8,6 +8,7 @@ import { BUDGETS, FEATURES, FILES, REQUEST_API } from "@/lib/request";
 import { clearSelection, readSelection, saveSelection } from "@/lib/selection";
 import { SITE, WHATSAPP_URL } from "@/lib/site";
 import { ArrowRight, IconCheck, IconWhatsApp } from "@/components/ui/icons";
+import FilePicker from "@/components/forms/FilePicker";
 import styles from "./request.module.css";
 
 const STEPS = ["Diseño y paquete", "Tus datos", "Tu negocio", "Diseño", "Funciones", "Materiales", "Plazos y envío"];
@@ -80,7 +81,6 @@ export default function RequestForm() {
     for (const f of files) {
       const ext = f.name.split(".").pop()?.toLowerCase() ?? "";
       if (!FILES.ext.includes(ext)) { msg = `«${f.name}» no es un formato permitido.`; break; }
-      if (f.size > FILES.maxFileMB * 1024 * 1024) { msg = `«${f.name}» pesa más de ${FILES.maxFileMB} MB.`; break; }
     }
     const total = files.reduce((s, f) => s + f.size, 0);
     if (!msg && total > FILES.maxTotalMB * 1024 * 1024) msg = `Entre todos los archivos no pueden pasar de ${FILES.maxTotalMB} MB.`;
@@ -311,11 +311,9 @@ export default function RequestForm() {
       <fieldset ref={(el) => { stepRefs.current[5] = el; }} hidden={step !== 5} className={styles.step}>
         <legend tabIndex={-1}>Materiales</legend>
         <p className={styles.help}>Sube tu logo, fotos, videos, documentos comerciales, catálogo o textos. Hasta {FILES.maxFiles} archivos, {FILES.maxFileMB} MB cada uno y {FILES.maxTotalMB} MB en total. Formatos: {FILES.ext.join(", ")}.</p>
-        <label className={styles.field}>Archivos <small>(opcional)</small>
-          <input type="file" name="archivos[]" multiple accept={FILES.ext.map((e) => `.${e}`).join(",")} onChange={(e) => checkFiles(e.target.files)} aria-describedby="error-archivos" />
-        </label>
+        <FilePicker name="archivos[]" label="Archivos" ext={FILES.ext} maxMB={FILES.maxFileMB} maxFiles={FILES.maxFiles} context="formulario de solicitud de página web" />
         {fileError && <p id="error-archivos" className={styles.err} role="alert">{fileError}</p>}
-        <p className={styles.help}>Si tus videos o fotos pesan más, envíanos un enlace de Google Drive en el último paso.</p>
+        <p className={styles.help}>Las fotos pesadas se achican solas. Si un video o documento pesa más de {FILES.maxFileMB} MB, te mostramos cómo enviarlo por WhatsApp sin perder lo que ya llenaste.</p>
         <p className={styles.warn}>Nunca te pediremos contraseñas de tu correo, tu banco o tu hosting. No las escribas en este formulario.</p>
       </fieldset>
 

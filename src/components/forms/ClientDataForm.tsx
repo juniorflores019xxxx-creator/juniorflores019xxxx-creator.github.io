@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ACCEPT, getForm, type DataForm, type Field } from "@/lib/forms";
 import { SITE, WHATSAPP_URL } from "@/lib/site";
 import { ArrowRight, IconCheck, IconWhatsApp } from "@/components/ui/icons";
+import FilePicker from "./FilePicker";
 import styles from "@/components/designs/request.module.css";
 
 // Formulario de datos para clientes. Lee el formulario de ?f=<id>, lo muestra por pasos
@@ -11,7 +12,7 @@ import styles from "@/components/designs/request.module.css";
 const API = "/api/datos.php";
 const MAX_MB = 10;
 
-function FieldInput({ f }: { f: Field }) {
+function FieldInput({ f, context }: { f: Field; context: string }) {
   const id = `c-${f.name}`;
   const label = <span>{f.label}{!f.required && <small> (opcional)</small>}</span>;
   const help = f.help && <small className={styles.help}>{f.help}</small>;
@@ -46,13 +47,7 @@ function FieldInput({ f }: { f: Field }) {
     );
   }
   if (f.type === "file") {
-    const ext = ACCEPT[f.accept ?? "todo"];
-    return (
-      <label className={styles.field}>{label}
-        <input type="file" name={`${f.name}[]`} multiple accept={ext.map((e) => `.${e}`).join(",")} />
-        <small className={styles.help}>{f.help ? `${f.help} ` : ""}Formatos: {ext.join(", ")}. Hasta {MAX_MB} MB por archivo.</small>
-      </label>
-    );
+    return <FilePicker name={`${f.name}[]`} label={f.label} help={f.help} ext={ACCEPT[f.accept ?? "todo"]} maxMB={MAX_MB} context={context} />;
   }
   if (f.type === "textarea") {
     return <label className={styles.field}>{label}<textarea id={id} name={f.name} rows={4} required={f.required} maxLength={f.max} placeholder={f.placeholder} />{help}</label>;
@@ -92,10 +87,6 @@ export default function ClientDataForm() {
   function validStep(i: number) {
     const fs = steps.current[i];
     if (!fs) return true;
-    for (const f of [...fs.querySelectorAll<HTMLInputElement>("input[type=file]")]) {
-      const big = [...(f.files ?? [])].find((x) => x.size > MAX_MB * 1024 * 1024);
-      if (big) { setError(`«${big.name}» pesa más de ${MAX_MB} MB. Compártelo con un enlace de Drive.`); setStatus("error"); return false; }
-    }
     for (const name of new Set([...fs.querySelectorAll<HTMLInputElement>("[data-required]")].map((x) => x.dataset.required!))) {
       const boxes = [...fs.querySelectorAll<HTMLInputElement>(`input[data-required="${name}"]`)];
       if (!boxes.some((b) => b.checked)) { boxes[0].setCustomValidity("Elige al menos una opción."); boxes[0].reportValidity(); boxes[0].setCustomValidity(""); return false; }
@@ -166,7 +157,7 @@ export default function ClientDataForm() {
           <fieldset key={s.title + i} ref={(el) => { steps.current[i] = el; }} hidden={step !== i} className={styles.step}>
             <legend tabIndex={-1}>{s.title}</legend>
             {s.intro && <p className={styles.help}>{s.intro}</p>}
-            {s.fields.map((f) => <FieldInput key={f.name} f={f} />)}
+            {s.fields.map((f) => <FieldInput key={f.name} f={f} context={`formulario «${form.title}»`} />)}
             {i === total - 1 && (
               <label className={styles.consent}>
                 <input type="checkbox" name="acepto" value="si" required />

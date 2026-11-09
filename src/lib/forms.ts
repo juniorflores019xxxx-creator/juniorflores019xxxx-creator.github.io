@@ -52,7 +52,7 @@ const ARCHIVOS_MARCA: Field = { name: "archivos_marca", label: "Logo actual y ma
 const FOTOS: Field = { name: "fotos", label: "Fotos", type: "file", accept: "imagenes", help: "De tu local, equipo, productos o trabajos. Mejor si son horizontales y nítidas." };
 const VIDEOS: Field = { name: "videos", label: "Videos cortos", type: "file", accept: "videos" };
 const DOCUMENTOS: Field = { name: "documentos", label: "Documentos", type: "file", accept: "documentos", help: "Catálogo, lista de precios, presentación de la empresa, etc." };
-const DRIVE: Field = { name: "enlace_archivos", label: "Enlace a Google Drive o Dropbox", type: "url", help: "Para videos o carpetas que pesan mucho.", max: 500 };
+const DRIVE: Field = { name: "enlace_archivos", label: "Enlace a Google Drive o Dropbox", type: "text", help: "Para videos o carpetas que pesan mucho. Si los mandaste por WhatsApp, escríbelo aquí.", max: 500 };
 const CIERRE: Section = {
   title: "Para terminar",
   fields: [

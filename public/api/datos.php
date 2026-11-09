@@ -74,6 +74,9 @@ foreach ($form['campos'] as $c) {
     if ($c['required'] && $v === '') $err[] = $c['label'];
     $datos[$n] = $v;
 }
+// Archivos que el cliente marcó como enviados por WhatsApp (pesaban más del límite)
+$porWhatsapp = array_slice(array_values(array_filter(array_map(fn($x) => clean($x, 200), (array)($_POST['archivos_whatsapp'] ?? [])))), 0, 30);
+$datos['archivos_whatsapp'] = $porWhatsapp;
 if (($datos['nombre'] ?? '') === '' || ($datos['telefono'] ?? '') === '') $err[] = 'nombre y WhatsApp';
 if ($err) fail('Revisa estos datos: ' . implode(', ', array_unique($err)) . '.');
 

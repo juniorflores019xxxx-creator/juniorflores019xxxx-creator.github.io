@@ -82,6 +82,10 @@ foreach ((array)($_POST['funciones'] ?? []) as $f) {
 $conCatalogo = ($_POST['catalogo'] ?? '') === 'si';
 if ($conCatalogo && ($paquete['id'] ?? '') !== $cat['catalogo']['solo_con']) $err[] = 'catalogo';
 $d['catalogo'] = $conCatalogo ? 'si' : 'no';
+// Archivos que el cliente marcó como enviados por WhatsApp (pesaban más del límite)
+$d['archivos_whatsapp'] = array_slice(array_values(array_filter(array_map(fn($x) => clean($x, 200), (array)($_POST['archivos_whatsapp'] ?? [])))), 0, 30);
+$d['archivos_whatsapp'] = implode('; ', $d['archivos_whatsapp']);
+
 $d['productos'] = '';
 if (!empty($paquete['tienda'])) $d['productos'] = $one('productos', $cat['productos']);
 

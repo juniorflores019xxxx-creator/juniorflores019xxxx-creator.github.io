@@ -83,3 +83,14 @@
 .color { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 12px; border-radius: 12px; border: 1px solid var(--line); font-weight: 400; cursor: pointer; }
 .color input[type=checkbox] { width: 18px; height: 18px; accent-color: #1c64e6; }
 .color input[type=color] { width: 42px; height: 34px; padding: 0; border: 1px solid var(--line-2); border-radius: 8px; background: none; cursor: pointer; }
+.fileList { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 6px; }
+.fileList li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px; border-radius: 10px; background: rgba(245, 247, 251, 0.04); border: 1px solid var(--line); font-weight: 400; font-size: 0.9rem; }
+.fileList li span { min-width: 0; overflow-wrap: anywhere; }
+.fileList small { color: var(--grey); }
+.fileList button, .linkBtn { min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); background: transparent; color: var(--paper); font-size: 0.85rem; cursor: pointer; flex: none; }
+.fileList button:hover, .linkBtn:hover { border-color: #ff9a9a; color: #ff9a9a; }
+.bigFile { display: grid; gap: 10px; padding: 14px; border-radius: 14px; border: 1px solid rgba(255, 196, 0, 0.35); background: rgba(255, 196, 0, 0.06); font-weight: 400; }
+.bigFile p { color: var(--grey); font-size: 0.92rem; }
+.bigFile b { color: var(--paper); }
+.bigActs { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.bigActs .consent { border: 0; padding: 0; min-height: 40px; align-items: center; }

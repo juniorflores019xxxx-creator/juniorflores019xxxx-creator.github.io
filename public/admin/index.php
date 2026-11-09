@@ -34,7 +34,7 @@ function solicitud_labels(): array {
         'nombre_comercial' => 'Nombre comercial', 'rubro' => 'Rubro', 'descripcion' => 'Descripción', 'servicios' => 'Servicios o productos', 'publico' => 'Público objetivo', 'objetivos' => 'Objetivos',
         'colores' => 'Colores', 'logo' => 'Logo', 'manual' => 'Manual de marca', 'referencias' => 'Referencias', 'cambios' => 'Conservar o cambiar',
         'catalogo' => 'Catálogo con WhatsApp', 'productos' => 'Cantidad de productos', 'dominio' => 'Dominio propio', 'hosting' => 'Hosting propio', 'adicionales' => 'Funciones adicionales',
-        'fecha_entrega' => 'Fecha deseada', 'presupuesto' => 'Presupuesto', 'aprobador' => 'Aprueba', 'observaciones' => 'Observaciones'];
+        'fecha_entrega' => 'Fecha deseada', 'presupuesto' => 'Presupuesto', 'aprobador' => 'Aprueba', 'observaciones' => 'Observaciones', 'archivos_whatsapp' => 'Archivos enviados por WhatsApp'];
 }
 
 // Nombre de carpeta seguro para el ZIP (sin tildes ni símbolos)
@@ -154,6 +154,7 @@ if ($logged && (isset($_GET['brief_dp']) || isset($_GET['brief_sw']))) {
             $val = is_array($v) ? implode(', ', $v) : (string)$v;
             $md[] = str_contains($val, "\n") ? '**' . $c['label'] . ':**' . "\n\n" . $val : '- **' . $c['label'] . ':** ' . $val;
         }
+        if (!empty($d['archivos_whatsapp'])) { $md[] = ''; $md[] = '## Archivos enviados por WhatsApp'; foreach ((array)$d['archivos_whatsapp'] as $x) $md[] = '- ' . $x . ' (pídelos del chat del cliente)'; }
         $fa = db()->prepare('SELECT * FROM entregas_archivos WHERE entrega_id = ? ORDER BY campo, id'); $fa->execute([$e['id']]);
         foreach ($fa->fetchAll() as $f) $files[] = ['campo' => $f['campo'], 'nombre' => $f['nombre'], 'path' => data_dir() . '/archivos/' . $e['numero'] . '/' . basename($f['guardado'])];
         $tipo = $e['formulario'];
@@ -263,6 +264,7 @@ if (isset($_GET['entrega'])) {
             : h(is_array($v) ? implode(', ', $v) : (string)$v);
         $rows .= '<dt>' . h($c['label']) . '</dt><dd>' . $val . '</dd>';
     }
+    if (!empty($d['archivos_whatsapp'])) $rows .= '<dt style="grid-column:1/-1;color:#ffd666;margin-top:12px">Enviados por WhatsApp (revisa el chat)</dt><dd style="grid-column:1/-1">' . h(implode('; ', (array)$d['archivos_whatsapp'])) . '</dd>';
     $fa = db()->prepare('SELECT * FROM entregas_archivos WHERE entrega_id = ? ORDER BY campo, id'); $fa->execute([$e['id']]);
     $files = '';
     foreach ($fa->fetchAll() as $f) $files .= '<li><span class="muted">' . h($f['campo']) . ':</span> <a href="/admin/?archivo_dp=' . (int)$f['id'] . '">' . h($f['nombre']) . '</a> <span class="muted">(' . round($f['bytes'] / 1048576, 1) . ' MB)</span></li>';
