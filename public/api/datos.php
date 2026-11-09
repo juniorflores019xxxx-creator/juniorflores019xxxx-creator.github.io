@@ -47,7 +47,7 @@ foreach ($form['campos'] as $c) {
             $fileFields[] = $c;
             continue 2;
         case 'multi':
-            $v = array_values(array_unique(array_filter(array_map(fn($x) => clean($x, 120), (array)($_POST[$n] ?? [])), fn($x) => in_array($x, $c['options'], true))));
+            $v = array_values(array_unique(array_filter(array_map(fn($x) => clean($x, 400), (array)($_POST[$n] ?? [])), fn($x) => in_array($x, $c['options'], true))));
             if ($c['required'] && !$v) $err[] = $c['label'];
             $datos[$n] = $v;
             continue 2;
