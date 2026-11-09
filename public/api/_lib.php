@@ -2,6 +2,9 @@
 // Funciones comunes del servidor de solicitudes de SIBNOVA. No se abre directamente.
 declare(strict_types=1);
 
+// Hora de Bolivia para fechas y números de solicitud (DP-/SW-AAAAMMDD-…)
+date_default_timezone_set('America/La_Paz');
+
 if (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) { http_response_code(404); exit; }
 
 // Hash de la clave de un solo uso para crear la cuenta de la bandeja (/admin/). Después de crearla ya no sirve.
