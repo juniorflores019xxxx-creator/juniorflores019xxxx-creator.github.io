@@ -9,6 +9,9 @@ if (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) { http_response_co
 
 // Hash de la clave de un solo uso para crear la cuenta de la bandeja (/admin/). Después de crearla ya no sirve.
 const SETUP_TOKEN_HASH = '$2y$10$HGDiMDaE4XGjcXY9YVvckOsOYOqC0jYtVO9hCRa.VOw5PO/tjoPdC';
+// Huella SHA-256 de la llave del agente de cotización (registra proformas en el CRM vía /api/agente.php).
+// La llave vive solo en la computadora de SIBNOVA; se puede apagar desde el CRM (Cuenta).
+const AGENT_TOKEN_SHA256 = '5eb065a4e12601648604bff908866a2cb554823514105eb19ef5f6a43d54d514';
 const NOTIFY_EMAIL = 'sibnovaltda@gmail.com';
 const MAIL_FROM = 'no-responder@sibnova.com.bo';
 const ALLOWED_HOSTS = ['sibnova.com.bo', 'www.sibnova.com.bo', 'localhost', '127.0.0.1'];
@@ -54,6 +57,17 @@ function db(): PDO {
     $pdo->exec('CREATE TABLE IF NOT EXISTS entregas_archivos (
         id INTEGER PRIMARY KEY, entrega_id INTEGER NOT NULL REFERENCES entregas(id) ON DELETE CASCADE,
         campo TEXT NOT NULL, nombre TEXT NOT NULL, guardado TEXT NOT NULL, tipo TEXT NOT NULL, bytes INTEGER NOT NULL)');
+    // Cotizaciones que registra el agente (sin costos, mínimos ni márgenes: eso queda en el informe interno local)
+    $pdo->exec('CREATE TABLE IF NOT EXISTS cotizaciones (
+        id INTEGER PRIMARY KEY, clave TEXT UNIQUE NOT NULL, creado TEXT NOT NULL, actualizado TEXT NOT NULL, etapa TEXT NOT NULL,
+        nombre TEXT NOT NULL, empresa TEXT, telefono TEXT, correo TEXT, ciudad TEXT, rubro TEXT, proyecto TEXT, origen TEXT, prioridad TEXT,
+        proforma TEXT, vigencia TEXT, monto INTEGER NOT NULL DEFAULT 0, soporte_mensual INTEGER NOT NULL DEFAULT 0, opciones TEXT NOT NULL DEFAULT \'[]\',
+        opcion_elegida TEXT, mensaje_cliente TEXT, resumen_equipo TEXT, proximo_seguimiento TEXT, notas TEXT)');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS cotizaciones_archivos (
+        id INTEGER PRIMARY KEY, cotizacion_id INTEGER NOT NULL REFERENCES cotizaciones(id) ON DELETE CASCADE,
+        nombre TEXT NOT NULL, guardado TEXT NOT NULL, bytes INTEGER NOT NULL, subido TEXT NOT NULL)');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS cotizaciones_actividad (
+        id INTEGER PRIMARY KEY, cotizacion_id INTEGER NOT NULL REFERENCES cotizaciones(id) ON DELETE CASCADE, fecha TEXT NOT NULL, texto TEXT NOT NULL)');
     return $pdo;
 }
 

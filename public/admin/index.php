@@ -28,6 +28,9 @@ $logged = !empty($_SESSION['ok']) && ($_SESSION['vence'] ?? 0) > time();
 if ($logged) $_SESSION['vence'] = time() + 7200;
 $hash = setting('admin_hash');
 $msg = '';
+// Etapas de las cotizaciones que registra el agente: clave => [nombre, color]
+const ETAPAS_COT = ['proforma' => ['Proforma lista', '#4c8dff'], 'enviada' => ['Enviada', '#a78bfa'], 'negociacion' => ['En negociación', '#fb923c'], 'ganado' => ['Ganada', '#22c55e'], 'perdido' => ['Perdida', '#ef4444']];
+const COT_ABIERTAS = ['proforma', 'enviada', 'negociacion'];
 
 function solicitud_labels(): array {
     return ['nombre' => 'Nombre', 'empresa' => 'Empresa', 'nit' => 'NIT', 'cargo' => 'Cargo', 'correo' => 'Correo', 'telefono' => 'Teléfono / WhatsApp', 'ciudad' => 'Ciudad', 'pais' => 'País',
@@ -100,6 +103,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int)($_POST['id'] ?? 0);
         db()->prepare('UPDATE entregas SET revisado = CASE revisado WHEN 1 THEN 0 ELSE 1 END WHERE id = ?')->execute([$id]);
         go('?entrega=' . $id);
+    } elseif ($logged && $a === 'cot_etapa') {
+        $id = (int)($_POST['id'] ?? 0); $e = (string)($_POST['etapa'] ?? '');
+        $nota = clean($_POST['nota'] ?? '', 500);
+        if (isset(ETAPAS_COT[$e]) && $id > 0) {
+            $f = now_iso();
+            db()->prepare('UPDATE cotizaciones SET etapa = ?, actualizado = ? WHERE id = ?')->execute([$e, $f, $id]);
+            db()->prepare('INSERT INTO cotizaciones_actividad (cotizacion_id, fecha, texto) VALUES (?, ?, ?)')->execute([$id, $f, 'Etapa: ' . ETAPAS_COT[$e][0] . ($nota !== '' ? ' — ' . $nota : '')]);
+        }
+        go('?cot=' . $id);
+    } elseif ($logged && $a === 'cot_seguir') {
+        $id = (int)($_POST['id'] ?? 0);
+        $fs = (string)($_POST['proximo'] ?? '');
+        $fs = preg_match('/^\d{4}-\d{2}-\d{2}$/', $fs) ? $fs : '';
+        db()->prepare('UPDATE cotizaciones SET proximo_seguimiento = ?, notas = ?, actualizado = ? WHERE id = ?')->execute([$fs, clean($_POST['notas'] ?? '', 3000), now_iso(), $id]);
+        go('?cot=' . $id);
+    } elseif ($logged && $a === 'agente') {
+        set_setting('agente_apagado', setting('agente_apagado') === '1' ? '0' : '1');
+        go('?cuenta=1');
     } elseif ($logged && $a === 'clave') {
         $nueva = (string)($_POST['clave'] ?? '');
         if (!password_verify((string)($_POST['actual'] ?? ''), (string)$hash)) $msg = 'La contraseña actual no es correcta.';
@@ -127,6 +148,18 @@ if ($logged && isset($_GET['archivo_dp'])) {
     $st->execute([(int)$_GET['archivo_dp']]);
     $f = $st->fetch();
     $path = $f ? data_dir() . '/archivos/' . $f['numero'] . '/' . basename($f['guardado']) : '';
+    if (!$f || !is_file($path)) { http_response_code(404); exit('Archivo no encontrado.'); }
+    header('Content-Type: application/octet-stream');
+    header('Content-Disposition: attachment; filename="' . preg_replace('/[^A-Za-z0-9._ -]/', '_', $f['nombre']) . '"; filename*=UTF-8\'\'' . rawurlencode($f['nombre']));
+    header('Content-Length: ' . filesize($path));
+    readfile($path);
+    exit;
+}
+if ($logged && isset($_GET['archivo_cot'])) {
+    $st = db()->prepare('SELECT a.*, c.clave FROM cotizaciones_archivos a JOIN cotizaciones c ON c.id = a.cotizacion_id WHERE a.id = ?');
+    $st->execute([(int)$_GET['archivo_cot']]);
+    $f = $st->fetch();
+    $path = $f ? data_dir() . '/archivos/cotizaciones/' . basename($f['clave']) . '/' . basename($f['guardado']) : '';
     if (!$f || !is_file($path)) { http_response_code(404); exit('Archivo no encontrado.'); }
     header('Content-Type: application/octet-stream');
     header('Content-Disposition: attachment; filename="' . preg_replace('/[^A-Za-z0-9._ -]/', '_', $f['nombre']) . '"; filename*=UTF-8\'\'' . rawurlencode($f['nombre']));
@@ -241,7 +274,7 @@ function empty_state(string $t, string $d = ''): string { return '<div class="em
 function page(string $title, string $body, string $active = '', bool $bare = false): never {
     global $tok;
     $nav = [['inicio', '/admin/', 'Inicio', 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['clientes', '/admin/?clientes=1', 'Clientes', 'M16 19a4 4 0 0 0-8 0M12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM20 19a3 3 0 0 0-3-3M17 11a2.5 2.5 0 1 0 0-5M4 19a3 3 0 0 1 3-3M7 11a2.5 2.5 0 1 1 0-5'],
-        ['solicitudes', '/admin/?solicitudes=1', 'Solicitudes', 'M4 5h16v14H4zM4 9h16M8 13h5'], ['datos', '/admin/?datos=1', 'Datos recibidos', 'M12 3v12M7 10l5 5 5-5M4 21h16'],
+        ['solicitudes', '/admin/?solicitudes=1', 'Solicitudes', 'M4 5h16v14H4zM4 9h16M8 13h5'], ['cotizaciones', '/admin/?cotizaciones=1', 'Cotizaciones', 'M7 3h10v18l-5-3-5 3zM10 8h4M10 12h4'], ['datos', '/admin/?datos=1', 'Datos recibidos', 'M12 3v12M7 10l5 5 5-5M4 21h16'],
         ['formularios', '/admin/?formularios=1', 'Formularios', 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5'], ['cuenta', '/admin/?cuenta=1', 'Cuenta', 'M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0']];
     $links = implode('', array_map(fn($n) => '<a href="' . $n[1] . '"' . ($n[0] === $active ? ' aria-current="page"' : '') . '><svg viewBox="0 0 24 24" aria-hidden="true"><path d="' . $n[3] . '"/></svg>' . $n[2] . '</a>', $nav));
     $side = $bare ? '' : '<aside class="side"><a class="brand" href="/admin/"><img src="/brand/sn-logo-256.webp" alt="" width="40" height="19"><span>SIBNOVA<small>CRM</small></span></a><nav>' . $links . '</nav>
@@ -330,6 +363,70 @@ $porEstado = array_fill_keys($ESTADOS, []);
 foreach ($sols as $s) $porEstado[$s['estado']][] = $s;
 $suma = fn(array $estados) => array_sum(array_map(fn($s) => (int)$s['precio_inicial'], array_merge(...array_map(fn($e) => $porEstado[$e] ?? [], $estados))));
 $cuenta = fn(array $estados) => array_sum(array_map(fn($e) => count($porEstado[$e] ?? []), $estados));
+$cots = db()->query('SELECT id, clave, creado, actualizado, etapa, nombre, empresa, telefono, correo, proyecto, proforma, vigencia, monto, prioridad, proximo_seguimiento FROM cotizaciones ORDER BY actualizado DESC')->fetchAll();
+$hoy = date('Y-m-d');
+function etapa_badge(string $e): string { $x = ETAPAS_COT[$e] ?? [$e, '#8e96a8']; return '<span class="badge" style="--c:' . $x[1] . '">' . h($x[0]) . '</span>'; }
+function fecha_corta(string $ymd): string { $t = strtotime($ymd); return $t ? date('j', $t) . ' ' . ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][(int)date('n', $t) - 1] . ' ' . date('Y', $t) : '—'; }
+// Enlace de WhatsApp al cliente con el mensaje de la proforma ya escrito
+function wa_texto(string $tel, string $txt): string { return wa_link($tel) . ($txt !== '' ? '?text=' . rawurlencode($txt) : ''); }
+
+/* ---------- Cotizaciones ---------- */
+if (isset($_GET['cotizaciones'])) {
+    $fe = (string)($_GET['etapa'] ?? '');
+    $q = mb_strtolower(clean($_GET['q'] ?? '', 80));
+    $lista = array_filter($cots, fn($c) => (!isset(ETAPAS_COT[$fe]) || $c['etapa'] === $fe) && ($q === '' || str_contains(mb_strtolower($c['nombre'] . ' ' . $c['empresa'] . ' ' . $c['proforma'] . ' ' . $c['proyecto']), $q)));
+    $chips = '<a class="chip" href="/admin/?cotizaciones=1"' . ($fe === '' ? ' aria-current="page"' : '') . '>Todas <i>' . count($cots) . '</i></a>';
+    foreach (ETAPAS_COT as $k => $x) $chips .= '<a class="chip" href="/admin/?cotizaciones=1&amp;etapa=' . $k . '"' . ($fe === $k ? ' aria-current="page"' : '') . '><span class="dot" style="--c:' . $x[1] . '"></span>' . h($x[0]) . ' <i>' . count(array_filter($cots, fn($c) => $c['etapa'] === $k)) . '</i></a>';
+    $abiertas = array_filter($cots, fn($c) => in_array($c['etapa'], COT_ABIERTAS, true));
+    $vencidas = array_filter($abiertas, fn($c) => $c['proximo_seguimiento'] !== '' && $c['proximo_seguimiento'] !== null && $c['proximo_seguimiento'] <= $hoy);
+    $trs = '';
+    foreach ($lista as $c) {
+        $seg = $c['proximo_seguimiento'] ? (in_array($c['etapa'], COT_ABIERTAS, true) && $c['proximo_seguimiento'] <= $hoy ? '<span class="warn">' . fecha_corta($c['proximo_seguimiento']) . ' · toca hoy</span>' : fecha_corta($c['proximo_seguimiento'])) : '<span class="muted">—</span>';
+        $trs .= '<tr><td><a class="who" href="/admin/?cot=' . (int)$c['id'] . '"><b>' . h($c['nombre']) . '</b><small>' . h($c['empresa'] ?: '—') . '</small></a></td><td>' . h($c['proyecto']) . '<br><small class="muted">' . h($c['proforma']) . '</small></td><td>' . bs((int)$c['monto']) . '</td><td>' . $seg . '</td><td class="muted">' . ($c['vigencia'] ? fecha_corta($c['vigencia']) : '—') . '</td><td>' . etapa_badge($c['etapa']) . '</td></tr>';
+    }
+    page('Cotizaciones', '<div class="top"><div><h1>Cotizaciones</h1><p class="sub">Las proformas que prepara el agente de cotización, con su PDF, etapa y seguimiento.</p></div>
+    <form method="get" class="search"><input type="hidden" name="cotizaciones" value="1"><input name="q" value="' . h($q) . '" placeholder="Buscar cliente, proyecto o proforma"><button class="ghost">Buscar</button></form></div>
+    <div class="stats">' . kpi('Abiertas', (string)count($abiertas), bs(array_sum(array_column($abiertas, 'monto'))) . ' en juego') . kpi('Seguimientos para hoy', (string)count($vencidas), 'Clientes a los que toca escribir') . kpi('Ganadas', (string)count(array_filter($cots, fn($c) => $c['etapa'] === 'ganado')), bs(array_sum(array_map(fn($c) => $c['etapa'] === 'ganado' ? (int)$c['monto'] : 0, $cots))) . ' vendidos') . '</div>
+    <div class="chips">' . $chips . '</div>
+    <div class="card scroll">' . ($trs ? '<table><thead><tr><th>Cliente</th><th>Proyecto y proforma</th><th>Monto</th><th>Próximo seguimiento</th><th>Vigencia</th><th>Etapa</th></tr></thead><tbody>' . $trs . '</tbody></table>' : empty_state('Todavía no hay cotizaciones', 'Aparecen cuando el agente de cotización termina una proforma.')) . '</div>', 'cotizaciones');
+}
+
+if (isset($_GET['cot'])) {
+    $st = db()->prepare('SELECT * FROM cotizaciones WHERE id = ?');
+    $st->execute([(int)$_GET['cot']]);
+    $c = $st->fetch();
+    if (!$c) go('?cotizaciones=1');
+    $ops = json_decode($c['opciones'], true) ?: [];
+    $otr = '';
+    foreach ($ops as $o) $otr .= '<tr><td><b>' . h($o['nombre']) . '</b>' . (!empty($o['recomendada']) ? ' <span class="badge" style="--c:#2e7dff">Recomendada</span>' : '') . ($o['id'] === $c['opcion_elegida'] ? ' <span class="badge" style="--c:#22c55e">Elegida</span>' : '') . '</td><td>' . bs((int)$o['precio']) . '</td><td class="muted">' . h($o['semanas']) . ' semanas</td></tr>';
+    $fa = db()->prepare('SELECT * FROM cotizaciones_archivos WHERE cotizacion_id = ? ORDER BY id DESC'); $fa->execute([$c['id']]);
+    $pdfs = $fa->fetchAll();
+    $files = '';
+    foreach ($pdfs as $i => $f) $files .= '<li><span><a href="/admin/?archivo_cot=' . (int)$f['id'] . '">' . h($f['nombre']) . '</a>' . ($i === 0 ? ' <small class="muted">· la más reciente</small>' : '') . '<br><small class="muted">' . fecha($f['subido']) . '</small></span><span class="muted">' . tamano((int)$f['bytes']) . '</span></li>';
+    $ac = db()->prepare('SELECT * FROM cotizaciones_actividad WHERE cotizacion_id = ? ORDER BY fecha DESC, id DESC'); $ac->execute([$c['id']]);
+    $hist = '';
+    foreach ($ac->fetchAll() as $x) $hist .= '<li><b>' . h($x['texto']) . '</b><br><small>' . fecha($x['fecha']) . '</small></li>';
+    $opts = implode('', array_map(fn($k) => '<option value="' . $k . '"' . ($k === $c['etapa'] ? ' selected' : '') . '>' . h(ETAPAS_COT[$k][0]) . '</option>', array_keys(ETAPAS_COT)));
+    $key = cliente_key((string)$c['telefono'], (string)$c['correo']);
+    $tel = (string)$c['telefono'];
+    $acciones = ($pdfs ? '<a class="btn" href="/admin/?archivo_cot=' . (int)$pdfs[0]['id'] . '">Descargar PDF</a>' : '')
+        . ($tel !== '' ? '<a class="btn wa" href="' . h(wa_texto($tel, (string)$c['mensaje_cliente'])) . '" target="_blank" rel="noopener">Abrir WhatsApp con el mensaje</a>' : '')
+        . '<a class="btn ghost" href="/admin/?cliente=' . h(rawurlencode($key)) . '">Ficha del cliente</a>';
+    page($c['proforma'] ?: $c['nombre'], '<p><a href="/admin/?cotizaciones=1">← Cotizaciones</a></p>
+    <div class="head-card"><div><span class="id">' . h($c['proforma'] ?: $c['clave']) . '</span><h1>' . h($c['nombre']) . ($c['empresa'] ? ' <span class="muted" style="font-weight:400">· ' . h($c['empresa']) . '</span>' : '') . '</h1><p class="sub">' . h($c['proyecto']) . ' · ' . etapa_badge($c['etapa']) . '</p></div><div class="actions">' . $acciones . '</div></div>
+    <div class="stats">' . kpi('Monto de la propuesta', bs((int)$c['monto']), 'Opción recomendada') . kpi('Soporte mensual', $c['soporte_mensual'] ? bs((int)$c['soporte_mensual']) : '—') . kpi('Válida hasta', $c['vigencia'] ? fecha_corta($c['vigencia']) : '—', $c['vigencia'] && $c['vigencia'] < $hoy ? '<span class="warn">Vencida: renueva la proforma</span>' : '') . kpi('Prioridad', h($c['prioridad'] ?: '—'), h($c['origen'] ?: '')) . '</div>
+    <div class="grid main-side"><div class="grid" style="align-content:start">
+      <section class="card scroll"><h2>Opciones de la proforma</h2>' . ($otr ? '<table><tbody>' . $otr . '</tbody></table>' : '<p class="muted">Sin opciones registradas.</p>') . '</section>
+      <section class="card"><h2>Resumen para el equipo</h2><p style="white-space:pre-wrap;margin:0">' . h($c['resumen_equipo'] ?: '—') . '</p></section>
+      <section class="card"><h2>Mensaje para el cliente</h2><p style="white-space:pre-wrap;margin:0 0 12px">' . h($c['mensaje_cliente'] ?: '—') . '</p>' . ($tel !== '' ? '<a class="btn wa sm" href="' . h(wa_texto($tel, (string)$c['mensaje_cliente'])) . '" target="_blank" rel="noopener">Abrir WhatsApp de ' . h($c['nombre']) . ' con este mensaje</a><p class="muted" style="margin:8px 0 0;font-size:.85rem">Descarga el PDF y adjúntalo en WhatsApp con el clip → Documento.</p>' : '') . '</section>
+      <section class="card"><h2>Datos del cliente</h2><dl><dt>WhatsApp</dt><dd>' . h($tel ?: '—') . '</dd><dt>Correo</dt><dd>' . h($c['correo'] ?: '—') . '</dd><dt>Ciudad</dt><dd>' . h($c['ciudad'] ?: '—') . '</dd><dt>Rubro</dt><dd>' . h($c['rubro'] ?: '—') . '</dd><dt>Carpeta local</dt><dd class="muted">sibnova-clientes\\' . h($c['clave']) . '</dd></dl></section>
+    </div><div class="grid" style="align-content:start">
+      <section class="card"><h2>Cambiar etapa</h2><form method="post" class="grid">' . $tok . '<input type="hidden" name="accion" value="cot_etapa"><input type="hidden" name="id" value="' . (int)$c['id'] . '"><select name="etapa">' . $opts . '</select><input name="nota" maxlength="500" placeholder="Nota (opcional): envié el PDF, pidió descuento…"><button>Guardar</button></form></section>
+      <section class="card"><h2>Seguimiento</h2><form method="post" class="grid">' . $tok . '<input type="hidden" name="accion" value="cot_seguir"><input type="hidden" name="id" value="' . (int)$c['id'] . '"><label class="grid">Próximo seguimiento<input type="date" name="proximo" value="' . h((string)$c['proximo_seguimiento']) . '"></label><label class="grid">Notas<textarea name="notas" rows="4" maxlength="3000">' . h((string)$c['notas']) . '</textarea></label><button class="ghost">Guardar seguimiento</button></form></section>
+      <section class="card"><h2>PDF de la proforma</h2>' . ($files ? '<ul class="files">' . $files . '</ul>' : '<p class="muted">El agente todavía no subió el PDF.</p>') . '</section>
+      <section class="card"><h2>Actividad</h2>' . ($hist ? '<ul class="timeline">' . $hist . '</ul>' : '<p class="muted">Sin actividad.</p>') . '</section>
+    </div></div>', 'cotizaciones');
+}
 
 /* ---------- Formularios ---------- */
 if (isset($_GET['formularios'])) {
@@ -392,7 +489,12 @@ if (isset($_GET['cuenta'])) {
     page('Cuenta', '<div class="top"><div><h1>Cuenta</h1><p class="sub">Cambia la contraseña de acceso al CRM.</p></div></div>' . $m . '<form method="post" class="card grid" style="max-width:460px">' . $tok . '<input type="hidden" name="accion" value="clave">
     <label class="grid">Contraseña actual<input type="password" name="actual" required autocomplete="current-password"></label>
     <label class="grid">Nueva contraseña (12 caracteres o más)<input type="password" name="clave" required minlength="12" autocomplete="new-password"></label>
-    <label class="grid">Repite la nueva<input type="password" name="clave2" required minlength="12" autocomplete="new-password"></label><button>Guardar contraseña</button></form>', 'cuenta');
+    <label class="grid">Repite la nueva<input type="password" name="clave2" required minlength="12" autocomplete="new-password"></label><button>Guardar contraseña</button></form>
+    <section class="card grid" style="max-width:460px;margin-top:14px"><h2 style="margin:0">Agente de cotización</h2>' . (setting('agente_apagado') === '1'
+        ? '<p style="margin:0">Estado: ' . etapa_badge('perdido') . ' <b>Apagado</b>. El agente no puede registrar cotizaciones.</p>'
+        : '<p style="margin:0">Estado: ' . etapa_badge('ganado') . ' <b>Encendido</b>. El agente registra aquí cada proforma que prepara, con su PDF.</p>') . '
+    <p class="muted" style="margin:0;font-size:.88rem">Usa una llave propia guardada solo en la computadora de SIBNOVA. No conoce tu contraseña ni puede ver ni cambiar solicitudes, formularios o tu cuenta.</p>
+    <form method="post">' . $tok . '<input type="hidden" name="accion" value="agente"><button class="ghost">' . (setting('agente_apagado') === '1' ? 'Encender el acceso del agente' : 'Apagar el acceso del agente') . '</button></form></section>', 'cuenta');
 }
 
 /* ---------- Detalle de solicitud ---------- */
@@ -434,17 +536,19 @@ if (isset($_GET['cliente'])) {
     $key = (string)$_GET['cliente'];
     $mis = array_values(array_filter($sols, fn($s) => cliente_key((string)$s['telefono'], (string)$s['correo']) === $key));
     $misE = array_values(array_filter($ents, fn($e) => cliente_key((string)$e['telefono'], (string)$e['correo']) === $key));
-    if (!$mis && !$misE) go('?clientes=1');
-    $ref = $mis[0] ?? $misE[0];
+    $misC = array_values(array_filter($cots, fn($c) => cliente_key((string)$c['telefono'], (string)$c['correo']) === $key));
+    if (!$mis && !$misE && !$misC) go('?clientes=1');
+    $ref = $mis[0] ?? $misE[0] ?? $misC[0];
     $items = [];
+    foreach ($misC as $c) $items[] = [$c['creado'], '<tr><td><a href="/admin/?cot=' . (int)$c['id'] . '">' . h($c['proforma'] ?: $c['clave']) . '</a></td><td>Cotización · ' . h($c['proyecto']) . ' · ' . bs((int)$c['monto']) . '</td><td class="muted">' . fecha($c['creado']) . '</td><td>' . etapa_badge($c['etapa']) . '</td></tr>'];
     foreach ($mis as $s) $items[] = [$s['creado'], '<tr><td><a href="/admin/?ver=' . (int)$s['id'] . '">' . h($s['numero']) . '</a></td><td>Solicitud · ' . h($s['paquete_nombre']) . '</td><td class="muted">' . fecha($s['creado']) . '</td><td>' . badge($s['estado']) . '</td></tr>'];
     foreach ($misE as $e) $items[] = [$e['creado'], '<tr><td><a href="/admin/?entrega=' . (int)$e['id'] . '">' . h($e['numero']) . '</a></td><td>' . h($e['titulo']) . '</td><td class="muted">' . fecha($e['creado']) . '</td><td>' . badge($e['revisado'] ? 'Entregado' : 'Nueva solicitud') . '</td></tr>'];
     usort($items, fn($a, $b) => strcmp($b[0], $a[0]));
-    $valor = array_sum(array_map(fn($s) => in_array($s['estado'], GANADAS, true) ? (int)$s['precio_inicial'] : 0, $mis));
+    $valor = array_sum(array_map(fn($s) => in_array($s['estado'], GANADAS, true) ? (int)$s['precio_inicial'] : 0, $mis)) + array_sum(array_map(fn($c) => $c['etapa'] === 'ganado' ? (int)$c['monto'] : 0, $misC));
     page($ref['nombre'], '<p><a href="/admin/?clientes=1">← Clientes</a></p>
     <div class="head-card"><div><h1>' . h($ref['nombre']) . '</h1><p class="sub">' . h($ref['empresa'] ?: 'Sin empresa') . ' · ' . h($ref['telefono'] ?: '—') . ($ref['correo'] ? ' · <a href="mailto:' . h($ref['correo']) . '">' . h($ref['correo']) . '</a>' : '') . '</p></div>
     <div class="actions">' . ($ref['telefono'] ? '<a class="btn wa" href="' . h(wa_link((string)$ref['telefono'])) . '" target="_blank" rel="noopener">Escribir por WhatsApp</a>' : '') . '<a class="btn ghost" href="/admin/?formularios=1">Enviarle un formulario</a></div></div>
-    <div class="stats">' . kpi('Solicitudes', (string)count($mis)) . kpi('Formularios enviados', (string)count($misE)) . kpi('Ventas ganadas', bs($valor), 'Aprobado, en desarrollo o entregado') . '</div>
+    <div class="stats">' . kpi('Solicitudes', (string)count($mis)) . kpi('Cotizaciones', (string)count($misC)) . kpi('Formularios enviados', (string)count($misE)) . kpi('Ventas ganadas', bs($valor), 'Aprobadas o ganadas') . '</div>
     <section class="card scroll"><h2>Todo lo de este cliente</h2><table><thead><tr><th>Número</th><th>Qué es</th><th>Fecha</th><th>Estado</th></tr></thead><tbody>' . implode('', array_column($items, 1)) . '</tbody></table></section>', 'clientes');
 }
 
@@ -453,14 +557,15 @@ if (isset($_GET['clientes'])) {
     $cl = [];
     foreach ($sols as $s) { $k = cliente_key((string)$s['telefono'], (string)$s['correo']); $cl[$k] ??= ['n' => $s['nombre'], 'emp' => $s['empresa'], 'tel' => $s['telefono'], 'mail' => $s['correo'], 's' => 0, 'e' => 0, 'ult' => '', 'estado' => $s['estado']]; $cl[$k]['s']++; $cl[$k]['ult'] = max($cl[$k]['ult'], $s['creado']); }
     foreach ($ents as $e) { $k = cliente_key((string)$e['telefono'], (string)$e['correo']); $cl[$k] ??= ['n' => $e['nombre'], 'emp' => $e['empresa'], 'tel' => $e['telefono'], 'mail' => $e['correo'], 's' => 0, 'e' => 0, 'ult' => '', 'estado' => '']; $cl[$k]['e']++; $cl[$k]['ult'] = max($cl[$k]['ult'], $e['creado']); }
+    foreach ($cots as $c) { $k = cliente_key((string)$c['telefono'], (string)$c['correo']); $cl[$k] ??= ['n' => $c['nombre'], 'emp' => $c['empresa'], 'tel' => $c['telefono'], 'mail' => $c['correo'], 's' => 0, 'e' => 0, 'ult' => '', 'estado' => '']; $cl[$k]['s']++; $cl[$k]['ult'] = max($cl[$k]['ult'], $c['creado']); $cl[$k]['cot'] ??= $c['etapa']; }
     $q = mb_strtolower(clean($_GET['q'] ?? '', 80));
     if ($q !== '') $cl = array_filter($cl, fn($c) => str_contains(mb_strtolower($c['n'] . ' ' . $c['emp'] . ' ' . $c['tel'] . ' ' . $c['mail']), $q));
     uasort($cl, fn($a, $b) => strcmp($b['ult'], $a['ult']));
     $trs = '';
-    foreach ($cl as $k => $c) $trs .= '<tr><td><a class="who" href="/admin/?cliente=' . h(rawurlencode((string)$k)) . '"><b>' . h($c['n']) . '</b><small>' . h($c['emp'] ?: '—') . '</small></a></td><td>' . h($c['tel']) . '<br><small class="muted">' . h($c['mail']) . '</small></td><td>' . $c['s'] . '</td><td>' . $c['e'] . '</td><td class="muted">' . fecha($c['ult']) . '</td><td>' . ($c['estado'] ? badge($c['estado']) : '<span class="muted">Solo formularios</span>') . '</td></tr>';
+    foreach ($cl as $k => $c) $trs .= '<tr><td><a class="who" href="/admin/?cliente=' . h(rawurlencode((string)$k)) . '"><b>' . h($c['n']) . '</b><small>' . h($c['emp'] ?: '—') . '</small></a></td><td>' . h($c['tel']) . '<br><small class="muted">' . h($c['mail']) . '</small></td><td>' . $c['s'] . '</td><td>' . $c['e'] . '</td><td class="muted">' . fecha($c['ult']) . '</td><td>' . ($c['estado'] ? badge($c['estado']) : (isset($c['cot']) ? etapa_badge($c['cot']) : '<span class="muted">Solo formularios</span>')) . '</td></tr>';
     page('Clientes', '<div class="top"><div><h1>Clientes</h1><p class="sub">Cada cliente con todas sus solicitudes y formularios. Se agrupan por teléfono o correo.</p></div>
     <form method="get" class="search"><input type="hidden" name="clientes" value="1"><input name="q" value="' . h($q) . '" placeholder="Buscar nombre, empresa, teléfono o correo"><button class="ghost">Buscar</button></form></div>
-    <div class="card scroll">' . ($trs ? '<table><thead><tr><th>Cliente</th><th>Contacto</th><th>Solicitudes</th><th>Formularios</th><th>Último contacto</th><th>Estado actual</th></tr></thead><tbody>' . $trs . '</tbody></table>' : empty_state('Todavía no hay clientes', 'Aparecen cuando alguien envía una solicitud o un formulario.')) . '</div>', 'clientes');
+    <div class="card scroll">' . ($trs ? '<table><thead><tr><th>Cliente</th><th>Contacto</th><th>Solicitudes y cotizaciones</th><th>Formularios</th><th>Último contacto</th><th>Estado actual</th></tr></thead><tbody>' . $trs . '</tbody></table>' : empty_state('Todavía no hay clientes', 'Aparecen cuando alguien envía una solicitud o un formulario.')) . '</div>', 'clientes');
 }
 
 /* ---------- Lista de solicitudes ---------- */
@@ -485,6 +590,7 @@ $sinRevisar = count(array_filter($ents, fn($e) => !$e['revisado']));
 $stats = kpi('Solicitudes nuevas', (string)$cuenta(NUEVAS), 'Por atender', '/admin/?solicitudes=1&estado=' . rawurlencode('Nueva solicitud'))
     . kpi('En proceso', (string)$cuenta(EN_PROCESO), bs($suma(EN_PROCESO)) . ' en juego')
     . kpi('Ganadas', (string)$cuenta(GANADAS), bs($suma(GANADAS)) . ' en ventas')
+    . kpi('Cotizaciones abiertas', (string)count(array_filter($cots, fn($c) => in_array($c['etapa'], COT_ABIERTAS, true))), count(array_filter($cots, fn($c) => in_array($c['etapa'], COT_ABIERTAS, true) && $c['proximo_seguimiento'] && $c['proximo_seguimiento'] <= $hoy)) . ' seguimientos para hoy', '/admin/?cotizaciones=1')
     . kpi('Datos sin revisar', (string)$sinRevisar, 'De formularios de clientes', '/admin/?datos=1')
     . kpi('Este mes', (string)$delMes, 'Solicitudes recibidas');
 $cols = '';
@@ -497,6 +603,8 @@ foreach (array_diff($ESTADOS, ['Cancelado']) as $e) {
 $feed = [];
 foreach (db()->query('SELECT h.fecha, h.estado, h.nota, s.id, s.nombre, s.numero FROM historial h JOIN solicitudes s ON s.id = h.solicitud_id ORDER BY h.id DESC LIMIT 12') as $x)
     $feed[] = [$x['fecha'], '<li><span class="dot" style="--c:' . (COLOR[$x['estado']] ?? '#8e96a8') . '"></span><div><a href="/admin/?ver=' . (int)$x['id'] . '">' . h($x['nombre']) . '</a> · ' . h($x['estado']) . ($x['nota'] ? ' — ' . h($x['nota']) : '') . '<small>' . fecha($x['fecha']) . '</small></div></li>'];
+foreach (db()->query('SELECT a.fecha, a.texto, c.id, c.nombre FROM cotizaciones_actividad a JOIN cotizaciones c ON c.id = a.cotizacion_id ORDER BY a.fecha DESC LIMIT 12') as $x)
+    $feed[] = [$x['fecha'], '<li><span class="dot" style="--c:#a78bfa"></span><div><a href="/admin/?cot=' . (int)$x['id'] . '">' . h($x['nombre']) . '</a> · ' . h($x['texto']) . '<small>' . fecha($x['fecha']) . '</small></div></li>'];
 foreach (array_slice($ents, 0, 12) as $e) $feed[] = [$e['creado'], '<li><span class="dot" style="--c:#7aa2ff"></span><div><a href="/admin/?entrega=' . (int)$e['id'] . '">' . h($e['nombre']) . '</a> envió «' . h($e['titulo']) . '»<small>' . fecha($e['creado']) . '</small></div></li>'];
 usort($feed, fn($a, $b) => strcmp($b[0], $a[0]));
 $feedHtml = implode('', array_column(array_slice($feed, 0, 12), 1));
