@@ -417,6 +417,20 @@ if (isset($_GET['cot'])) {
     <div class="stats">' . kpi('Monto de la propuesta', bs((int)$c['monto']), 'Opción recomendada') . kpi('Soporte mensual', $c['soporte_mensual'] ? bs((int)$c['soporte_mensual']) : '—') . kpi('Válida hasta', $c['vigencia'] ? fecha_corta($c['vigencia']) : '—', $c['vigencia'] && $c['vigencia'] < $hoy ? '<span class="warn">Vencida: renueva la proforma</span>' : '') . kpi('Prioridad', h($c['prioridad'] ?: '—'), h($c['origen'] ?: '')) . '</div>
     <div class="grid main-side"><div class="grid" style="align-content:start">
       <section class="card scroll"><h2>Opciones de la proforma</h2>' . ($otr ? '<table><tbody>' . $otr . '</tbody></table>' : '<p class="muted">Sin opciones registradas.</p>') . '</section>
+      ' . (function () use ($c, $ops) {
+        // Solo equipo: lo que le cuesta a SIBNOVA cada opción y la ganancia estimada al precio de la proforma
+        $in = (json_decode((string)($c['interno'] ?? '{}'), true) ?: [])['opciones'] ?? [];
+        if (!$in) return '<section class="card"><h2>Costo para SIBNOVA <span class="badge" style="--c:#f5b700">Solo equipo</span></h2><p class="muted" style="margin:0">El agente todavía no registró los costos de esta cotización.</p></section>';
+        $trs = '';
+        foreach ($ops as $o) {
+            $x = $in[$o['id']] ?? null;
+            if (!$x) continue;
+            $gan = (int)$o['precio'] - $x['costo'];
+            $pct = $o['precio'] > 0 ? round($gan / $o['precio'] * 100) : 0;
+            $trs .= '<tr><td><b>' . h($o['nombre']) . '</b>' . (!empty($o['recomendada']) ? ' <small class="muted">· recomendada</small>' : '') . '<br><small class="muted">' . h($x['horas']) . '</small></td><td>' . bs((int)$o['precio']) . '</td><td><b>' . bs($x['costo']) . '</b><br><small class="muted">hasta ' . bs($x['costo_max']) . ' si se usan las horas máximas</small></td><td>' . bs($x['minimo']) . '</td><td class="' . ($gan > 0 ? '' : 'warn') . '"><b>' . bs($gan) . '</b><br><small class="muted">' . $pct . ' % del precio</small></td></tr>';
+        }
+        return '<section class="card scroll" style="border-color:rgba(245,183,0,.35)"><h2>Costo para SIBNOVA <span class="badge" style="--c:#f5b700">Solo equipo</span></h2><table><thead><tr><th>Opción</th><th>Precio al cliente</th><th>Te cuesta hacerlo</th><th>No bajar de</th><th>Ganancia estimada</th></tr></thead><tbody>' . $trs . '</tbody></table><p class="muted" style="margin:10px 0 0;font-size:.85rem">El costo incluye las horas del equipo y un margen para imprevistos. No incluye servicios de terceros sin monto confirmado. Nunca copies estos números al cliente.</p></section>';
+      })() . '
       <section class="card"><h2>Resumen para el equipo</h2><p style="white-space:pre-wrap;margin:0">' . h($c['resumen_equipo'] ?: '—') . '</p></section>
       <section class="card"><h2>Mensaje para el cliente</h2><p style="white-space:pre-wrap;margin:0 0 12px">' . h($c['mensaje_cliente'] ?: '—') . '</p>' . ($tel !== '' ? '<a class="btn wa sm" href="' . h(wa_texto($tel, (string)$c['mensaje_cliente'])) . '" target="_blank" rel="noopener">Abrir WhatsApp de ' . h($c['nombre']) . ' con este mensaje</a><p class="muted" style="margin:8px 0 0;font-size:.85rem">Descarga el PDF y adjúntalo en WhatsApp con el clip → Documento.</p>' : '') . '</section>
       <section class="card"><h2>Datos del cliente</h2><dl><dt>WhatsApp</dt><dd>' . h($tel ?: '—') . '</dd><dt>Correo</dt><dd>' . h($c['correo'] ?: '—') . '</dd><dt>Ciudad</dt><dd>' . h($c['ciudad'] ?: '—') . '</dd><dt>Rubro</dt><dd>' . h($c['rubro'] ?: '—') . '</dd><dt>Carpeta local</dt><dd class="muted">sibnova-clientes\\' . h($c['clave']) . '</dd></dl></section>

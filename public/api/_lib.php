@@ -63,11 +63,16 @@ function db(): PDO {
         nombre TEXT NOT NULL, empresa TEXT, telefono TEXT, correo TEXT, ciudad TEXT, rubro TEXT, proyecto TEXT, origen TEXT, prioridad TEXT,
         proforma TEXT, vigencia TEXT, monto INTEGER NOT NULL DEFAULT 0, soporte_mensual INTEGER NOT NULL DEFAULT 0, opciones TEXT NOT NULL DEFAULT \'[]\',
         opcion_elegida TEXT, mensaje_cliente TEXT, resumen_equipo TEXT, proximo_seguimiento TEXT, notas TEXT)');
+    // Costos internos por opción (costo, costo con horas máximas, precio mínimo, horas): solo se muestran al equipo en el CRM
+    if (!in_array('interno', array_column($pdo->query('PRAGMA table_info(cotizaciones)')->fetchAll(), 'name'), true))
+        $pdo->exec('ALTER TABLE cotizaciones ADD COLUMN interno TEXT NOT NULL DEFAULT \'{}\'');
     $pdo->exec('CREATE TABLE IF NOT EXISTS cotizaciones_archivos (
         id INTEGER PRIMARY KEY, cotizacion_id INTEGER NOT NULL REFERENCES cotizaciones(id) ON DELETE CASCADE,
         nombre TEXT NOT NULL, guardado TEXT NOT NULL, bytes INTEGER NOT NULL, subido TEXT NOT NULL)');
     $pdo->exec('CREATE TABLE IF NOT EXISTS cotizaciones_actividad (
         id INTEGER PRIMARY KEY, cotizacion_id INTEGER NOT NULL REFERENCES cotizaciones(id) ON DELETE CASCADE, fecha TEXT NOT NULL, texto TEXT NOT NULL)');
+    // Fechas antiguas en formato ISO con zona (2026-11-10T14:42:00-04:00 o …Z) → hora de Bolivia (UTC-4), para ordenar bien
+    $pdo->exec("UPDATE cotizaciones_actividad SET fecha = datetime(fecha, '-4 hours') WHERE fecha LIKE '%T%' AND datetime(fecha) IS NOT NULL");
     return $pdo;
 }
 

@@ -1,7 +1,8 @@
 <?php
 // Puerta del agente de cotización de SIBNOVA: registra o actualiza una cotización en el CRM (/admin/ → Cotizaciones)
 // y guarda el PDF de la proforma. Solo responde a la llave del agente (cabecera X-Sibnova-Agente), que se puede
-// apagar desde el CRM. Nunca recibe costos, precios mínimos ni márgenes: si llegan, se descartan.
+// apagar desde el CRM. Los costos y precios mínimos llegan solo en «interno» y se muestran únicamente al equipo;
+// dentro de las opciones (lo que ve el cliente) se descartan.
 declare(strict_types=1);
 require __DIR__ . '/_lib.php';
 
@@ -54,6 +55,13 @@ foreach (array_slice((array)($in['opciones'] ?? []), 0, 6) as $o) {
     $ops[] = ['id' => clean((string)($o['id'] ?? ''), 40), 'nombre' => clean((string)($o['nombre'] ?? ''), 120), 'precio' => max(0, (int)($o['precio'] ?? 0)),
         'semanas' => clean((string)($o['semanas'] ?? ''), 20), 'recomendada' => !empty($o['recomendada'])];
 }
+// Costos internos por opción (solo equipo)
+$interno = [];
+foreach (array_slice((array)($in['interno']['opciones'] ?? []), 0, 6) as $o) {
+    if (!is_array($o) || !isset($o['id'])) continue;
+    $interno[clean((string)$o['id'], 40)] = ['costo' => max(0, (int)round((float)($o['costo'] ?? 0))), 'costo_max' => max(0, (int)round((float)($o['costo_max'] ?? 0))),
+        'minimo' => max(0, (int)($o['minimo'] ?? 0)), 'horas' => clean((string)($o['horas'] ?? ''), 30)];
+}
 $etapa = in_array($in['etapa'] ?? '', ETAPAS, true) ? $in['etapa'] : ($actual['etapa'] ?? 'proforma');
 if (!$actual && $v['nombre'] === '') fail('Falta el nombre del cliente.');
 
@@ -78,20 +86,21 @@ try {
         $set = ['actualizado = ?', 'etapa = ?']; $par = [$ahora, $etapa];
         foreach ($v as $k => $x) if ($x !== '' && $x !== 0) { $set[] = "$k = ?"; $par[] = $x; }
         if ($ops) { $set[] = 'opciones = ?'; $par[] = json_encode($ops, JSON_UNESCAPED_UNICODE); }
+        if ($interno) { $set[] = 'interno = ?'; $par[] = json_encode(['opciones' => $interno], JSON_UNESCAPED_UNICODE); }
         $par[] = $actual['id'];
         $pdo->prepare('UPDATE cotizaciones SET ' . implode(', ', $set) . ' WHERE id = ?')->execute($par);
         $id = (int)$actual['id'];
     } else {
         $cols = array_keys($v);
-        $pdo->prepare('INSERT INTO cotizaciones (clave, creado, actualizado, etapa, opciones, notas, ' . implode(', ', $cols) . ') VALUES (?, ?, ?, ?, ?, \'\', ' . implode(', ', array_fill(0, count($cols), '?')) . ')')
-            ->execute(array_merge([$clave, $ahora, $ahora, $etapa, json_encode($ops, JSON_UNESCAPED_UNICODE)], array_values($v)));
+        $pdo->prepare('INSERT INTO cotizaciones (clave, creado, actualizado, etapa, opciones, interno, notas, ' . implode(', ', $cols) . ') VALUES (?, ?, ?, ?, ?, ?, \'\', ' . implode(', ', array_fill(0, count($cols), '?')) . ')')
+            ->execute(array_merge([$clave, $ahora, $ahora, $etapa, json_encode($ops, JSON_UNESCAPED_UNICODE), json_encode(['opciones' => $interno], JSON_UNESCAPED_UNICODE)], array_values($v)));
         $id = (int)$pdo->lastInsertId();
     }
     $act = $pdo->prepare('INSERT INTO cotizaciones_actividad (cotizacion_id, fecha, texto) VALUES (?, ?, ?)');
     foreach (array_slice((array)($in['actividad'] ?? []), 0, 10) as $a) {
         $t = clean(is_array($a) ? (string)($a['texto'] ?? '') : (string)$a, 300);
         $fa = is_array($a) ? clean((string)($a['fecha'] ?? ''), 40) : '';
-        if ($t !== '') $act->execute([$id, strtotime($fa) ? $fa : $ahora, $t]);
+        if ($t !== '') $act->execute([$id, strtotime($fa) ? date('Y-m-d H:i:s', strtotime($fa)) : $ahora, $t]);
     }
     if ($pdf) {
         $dir = data_dir() . '/archivos/cotizaciones/' . $clave;
