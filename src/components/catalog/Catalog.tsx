@@ -7,7 +7,7 @@ import Gallery3D from "@/components/ui/Gallery3D";
 import DesignCatalog from "@/components/designs/DesignCatalog";
 import { ArrowRight, ArrowUpRight, IconCheck } from "@/components/ui/icons";
 import Split from "@/components/ui/Split";
-import { COMBOS, INICIO, PRECIO, PROMO, REDES_URL } from "@/lib/redes";
+import { COMBOS, COMBOS_MK, INICIO, PRECIO, PROMO, REDES_URL, TOTAL } from "@/lib/redes";
 import styles from "./catalog.module.css";
 import service from "@/components/service/service.module.css";
 
@@ -117,6 +117,7 @@ export default function Catalog() {
               </li>
             ))}
           </ul>
+          <p className={styles.note}><b>Marketing sin manejo de redes:</b> {COMBOS_MK.map((c) => `${c.name} ${formatBs(c.precio)}${c.pago === "mensual" ? "/mes" : ""}`).join(" · ")} · <b>Combo Total</b> (redes + marketing) {formatBs(TOTAL.precio)}/mes. <Link href={`${REDES_URL}#marketing`}>Ver combos de marketing</Link></p>
           <p className={styles.note}>Para empezar: logo con perfil, portada e ícono {formatBs(PRECIO.logo)} · creación de cada red {formatBs(PRECIO.red)} · logo + Facebook, Instagram y TikTok {formatBs(INICIO.precio)}. <Link href={REDES_URL}>Ver el catálogo completo de redes sociales</Link></p>
         </div>
       </section>

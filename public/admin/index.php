@@ -239,8 +239,8 @@ if ($logged && isset($_GET['enviar'])) {
 const CATALOGOS = [
     [
         'id' => 'redes-sociales',
-        'titulo' => 'Redes sociales: logo, creación de redes y manejo mensual',
-        'resumen' => 'Precio de cada servicio por separado y 3 combos mensuales (Esencial, Profesional y Premium) con videos grabados en el negocio, publicaciones y manejo de redes. Aparte: logo y creación de redes.',
+        'titulo' => 'Marketing digital y community manager',
+        'resumen' => 'Manejo de redes (combos Esencial, Profesional y Premium), marketing (combos Despegue, Visibilidad y Lanzamiento), el Combo Total con los dos, logo, creación de redes y cada servicio por separado.',
         'enlace' => '/redes-sociales/',
         'pdf' => '/catalogos/sibnova-servicios-redes-sociales.pdf',
         'promo' => 'Promoción del 20 % para quienes contraten hasta el 31 de enero de 2027, durante los 3 primeros meses.',
@@ -248,6 +248,10 @@ const CATALOGOS = [
             ['Combo Esencial: 2 videos, 5 publicaciones, Facebook e Instagram', 'Bs 1.960/mes con promoción · normal Bs 2.450', 'combo-esencial'],
             ['Combo Profesional: 4 videos, 8 publicaciones, 8 historias, 3 redes', 'Bs 3.500/mes con promoción · normal Bs 4.380', 'combo-profesional'],
             ['Combo Premium: 8 videos, 12 publicaciones, 12 historias, 3 redes y publicidad', 'Bs 6.010/mes con promoción · normal Bs 7.520', 'combo-premium'],
+            ['Marketing · Combo Despegue: plan de marketing, manual de marca y WhatsApp Business', 'Bs 2.560 pago único (por separado Bs 2.850)', 'combo-despegue'],
+            ['Marketing · Combo Visibilidad: publicidad, Google Maps y 1 video publicitario al mes', 'Bs 2.960/mes con promoción · normal Bs 3.700', 'combo-visibilidad'],
+            ['Marketing · Combo Lanzamiento: campaña de un mes con video y anuncios', 'Bs 5.520 pago único (por separado Bs 6.500)', 'combo-lanzamiento'],
+            ['Combo Total: Profesional (redes) + Visibilidad (marketing)', 'Bs 5.900/mes con promoción · luego Bs 7.270', 'combo-total'],
             ['Logo + creación de Facebook, Instagram y TikTok', 'Bs 1.050 (logo Bs 450 + 3 redes × Bs 200)', 'logo-redes'],
             ['Solo logo (con perfil, portada e ícono)', 'Bs 450', 'logo'],
             ['Solo creación de redes', 'Bs 200 por red', 'redes-sociales'],

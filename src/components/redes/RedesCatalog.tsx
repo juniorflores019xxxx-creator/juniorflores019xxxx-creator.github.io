@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { formatBs } from "@/lib/catalog";
-import { BENEFICIOS, COMBOS, CONDICIONES, INICIO, PASOS, PRECIO, PROMO, REDES_PDF, SUELTOS, waLink } from "@/lib/redes";
+import { BENEFICIOS, COMBOS, COMBOS_MK, CONDICIONES, INICIO, PASOS, PRECIO, PROMO, REDES_PDF, SUELTOS, TOTAL, waLink } from "@/lib/redes";
 import { ArrowRight, IconCheck } from "@/components/ui/icons";
 import styles from "@/components/catalog/catalog.module.css";
 import service from "@/components/service/service.module.css";
@@ -24,7 +24,8 @@ export default function RedesCatalog() {
             <p className="lead" data-reveal>Grabamos videos en tu negocio, diseñamos tus publicaciones, publicamos en Facebook, Instagram y TikTok, y respondemos a tus clientes. Contrata cada servicio por separado o en un combo que te sale más barato.</p>
             <p className={r.promoPill} data-reveal><b>{PROMO.pct} % de descuento</b> en los combos para quienes contraten hasta el {PROMO.hasta}</p>
             <div className={r.ctas} data-reveal>
-              <a href="#combos" className="btn btn-primary btn-lg">Ver los combos <ArrowRight /></a>
+              <a href="#combos" className="btn btn-primary btn-lg">Manejo de redes <ArrowRight /></a>
+              <a href="#marketing" className="btn btn-ghost btn-lg">Marketing</a>
               <a href={REDES_PDF} className="btn btn-ghost btn-lg" target="_blank" rel="noopener">Descargar en PDF</a>
             </div>
           </div>
@@ -50,7 +51,7 @@ export default function RedesCatalog() {
       <section id="combos" className={styles.plansSection} aria-labelledby="combos-titulo">
         <div className="wrap">
           <div className={service.head}>
-            <h2 id="combos-titulo" className="display h2">Elige tu <em className={styles.accent}>combo mensual</em></h2>
+            <h2 id="combos-titulo" className="display h2">Manejo de redes: <em className={styles.accent}>combos mensuales</em></h2>
             <p className="lead" data-reveal>Todo lo que hacemos cada mes en tus redes, en un solo precio. Con {PROMO.pct} % menos durante los {PROMO.meses} primeros meses.</p>
           </div>
           <ul className={r.combos}>
@@ -88,6 +89,51 @@ export default function RedesCatalog() {
               <b>{formatBs(INICIO.precio)}</b>
               <span className={r.mes}>pago único</span>
               <a href={waLink(`Hola SIBNOVA, quiero el logo + la creación de Facebook, Instagram y TikTok (${formatBs(INICIO.precio)}).`)} className="btn btn-ghost" target="_blank" rel="noopener">Lo quiero</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- Combos de marketing ---------- */}
+      <section id="marketing" className={styles.plansSection} aria-labelledby="marketing-titulo">
+        <div className="wrap">
+          <div className={service.head}>
+            <h2 id="marketing-titulo" className="display h2">Marketing: <em className={styles.accent}>más clientes y ventas</em></h2>
+            <p className="lead" data-reveal>Sin manejo de redes. Para negocios que ya tienen quien publique por ellos, o que quieren atraer clientes nuevos con estrategia, publicidad y video.</p>
+          </div>
+          <ul className={r.combos}>
+            {COMBOS_MK.map((c) => (
+              <li key={c.slug} id={c.slug} className={`${styles.plan} ${c.featured ? styles.featured : ""}`} data-reveal>
+                <div className={styles.planHead}>
+                  <span className={styles.planNum}>{c.pago === "mensual" ? "Cada mes" : "Pago único"}{c.featured && <em>El más elegido</em>}</span>
+                  <h3 className={styles.planName}>{c.name}</h3>
+                  <p className={styles.kind}>{c.pitch}</p>
+                </div>
+                <p className={styles.price}>
+                  <span className={r.antes}>Por separado {formatBs(c.normal)}</span>
+                  <b>{formatBs(c.precio)} {c.pago === "mensual" && <span className={r.mes}>/mes</span>}</b>
+                  <span className={r.ahorro}>Ahorras {formatBs(c.normal - c.precio)}{c.pago === "mensual" ? ` cada mes los ${PROMO.meses} primeros meses` : ""}</span>
+                </p>
+                <span className={r.label}>{c.pago === "mensual" ? "Cada mes hacemos" : "Hacemos"}</span>
+                <ul className={styles.includes}>
+                  {c.hacemos.map((d) => <li key={d}><IconCheck width={18} height={18} />{d}</li>)}
+                </ul>
+                {c.nota && <p className={styles.excludes}>{c.nota}</p>}
+                <a href={waLink(`Hola SIBNOVA, me interesa el ${c.name} de marketing (${formatBs(c.precio)}). ¿Me cuentan cómo empezamos?`)} className={`btn ${c.featured ? "btn-primary" : "btn-ghost"} ${styles.planBtn}`} target="_blank" rel="noopener">Quiero este combo</a>
+              </li>
+            ))}
+          </ul>
+
+          <div id="total" className={r.inicio} data-reveal>
+            <div>
+              <h3>Combo Total: manejo de redes + marketing</h3>
+              <p>Combo Profesional ({formatBs(COMBOS.find((c) => c.slug === "profesional")!.precio)}) + Combo Visibilidad ({formatBs(COMBOS_MK.find((c) => c.slug === "visibilidad")!.precio)}). Como el estudio del negocio y la grabación se hacen una sola vez, te cobramos menos por los dos juntos. Desde el 4.º mes: {formatBs(TOTAL.despues)} al mes.</p>
+            </div>
+            <div className={r.inicioPrecio}>
+              <span className={r.antes}>{formatBs(TOTAL.suma)}</span>
+              <b>{formatBs(TOTAL.precio)} <span className={r.mes}>/mes</span></b>
+              <span className={r.ahorro}>Ahorras {formatBs(TOTAL.suma - TOTAL.precio)} cada mes</span>
+              <a href={waLink(`Hola SIBNOVA, me interesa el Combo Total de redes y marketing (${formatBs(TOTAL.precio)} al mes).`)} className="btn btn-primary" target="_blank" rel="noopener">Lo quiero</a>
             </div>
           </div>
         </div>

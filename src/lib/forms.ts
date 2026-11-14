@@ -379,10 +379,77 @@ export const FORMS: DataForm[] = [
     ],
   });
 
+  // Combos de marketing (sin manejo de redes) y Combo Total
+  function combosMarketing(): DataForm[] {
+    const ESTRATEGIA: Section = {
+      title: "Tu negocio y tus metas",
+      intro: "Con esto armamos tu plan de marketing.",
+      fields: [
+        { name: "objetivo_marketing", label: "¿Qué quieres lograr en los próximos 3 meses?", type: "multi", required: true, options: ["Más clientes nuevos", "Vender un producto o servicio en especial", "Que más gente conozca mi marca", "Recibir más mensajes por WhatsApp", "Que visiten mi local", "Entrar a otra ciudad o país"] },
+        { name: "productos_estrella", label: "Productos o servicios que más quieres vender", type: "textarea", required: true, max: 2000 },
+        { name: "diferencia", label: "¿Por qué te eligen a ti y no a la competencia?", type: "textarea", max: 1000 },
+        { name: "competencia", label: "Tus competidores (nombres, páginas o redes)", type: "textarea", max: 1000 },
+        { name: "ventas_hoy", label: "¿Cómo te llegan los clientes hoy?", type: "multi", options: ["Recomendaciones", "Redes sociales", "Google", "Local o tienda", "Ferias y eventos", "Vendedores", "Otro"] },
+        { name: "presupuesto_mes", label: "¿Cuánto podrías invertir en publicidad al mes? (aparte de nuestro servicio)", type: "select", options: ["Nada por ahora", "Menos de Bs 500", "Entre Bs 500 y Bs 1.500", "Entre Bs 1.500 y Bs 5.000", "Más de Bs 5.000", "Quiero que me recomienden"] },
+      ],
+    };
+    const MARCA: Section = { ...COLORES, title: "Tu marca", intro: "Para tu manual de marca y tus plantillas." };
+    const WHATSAPP: Section = {
+      title: "Tu WhatsApp Business",
+      fields: [
+        { name: "whatsapp_empresa", label: "Número que será tu WhatsApp de empresa", type: "tel", required: true, max: 20 },
+        { name: "whatsapp_tipo", label: "¿Ya usas WhatsApp Business en ese número?", type: "select", options: ["Sí", "No, uso WhatsApp normal", "No sé"] },
+        { name: "productos_catalogo", label: "Productos o servicios para tu catálogo (nombre, precio y descripción)", type: "textarea", max: 4000, help: "Uno por línea, o sube tu lista en Excel al final." },
+        { name: "preguntas_clientes", label: "Preguntas que más te hacen, con su respuesta", type: "textarea", max: 3000 },
+        { name: "aviso_wa", label: "Sin contraseñas", type: "note", help: "La configuración la hacemos contigo en una llamada corta. Nunca escribas códigos ni contraseñas en este formulario." },
+      ],
+    };
+    const MAPS: Section = {
+      title: "Google Maps y búsquedas",
+      fields: [
+        { name: "tiene_ficha", label: "¿Tu negocio ya aparece en Google Maps?", type: "select", required: true, options: ["Sí", "No", "No sé"] },
+        { name: "enlace_ficha", label: "Enlace de tu ficha en Google Maps (si tienes)", type: "text", max: 400, when: { field: "tiene_ficha", in: ["Sí"] } },
+        { name: "direccion", label: "Dirección para mostrar", type: "text", max: 200, help: "Déjalo en blanco si no atiendes en un local." },
+        { name: "horarios", label: "Horarios de atención", type: "text", max: 200 },
+        { name: "telefonos", label: "Teléfonos y WhatsApp para mostrar", type: "text", max: 200 },
+        { name: "palabras", label: "¿Cómo te buscarían tus clientes en Google?", type: "text", max: 300, placeholder: "Por ejemplo: importadora de alimentos Santa Cruz" },
+      ],
+    };
+    const LANZAR: Section = {
+      title: "Tu lanzamiento",
+      fields: [
+        { name: "que_lanzas", label: "¿Qué quieres lanzar o promocionar?", type: "textarea", required: true, max: 1500, placeholder: "Producto nuevo, apertura, temporada, promoción…" },
+        { name: "fecha_lanzamiento", label: "¿Cuándo es el lanzamiento?", type: "date" },
+        { name: "oferta", label: "¿Hay una oferta o precio especial?", type: "textarea", max: 800 },
+        { name: "publico_campana", label: "¿A quién quieres llegar?", type: "textarea", max: 800, placeholder: "Edad, ciudad, a qué se dedican…" },
+      ],
+    };
+    const ADS = { ...PUBLICIDAD, intro: "Tu combo incluye el manejo de anuncios. Lo que pagas a Facebook, TikTok o Google por mostrarlos va aparte y lo pagas tú directamente." };
+    const VIDEO: Section = { ...GRABACION, title: "Grabación del video publicitario", intro: "Nuestro camarógrafo va a tu negocio a grabar. Agendamos la fecha contigo." };
+    const fin = { ...CIERRE, fields: CIERRE.fields.filter((x) => x.name !== "fecha_deseada") };
+    const mk = (id: string, title: string, short: string, incluye: string, secciones: Section[]): DataForm => ({
+      id, title, short,
+      intro: "Con estas respuestas preparamos tu trabajo. Lo que no sepas, déjalo en blanco o elige «lo que me recomienden». Tu información es confidencial: solo la usamos para tu proyecto.",
+      sections: [aviso(incluye), CONTACTO, ...secciones, APROBACION, ARCHIVOS_PLAN, fin],
+    });
+    return [
+      mk("combo-despegue", "Datos para tu Combo Despegue", "Marketing: plan de marketing, manual de marca y WhatsApp Business.",
+        "Combo Despegue: plan de marketing para los próximos 3 meses, manual de marca con 5 plantillas y tu WhatsApp Business configurado.", [ESTRATEGIA, MARCA, WHATSAPP]),
+      mk("combo-visibilidad", "Datos para tu Combo Visibilidad", "Marketing mensual: publicidad pagada, Google Maps y 1 video publicitario por mes.",
+        "Combo Visibilidad, cada mes: publicidad pagada con 3 anuncios y seguimiento, Google Maps y búsquedas, 1 video publicitario e informe de resultados.", [ESTRATEGIA, ADS, MAPS, VIDEO]),
+      mk("combo-lanzamiento", "Datos para tu Combo Lanzamiento", "Marketing: campaña de lanzamiento de un mes con video publicitario, anuncios y Google Maps.",
+        "Combo Lanzamiento: plan de la campaña, un mes de campaña (imágenes, historias, carrusel, 2 reels y anuncios), 1 video publicitario, Google Maps e informe final.", [LANZAR, ESTRATEGIA, ADS, MAPS, VIDEO]),
+      mk("combo-total", "Datos para tu Combo Total", "Manejo de redes (Combo Profesional) + marketing (Combo Visibilidad) en un solo formulario.",
+        "Combo Total, cada mes: todo el Combo Profesional (4 videos, 8 publicaciones, 8 historias y manejo de Facebook, Instagram y TikTok) más el Combo Visibilidad (publicidad pagada, Google Maps y 1 video publicitario).",
+        [NEGOCIO, redesCombo("Facebook, Instagram y TikTok"), sec(redes, "Información del perfil"), CONTENIDO_MES, { ...ESTRATEGIA, fields: ESTRATEGIA.fields.filter((x) => x.name !== "competencia") }, ADS, { ...MAPS, fields: MAPS.fields.filter((x) => !["direccion", "horarios", "telefonos"].includes(x.name)) }, GRABACION]),
+    ];
+  }
+
   FORMS.push(
     combo("combo-esencial", "Esencial", "Facebook e Instagram", "2 videos grabados en tu negocio, 5 publicaciones con imagen y texto, manejo de Facebook e Instagram (publicar y responder de lunes a sábado), plan y calendario del mes e informe de resultados. De regalo: fotos de la sesión y mejora de tu perfil.", false),
     combo("combo-profesional", "Profesional", "Facebook, Instagram y TikTok", "4 videos grabados en tu negocio, 8 publicaciones con imagen y texto, 8 historias, manejo de Facebook, Instagram y TikTok (publicar y responder de lunes a sábado), plan y calendario del mes, informe y reunión mensual. De regalo: fotos de la sesión, mejora de tus perfiles y respuestas listas para tus preguntas frecuentes.", false),
     combo("combo-premium", "Premium", "Facebook, Instagram y TikTok", "8 videos grabados en tu negocio, 12 publicaciones con imagen y texto, 12 historias, manejo de Facebook, Instagram y TikTok también domingos y feriados, manejo de publicidad pagada, plan y calendario del mes, informe y reunión mensual. De regalo: fotos de las sesiones, mejora de tus perfiles, respuestas listas y portada especial para fechas importantes.", true),
+    ...combosMarketing(),
     {
       id: "servicios-sueltos",
       title: "Pedido de servicios por separado",
@@ -396,7 +463,8 @@ export const FORMS: DataForm[] = [
             { name: "servicios_elegidos", label: "Servicios", type: "multi", required: true, options: [
               "Logo de tu empresa", "Creación de una red social", "Plan y calendario del mes", "Manejo de una red social por mes",
               "Publicaciones con imagen y texto", "Historias de 24 horas", "Carrusel (varias imágenes)", "Video corto grabado en tu negocio",
-              "Manejo de publicidad pagada", "Atención domingos y feriados", "Informe de resultados", "Reunión mensual", "Toma con dron (se cotiza)"] },
+              "Manejo de publicidad pagada", "Atención domingos y feriados", "Informe de resultados", "Reunión mensual", "Toma con dron (se cotiza)",
+              "Plan de marketing", "Google Maps y búsquedas", "Campaña de lanzamiento", "Video publicitario", "Manual de marca", "WhatsApp Business"] },
             { name: "cantidades", label: "¿Cuántos de cada uno?", type: "textarea", max: 1000, placeholder: "Por ejemplo: 4 videos, 8 publicaciones, creación de Instagram y TikTok" },
             { name: "rubro", label: "¿A qué se dedica tu negocio?", type: "textarea", required: true, max: 1500 },
             REDES_ACTUALES,
