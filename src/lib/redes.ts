@@ -8,7 +8,7 @@ export const REDES_PDF = "/catalogos/sibnova-servicios-redes-sociales.pdf";
 export const PROMO = { pct: 20, hasta: "31 de enero de 2027", meses: 3 };
 
 export const PRECIO = {
-  logo: 2400, red: 300, estrategia: 250, manejo: 300, domingos: 300, post: 120, historia: 40, carrusel: 350,
+  logo: 450, red: 200, estrategia: 250, manejo: 300, domingos: 300, post: 120, historia: 40, carrusel: 350,
   video: 400, informe: 200, reunion: 150, publicidad: 600,
 } as const;
 type Pieza = keyof typeof PRECIO;
@@ -52,12 +52,12 @@ export const COMBOS: Combo[] = [
   }),
 ];
 
-export const INICIO = { normal: PRECIO.logo + 3 * PRECIO.red, precio: promo(PRECIO.logo + 3 * PRECIO.red) };
+export const INICIO = { precio: PRECIO.logo + 3 * PRECIO.red };
 
 export const SUELTOS: { grupo: string; items: { t: string; d: string; precio: number | null; unidad: string }[] }[] = [
   { grupo: "Para empezar (pago único)", items: [
-    { t: "Logo de tu empresa", d: "Varias propuestas para elegir y 2 rondas de ajustes. Recibes el logo para imprimir y para internet, más tu foto de perfil, portada e ícono.", precio: PRECIO.logo, unidad: "pago único" },
-    { t: "Creación de una red social", d: "Abrimos tu página en Facebook, Instagram o TikTok con tu correo y tu número, la verificamos y la dejamos completa con tus datos.", precio: PRECIO.red, unidad: "por red" },
+    { t: "Logo de tu empresa", d: "Propuestas para elegir y 2 rondas de ajustes. Recibes tu logo para imprimir y para internet, más tu foto de perfil, tu portada y tu ícono listos para redes.", precio: PRECIO.logo, unidad: "pago único" },
+    { t: "Creación de una red social", d: "Abrimos tu página en Facebook, Instagram o TikTok con tu correo y tu número, la verificamos y subimos tu foto de perfil, tu portada, tu descripción y tus datos de contacto.", precio: PRECIO.red, unidad: "por red" },
   ] },
   { grupo: "Contenido y atención (cada mes)", items: [
     { t: "Plan y calendario del mes", d: "Decidimos qué publicar según tu negocio y te lo mostramos para que lo apruebes.", precio: PRECIO.estrategia, unidad: "por mes" },

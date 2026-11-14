@@ -82,12 +82,11 @@ export default function RedesCatalog() {
           <div className={r.inicio} data-reveal>
             <div>
               <h3>¿Todavía no tienes logo o redes?</h3>
-              <p>Logo con foto de perfil, portada e ícono, más la creación de tu Facebook, Instagram y TikTok, verificados y completos con tus datos. Por separado: logo {formatBs(PRECIO.logo)} + 3 redes × {formatBs(PRECIO.red)} = {formatBs(INICIO.normal)}.</p>
+              <p>Tu logo con foto de perfil, portada e ícono ({formatBs(PRECIO.logo)}), más la creación de tu Facebook, Instagram y TikTok con todo cargado ({formatBs(PRECIO.red)} cada una). Después eliges tu combo mensual para que manejemos tus redes.</p>
             </div>
             <div className={r.inicioPrecio}>
-              <span className={r.antes}>{formatBs(INICIO.normal)}</span>
               <b>{formatBs(INICIO.precio)}</b>
-              <span className={r.ahorro}>Ahorras {formatBs(INICIO.normal - INICIO.precio)}</span>
+              <span className={r.mes}>pago único</span>
               <a href={waLink(`Hola SIBNOVA, quiero el logo + la creación de Facebook, Instagram y TikTok (${formatBs(INICIO.precio)}).`)} className="btn btn-ghost" target="_blank" rel="noopener">Lo quiero</a>
             </div>
           </div>

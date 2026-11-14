@@ -300,7 +300,7 @@ export const FORMS: DataForm[] = [
     fields: [
       ...sec(redes, "Tus redes").fields.map((x) =>
         x.name === "redes" ? { ...x, label: "¿En qué redes trabajamos?", help: `Tu combo incluye ${incluidas}. Si quieres otra red, márcala y te la cotizamos aparte.` } : x),
-      { name: "aviso_creacion", label: "Creación de redes", type: "note", help: "Tu combo es el manejo de cada mes. Si todavía no tienes alguna de estas redes, su creación se cobra aparte: Bs 300 por red, o el paquete logo + 3 redes con descuento.", when: { field: "trabajo_redes", in: ["Crear las redes desde cero", "Crear algunas y mejorar otras"] } },
+      { name: "aviso_creacion", label: "Creación de redes", type: "note", help: "Tu combo es el manejo de cada mes. Si todavía no tienes alguna de estas redes, su creación se cobra aparte: Bs 200 por red, con tu foto de perfil, portada y datos ya cargados.", when: { field: "trabajo_redes", in: ["Crear las redes desde cero", "Crear algunas y mejorar otras"] } },
       { name: "aviso_acceso", label: "Cómo nos das acceso", type: "note", help: "Nunca escribas contraseñas aquí. Te mandamos una guía corta por WhatsApp para agregarnos como administradores desde tu Facebook (Meta Business Suite) y tu TikTok. Las cuentas siguen siendo tuyas.", when: { field: "quien_crea", in: DUENO_ACCESO } },
     ],
   });
