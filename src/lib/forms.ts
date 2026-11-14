@@ -299,8 +299,8 @@ export const FORMS: DataForm[] = [
     ...sec(redes, "Tus redes"),
     fields: [
       ...sec(redes, "Tus redes").fields.map((x) =>
-        x.name === "redes" ? { ...x, label: "¿En qué redes trabajamos?", help: `Tu combo incluye ${incluidas}. Si quieres otra red, márcala y te la cotizamos aparte.` } : x),
-      { name: "aviso_creacion", label: "Creación de redes", type: "note", help: "Tu combo es el manejo de cada mes. Si todavía no tienes alguna de estas redes, su creación se cobra aparte: Bs 200 por red, con tu foto de perfil, portada y datos ya cargados.", when: { field: "trabajo_redes", in: ["Crear las redes desde cero", "Crear algunas y mejorar otras"] } },
+        x.name === "redes" ? { ...x, label: "¿En qué redes trabajamos?", help: `Tu plan trabaja con ${incluidas}. Si quieres otra red, márcala y te la cotizamos aparte.` } : x),
+      { name: "aviso_creacion", label: "Creación de redes", type: "note", help: "Tu plan es el contenido de cada mes. Si todavía no tienes alguna de estas redes, su creación se cobra aparte, una sola vez: Bs 200 por red, con tu foto de perfil, portada y datos ya cargados.", when: { field: "trabajo_redes", in: ["Crear las redes desde cero", "Crear algunas y mejorar otras"] } },
       { name: "aviso_acceso", label: "Cómo nos das acceso", type: "note", help: "Nunca escribas contraseñas aquí. Te mandamos una guía corta por WhatsApp para agregarnos como administradores desde tu Facebook (Meta Business Suite) y tu TikTok. Las cuentas siguen siendo tuyas.", when: { field: "quien_crea", in: DUENO_ACCESO } },
     ],
   });
@@ -349,7 +349,7 @@ export const FORMS: DataForm[] = [
   };
   const PUBLICIDAD: Section = {
     title: "Publicidad pagada",
-    intro: "Tu combo incluye el manejo de anuncios. Lo que pagas a Facebook o TikTok por mostrarlos va aparte y lo pagas tú directamente.",
+    intro: "Tu plan incluye el manejo de anuncios. Lo que pagas a Facebook o TikTok por mostrarlos va aparte y lo pagas tú directamente.",
     fields: [
       { name: "presupuesto_publicidad", label: "¿Cuánto podrías invertir en anuncios al mes?", type: "select", required: true, options: ["Menos de Bs 500", "Entre Bs 500 y Bs 1.000", "Entre Bs 1.000 y Bs 3.000", "Más de Bs 3.000", "Quiero que me recomienden"] },
       { name: "objetivo_publicidad", label: "¿Qué quieres lograr con los anuncios?", type: "multi", options: ["Que me escriban por WhatsApp", "Vender un producto o servicio", "Que más gente conozca mi marca", "Que visiten mi local", "Conseguir seguidores"] },
@@ -359,15 +359,22 @@ export const FORMS: DataForm[] = [
   };
   const ARCHIVOS_PLAN: Section = { title: "Archivos", intro: "Tu logo y todo lo que podamos usar en tus publicaciones. " + PESADOS, fields: [{ ...ARCHIVOS_MARCA, label: "Tu logo", help: "En la mejor calidad que tengas (PNG o PDF)." }, FOTOS, VIDEOS, DRIVE] };
 
-  const combo = (id: string, nombre: string, incluidas: string, incluye: string, conPublicidad: boolean): DataForm => ({
+  const QUIEN_PUBLICA = (gestion: string): Section => ({
+    title: "¿Quién publica?",
+    fields: [
+      { name: "quien_publica", label: "¿Quién publica el contenido en tus redes?", type: "select", required: true, options: ["Lo publico yo con el calendario que me dan", `Que lo publique y responda SIBNOVA (gestión: ${gestion})`, "Quiero que me recomienden"] },
+    ],
+  });
+  const combo = (id: string, nombre: string, incluidas: string, incluye: string, conPublicidad: boolean, gestion: string): DataForm => ({
     id,
-    title: `Datos para tu Combo ${nombre}`,
-    short: `Manejo y contenido mensual del Combo ${nombre}: negocio, redes, temas, grabación y aprobaciones.`,
+    title: `Datos para tu Plan ${nombre}`,
+    short: `Contenido mensual del Plan ${nombre} (y gestión de redes si la elige): negocio, redes, temas, grabación y aprobaciones.`,
     intro: "Con estas respuestas planificamos tu primer mes: qué publicar, qué grabar y cómo atender a tus clientes. Lo que no sepas, déjalo en blanco o elige «lo que me recomienden». Tu información es confidencial: solo la usamos para tu proyecto.",
     sections: [
-      aviso(`Combo ${nombre}. Cada mes: ${incluye}`),
+      aviso(`Plan ${nombre}. Cada mes: ${incluye}`),
       CONTACTO,
       NEGOCIO,
+      QUIEN_PUBLICA(gestion),
       redesCombo(incluidas),
       sec(redes, "Información del perfil"),
       CONTENIDO_MES,
@@ -379,7 +386,7 @@ export const FORMS: DataForm[] = [
     ],
   });
 
-  // Combos de marketing (sin manejo de redes) y Combo Total
+  // Publicidad y Google Maps (paso 3) y proyectos de marketing
   function combosMarketing(): DataForm[] {
     const ESTRATEGIA: Section = {
       title: "Tu negocio y tus metas",
@@ -424,7 +431,7 @@ export const FORMS: DataForm[] = [
         { name: "publico_campana", label: "¿A quién quieres llegar?", type: "textarea", max: 800, placeholder: "Edad, ciudad, a qué se dedican…" },
       ],
     };
-    const ADS = { ...PUBLICIDAD, intro: "Tu combo incluye el manejo de anuncios. Lo que pagas a Facebook, TikTok o Google por mostrarlos va aparte y lo pagas tú directamente." };
+    const ADS = { ...PUBLICIDAD, intro: "Tu servicio incluye el manejo de anuncios. Lo que pagas a Facebook, TikTok o Google por mostrarlos va aparte y lo pagas tú directamente." };
     const VIDEO: Section = { ...GRABACION, title: "Grabación del video publicitario", intro: "Nuestro camarógrafo va a tu negocio a grabar. Agendamos la fecha contigo." };
     const fin = { ...CIERRE, fields: CIERRE.fields.filter((x) => x.name !== "fecha_deseada") };
     const mk = (id: string, title: string, short: string, incluye: string, secciones: Section[]): DataForm => ({
@@ -435,20 +442,17 @@ export const FORMS: DataForm[] = [
     return [
       mk("combo-despegue", "Datos para tu Combo Despegue", "Marketing: plan de marketing, manual de marca y WhatsApp Business.",
         "Combo Despegue: plan de marketing para los próximos 3 meses, manual de marca con 5 plantillas y tu WhatsApp Business configurado.", [ESTRATEGIA, MARCA, WHATSAPP]),
-      mk("combo-visibilidad", "Datos para tu Combo Visibilidad", "Marketing mensual: publicidad pagada, Google Maps y 1 video publicitario por mes.",
-        "Combo Visibilidad, cada mes: publicidad pagada con 3 anuncios y seguimiento, Google Maps y búsquedas, 1 video publicitario e informe de resultados.", [ESTRATEGIA, ADS, MAPS, VIDEO]),
+      mk("combo-visibilidad", "Datos para tu publicidad y Google Maps", "Paso 3, cada mes: publicidad pagada y Google Maps.",
+        "Publicidad pagada y Google Maps, cada mes: 3 anuncios con seguimiento semanal, tu ficha de Google Maps con fotos, horario, reseñas y publicaciones, e informe de resultados.", [ESTRATEGIA, ADS, MAPS]),
       mk("combo-lanzamiento", "Datos para tu Combo Lanzamiento", "Marketing: campaña de lanzamiento de un mes con video publicitario, anuncios y Google Maps.",
         "Combo Lanzamiento: plan de la campaña, un mes de campaña (imágenes, historias, carrusel, 2 reels y anuncios), 1 video publicitario, Google Maps e informe final.", [LANZAR, ESTRATEGIA, ADS, MAPS, VIDEO]),
-      mk("combo-total", "Datos para tu Combo Total", "Manejo de redes (Combo Profesional) + marketing (Combo Visibilidad) en un solo formulario.",
-        "Combo Total, cada mes: todo el Combo Profesional (4 videos, 8 publicaciones, 8 historias y manejo de Facebook, Instagram y TikTok) más el Combo Visibilidad (publicidad pagada, Google Maps y 1 video publicitario).",
-        [NEGOCIO, redesCombo("Facebook, Instagram y TikTok"), sec(redes, "Información del perfil"), CONTENIDO_MES, { ...ESTRATEGIA, fields: ESTRATEGIA.fields.filter((x) => x.name !== "competencia") }, ADS, { ...MAPS, fields: MAPS.fields.filter((x) => !["direccion", "horarios", "telefonos"].includes(x.name)) }, GRABACION]),
     ];
   }
 
   FORMS.push(
-    combo("combo-esencial", "Esencial", "Facebook e Instagram", "2 videos grabados en tu negocio, 5 publicaciones con imagen y texto, manejo de Facebook e Instagram (publicar y responder de lunes a sábado), plan y calendario del mes e informe de resultados. De regalo: fotos de la sesión y mejora de tu perfil.", false),
-    combo("combo-profesional", "Profesional", "Facebook, Instagram y TikTok", "4 videos grabados en tu negocio, 8 publicaciones con imagen y texto, 8 historias, manejo de Facebook, Instagram y TikTok (publicar y responder de lunes a sábado), plan y calendario del mes, informe y reunión mensual. De regalo: fotos de la sesión, mejora de tus perfiles y respuestas listas para tus preguntas frecuentes.", false),
-    combo("combo-premium", "Premium", "Facebook, Instagram y TikTok", "8 videos grabados en tu negocio, 12 publicaciones con imagen y texto, 12 historias, manejo de Facebook, Instagram y TikTok también domingos y feriados, manejo de publicidad pagada, plan y calendario del mes, informe y reunión mensual. De regalo: fotos de las sesiones, mejora de tus perfiles, respuestas listas y portada especial para fechas importantes.", true),
+    combo("combo-esencial", "Esencial", "Facebook e Instagram", "2 videos grabados en tu negocio, 5 publicaciones con imagen y texto, plan y calendario del mes e informe de resultados. De regalo: fotos de la sesión y mejora de tu perfil. Si eliges la gestión, también publicamos y respondemos en Facebook e Instagram de lunes a sábado.", false, "+ Bs 480 al mes con la promoción"),
+    combo("combo-profesional", "Profesional", "Facebook, Instagram y TikTok", "4 videos grabados en tu negocio, 8 publicaciones con imagen y texto, 8 historias, plan y calendario del mes, informe y reunión mensual. De regalo: fotos de la sesión, mejora de tus perfiles y respuestas listas para tus preguntas frecuentes. Si eliges la gestión, también publicamos y respondemos en Facebook, Instagram y TikTok de lunes a sábado.", false, "+ Bs 720 al mes con la promoción"),
+    combo("combo-premium", "Premium", "Facebook, Instagram y TikTok", "8 videos grabados en tu negocio, 12 publicaciones con imagen y texto, 12 historias, manejo de publicidad pagada, plan y calendario del mes, informe y reunión mensual. De regalo: fotos de las sesiones, mejora de tus perfiles, respuestas listas y portada especial para fechas importantes. Si eliges la gestión, también publicamos y respondemos en Facebook, Instagram y TikTok, incluso domingos y feriados.", true, "+ Bs 960 al mes con la promoción"),
     ...combosMarketing(),
     {
       id: "servicios-sueltos",
@@ -461,7 +465,7 @@ export const FORMS: DataForm[] = [
           title: "Servicios que quieres",
           fields: [
             { name: "servicios_elegidos", label: "Servicios", type: "multi", required: true, options: [
-              "Logo de tu empresa", "Creación de una red social", "Plan y calendario del mes", "Manejo de una red social por mes",
+              "Logo de tu empresa", "Creación de una red social", "Plan y calendario del mes", "Gestión de una red social por mes",
               "Publicaciones con imagen y texto", "Historias de 24 horas", "Carrusel (varias imágenes)", "Video corto grabado en tu negocio",
               "Manejo de publicidad pagada", "Atención domingos y feriados", "Informe de resultados", "Reunión mensual", "Toma con dron (se cotiza)",
               "Plan de marketing", "Google Maps y búsquedas", "Campaña de lanzamiento", "Video publicitario", "Manual de marca", "WhatsApp Business"] },

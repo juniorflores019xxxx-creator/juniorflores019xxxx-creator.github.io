@@ -11,8 +11,8 @@ import { formatBs } from "@/lib/catalog";
 import { COMBOS, REDES_URL } from "@/lib/redes";
 import { SITE } from "@/lib/site";
 
-const title = `Redes sociales para tu negocio | ${SITE.name}`;
-const description = `Manejo de Facebook, Instagram y TikTok con videos grabados en tu negocio, publicaciones y atención a tus clientes. Combos desde ${formatBs(COMBOS[0].precio)} al mes en Santa Cruz, Bolivia.`;
+const title = `Marketing digital y community manager | ${SITE.name}`;
+const description = `Contenido mensual con videos grabados en tu negocio, gestión de Facebook, Instagram y TikTok, publicidad pagada y Google Maps. Planes desde ${formatBs(COMBOS[0].precio)} al mes en Santa Cruz, Bolivia. Logo y creación de redes aparte.`;
 
 export const metadata: Metadata = {
   title,

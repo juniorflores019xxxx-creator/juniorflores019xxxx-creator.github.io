@@ -62,7 +62,7 @@ export default function Services() {
             );
           })}
           <li className={`${styles.item} ${styles.wide}`}>
-            <Link href="/redes-sociales/" className={styles.link} aria-label="Marketing digital y community manager: ver combos y precios">
+            <Link href="/redes-sociales/" className={styles.link} aria-label="Marketing digital y community manager: ver planes y precios">
               <article className={`spot ${styles.card}`}>
                 <div className={styles.top}>
                   <span className="num">05<em className={styles.isNew}>Nuevo</em></span>
@@ -71,8 +71,8 @@ export default function Services() {
                   </span>
                 </div>
                 <h3 className={styles.title}>Marketing digital y community manager</h3>
-                <p className={styles.text}>Manejamos tus redes sociales: videos grabados en tu negocio, publicaciones, respuesta a tus clientes e informe mensual. Combos con precio claro.</p>
-                <span className={styles.more}>Ver combos y precios <ArrowRight /></span>
+                <p className={styles.text}>Cada mes hacemos el contenido de tu negocio: videos, diseños y textos. Si quieres, también lo publicamos y atendemos tus redes. Y para atraer clientes nuevos, manejamos tu publicidad pagada y tu Google Maps.</p>
+                <span className={styles.more}>Ver planes y precios <ArrowRight /></span>
                 <span className={styles.bar} aria-hidden="true" />
               </article>
             </Link>
