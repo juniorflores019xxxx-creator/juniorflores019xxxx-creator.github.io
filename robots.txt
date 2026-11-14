@@ -1,0 +1,5 @@
+User-Agent: *
+Allow: /
+
+Host: https://sibnova.com.bo
+Sitemap: https://sibnova.com.bo/sitemap.xml

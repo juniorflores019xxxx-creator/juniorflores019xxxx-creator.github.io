@@ -1,0 +1,35 @@
+1:"$Sreact.fragment"
+2:I[30990,["/_next/static/chunks/2upjmqlzvefkp.js"],"default"]
+3:I[97367,["/_next/static/chunks/3fntmmi971322.js"],"OutletBoundary"]
+4:"$Sreact.suspense"
+8:I[97367,["/_next/static/chunks/3fntmmi971322.js"],"ViewportBoundary"]
+9:I[97367,["/_next/static/chunks/3fntmmi971322.js"],"MetadataBoundary"]
+:HL["/_next/static/chunks/027e3-gkgna98.css","style"]
+7:X
+15:X
+15:C
+0:{"buildId":"-ghC48SBCrNBxYDkOhy98","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"d":{"n":"12","slug":"neumorphism","name":"Neumorphism","short":"Botones y tarjetas en relieve suave, como si salieran del fondo. Tranquilo y táctil.","traits":["Relieve suave","Tonos pastel","Sensación táctil"],"categories":["Clínica y consultorio","Servicios profesionales","Landing page"],"hero":"split","body":"grid","demo":{"brand":"Sonrisa Clara","kind":"Consultorio odontológico","nav":["Tratamientos","Equipo","Citas","Contacto"],"kicker":"Odontología","title":"Cuida tu sonrisa sin miedo.","text":"Tratamientos explicados paso a paso, con citas puntuales y precios claros.","cta":"Agendar cita","cta2":"Ver tratamientos","features":[{"t":"Limpieza","d":"Profilaxis y control cada seis meses."},{"t":"Ortodoncia","d":"Brackets y alineadores."},{"t":"Estética","d":"Blanqueamiento y carillas."}],"aboutTitle":"Tranquilidad en cada cita","about":"Te explicamos cada tratamiento antes de empezar.","points":["Primera consulta de evaluación","Planes de pago","Recordatorios"],"photos":["dentista","retrato-sonrisa","sonrisa-mujer","clinica-recepcion"],"band":"Agenda tu evaluación."}}}],[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/027e3-gkgna98.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/2upjmqlzvefkp.js","async":true}]],["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":"$@6","staleTime":"$7","varyParams":null},{"rsc":["$","$1","h",{"children":[null,["$","$L8",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}],["$","meta","2",{"name":"theme-color","content":"#050609"}],["$","meta","3",{"name":"color-scheme","content":"dark"}]]}],["$","div",null,{"hidden":true,"children":["$","$L9",null,{"children":["$","$4",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"Ver diseño 12 Neumorphism | SIBNOVA"}],["$","meta","1",{"name":"description","content":"Desarrollamos aplicaciones, páginas web, automatización e inteligencia artificial para empresas en Santa Cruz y toda Bolivia. Haz el diagnóstico gratis."}],["$","meta","2",{"name":"application-name","content":"SIBNOVA"}],["$","meta","3",{"name":"keywords","content":"desarrollo de aplicaciones Bolivia,inteligencia artificial Bolivia,automatización empresarial,desarrollo web Santa Cruz,software a medida,SIBNOVA"}],["$","meta","4",{"name":"robots","content":"noindex, follow"}],["$","link","5",{"rel":"canonical","href":"https://sibnova.com.bo/catalogo/disenos/neumorphism/"}],["$","meta","6",{"property":"og:title","content":"SIBNOVA · Desarrollo de software e IA en Santa Cruz, Bolivia"}],["$","meta","7",{"property":"og:description","content":"Desarrollamos aplicaciones, páginas web, automatización e inteligencia artificial para empresas en Santa Cruz y toda Bolivia. Haz el diagnóstico gratis."}],["$","meta","8",{"property":"og:url","content":"https://sibnova.com.bo/"}],["$","meta","9",{"property":"og:site_name","content":"SIBNOVA"}],["$","meta","10",{"property":"og:locale","content":"es_BO"}],["$","meta","11",{"property":"og:image","content":"https://sibnova.com.bo/opengraph-image.png?opengraph-image.2u7wyxslwt20v.png"}],["$","meta","12",{"property":"og:image:type","content":"image/png"}],["$","meta","13",{"property":"og:image:width","content":"1200"}],["$","meta","14",{"property":"og:image:height","content":"630"}],["$","meta","15",{"property":"og:image:alt","content":"SIBNOVA - Transformamos ideas en tecnología"}],["$","meta","16",{"property":"og:type","content":"website"}],["$","meta","17",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","18",{"name":"twitter:title","content":"SIBNOVA · Desarrollo de software e IA en Santa Cruz, Bolivia"}],["$","meta","19",{"name":"twitter:description","content":"Desarrollamos aplicaciones, páginas web, automatización e inteligencia artificial para empresas en Santa Cruz y toda Bolivia. Haz el diagnóstico gratis."}],["$","meta","20",{"name":"twitter:image","content":"https://sibnova.com.bo/twitter-image.png?twitter-image.2u7wyxslwt20v.png"}],"$La","$Lb","$Lc","$Ld","$Le","$Lf","$L10"]}]}]}],"$L11"]}],"isPartial":"$@12","staleTime":"$7","varyParams":null},{"rsc":"$L13","isPartial":"$@14","staleTime":"$7","varyParams":"$15"},{"rsc":"$L16","isPartial":"$@17","staleTime":"$7","varyParams":"$15"},{"rsc":"$L18","isPartial":"$@19","staleTime":"$7","varyParams":"$15"}],"isUpgradeableISRFallback":false,"a":"$@1a","rootVaryParams":null,"needsRuntimeRequest":"$@1b"}
+1c:I[27201,["/_next/static/chunks/3fntmmi971322.js"],"IconMark"]
+1d:I[39756,["/_next/static/chunks/3fntmmi971322.js"],"default"]
+1e:I[37457,["/_next/static/chunks/3fntmmi971322.js"],"default"]
+5:null
+a:["$","meta","21",{"name":"twitter:image:alt","content":"SIBNOVA - Transformamos ideas en tecnología"}]
+b:["$","meta","22",{"name":"twitter:image:type","content":"image/png"}]
+c:["$","meta","23",{"name":"twitter:image:width","content":"1200"}]
+d:["$","meta","24",{"name":"twitter:image:height","content":"630"}]
+e:["$","link","25",{"rel":"icon","href":"/icon.png?icon.3sv08ocjhvsdq.png","sizes":"157x154","type":"image/png"}]
+f:["$","link","26",{"rel":"apple-touch-icon","href":"/apple-icon.png?apple-icon.3sv08ocjhvsdq.png","sizes":"157x154","type":"image/png"}]
+10:["$","$L1c","27",{}]
+11:["$","meta",null,{"name":"next-size-adjust","content":""}]
+13:["$","$1","c",{"children":[null,["$","$L1d",null,{"parallelRouterKey":"children","template":["$","$L1e",null,{}]}]]}]
+16:["$","$1","c",{"children":[null,["$","$L1d",null,{"parallelRouterKey":"children","template":["$","$L1e",null,{}]}]]}]
+18:["$","$1","c",{"children":[null,["$","$L1d",null,{"parallelRouterKey":"children","template":["$","$L1e",null,{}]}]]}]
+1b:true
+7:300
+7:C
+1a:0
+12:"$undefined"
+14:"$undefined"
+17:"$undefined"
+19:"$undefined"
+6:"$undefined"
