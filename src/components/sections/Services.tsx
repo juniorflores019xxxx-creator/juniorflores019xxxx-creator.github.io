@@ -35,19 +35,19 @@ export default function Services() {
         <div className={styles.head}>
           <Split as="h2" text="Lo que *construimos.*" className="display h2" />
           <p className="lead" data-reveal>
-            Cuatro capacidades, un mismo equipo: del primer boceto al sistema funcionando.
+            Cinco capacidades, un mismo equipo: del primer boceto al sistema funcionando, y tu marca activa en redes sociales.
           </p>
         </div>
 
         <ul ref={gridRef} className={styles.grid}>
-          {SERVICES.map(({ slug, n, title, short, icon }) => {
+          {SERVICES.map(({ slug, n, title, short, icon, status }) => {
             const Icon = SERVICE_ICONS[icon];
             return (
               <li key={slug} className={styles.item}>
                 <Link href={serviceHref(slug)} className={styles.link} aria-label={`${title}: ver cómo lo hacemos`}>
                   <article className={`spot ${styles.card}`}>
                     <div className={styles.top}>
-                      <span className="num">{n}</span>
+                      <span className="num">{n}{status && <em className={styles.status}>{status}</em>}</span>
                       <span className={styles.icon}><Icon /></span>
                     </div>
                     <h3 className={styles.title}>{title}</h3>
@@ -61,6 +61,22 @@ export default function Services() {
               </li>
             );
           })}
+          <li className={`${styles.item} ${styles.wide}`}>
+            <Link href="/redes-sociales/" className={styles.link} aria-label="Marketing digital y community manager: ver combos y precios">
+              <article className={`spot ${styles.card}`}>
+                <div className={styles.top}>
+                  <span className="num">05<em className={styles.isNew}>Nuevo</em></span>
+                  <span className={styles.icon}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path className="draw" d="M3 10v4a1 1 0 0 0 1 1h2l5 4V5L6 9H4a1 1 0 0 0-1 1z" /><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12" /></svg>
+                  </span>
+                </div>
+                <h3 className={styles.title}>Marketing digital y community manager</h3>
+                <p className={styles.text}>Manejamos tus redes sociales: videos grabados en tu negocio, publicaciones, respuesta a tus clientes e informe mensual. Combos con precio claro.</p>
+                <span className={styles.more}>Ver combos y precios <ArrowRight /></span>
+                <span className={styles.bar} aria-hidden="true" />
+              </article>
+            </Link>
+          </li>
         </ul>
       </div>
     </section>

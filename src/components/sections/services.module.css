@@ -105,3 +105,9 @@
 .more svg { width: 16px; height: 16px; transition: transform 0.5s var(--ease); }
 .link:hover .more svg, .link:focus-visible .more svg { transform: translateX(4px); }
 .link:hover .card { border-color: rgba(119, 158, 255, 0.28); }
+
+/* Etiquetas en la tarjeta y quinta tarjeta a lo ancho */
+.status, .isNew { margin-left: 10px; padding: 3px 10px; border-radius: 999px; font-style: normal; font-size: 0.7rem; letter-spacing: 0.04em; vertical-align: middle; }
+.status { color: #ffd666; background: rgba(255, 196, 0, 0.1); border: 1px solid rgba(255, 196, 0, 0.35); }
+.isNew { color: #6ee7b7; background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.4); }
+@media (min-width: 760px) { .wide { grid-column: 1 / -1; } }

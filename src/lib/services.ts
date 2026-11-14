@@ -9,6 +9,7 @@ export type Service = {
   title: string;
   short: string;          // texto de la tarjeta en la portada
   icon: ServiceIcon;
+  status?: string;        // etiqueta opcional, p. ej. «En desarrollo»
   topic: string;          // tema que se marca en el formulario de contacto
   intro: string;
   problems: { pain: string; fix: string }[];       // lo que resolvemos
@@ -88,6 +89,7 @@ export const SERVICES: Service[] = [
     title: "Inteligencia artificial",
     short: "Automatización inteligente para optimizar procesos, reducir costos y aumentar productividad.",
     icon: "ai",
+    status: "En desarrollo",
     topic: "Inteligencia artificial",
     intro:
       "Incorporamos inteligencia artificial en los procesos de tu empresa para responder, analizar y decidir más rápido. En Bolivia casi todo empieza por WhatsApp, así que ahí suele estar la primera oportunidad: un asistente que atiende, vende y registra mientras tu equipo se ocupa de lo importante.",

@@ -50,7 +50,7 @@ export default function ServiceDetail({ service }: { service: Service }) {
               <span aria-hidden="true">/</span>
               <span aria-current="page">{service.title}</span>
             </nav>
-            <span className="num" data-reveal>{service.n} · Servicio</span>
+            <span className="num" data-reveal>{service.n} · Servicio{service.status && ` · ${service.status}: ya estamos construyendo esta área`}</span>
             <h1 id="servicio-titulo" className={`display ${styles.title}`} data-reveal>{service.title}</h1>
             <p className={styles.short} data-reveal>{service.short}</p>
             <p className="lead" data-reveal>{service.intro}</p>
