@@ -7,6 +7,7 @@ import Gallery3D from "@/components/ui/Gallery3D";
 import DesignCatalog from "@/components/designs/DesignCatalog";
 import { ArrowRight, ArrowUpRight, IconCheck } from "@/components/ui/icons";
 import Split from "@/components/ui/Split";
+import { COMBOS, INICIO, PRECIO, PROMO, REDES_URL } from "@/lib/redes";
 import styles from "./catalog.module.css";
 import service from "@/components/service/service.module.css";
 
@@ -32,6 +33,9 @@ export default function Catalog() {
           <p className="lead" data-reveal>Paquetes con precio claro y 20 estilos que puedes ver funcionando antes de contratar. Tú eliges el diseño y nosotros lo adaptamos a tu marca.</p>
           <a href="#fundadores" className={styles.founderPill} data-reveal>
             <b>Clientes Fundadores</b> {FOUNDERS.slots} cupos hasta el {FOUNDERS.deadline} <ArrowRight />
+          </a>
+          <a href="#marketing" className={styles.founderPill} data-reveal>
+            <b>Nuevo:</b> marketing digital y community manager <ArrowRight />
           </a>
         </div>
         <Gallery3D
@@ -84,6 +88,36 @@ export default function Catalog() {
             </li>
           </ul>
           <p className={styles.note}>Precios en bolivianos. El monto exacto, el alcance y el plazo quedan escritos en tu proforma. <a href="#disenos">Ver los 20 diseños</a></p>
+        </div>
+      </section>
+
+      {/* ---------- Marketing digital y community manager ---------- */}
+      <section id="marketing" className="section" aria-labelledby="marketing-titulo">
+        <div className="wrap">
+          <div className={service.head}>
+            <div>
+              <span className={styles.soon}>Nuevo · {PROMO.pct} % de descuento hasta el {PROMO.hasta}</span>
+              <h2 id="marketing-titulo" className="display h2">Marketing digital y <em className={styles.accent}>community manager</em></h2>
+            </div>
+            <p className="lead" data-reveal>Manejamos tus redes sociales cada mes: videos grabados en tu negocio, publicaciones, respuesta a tus clientes e informe de resultados.</p>
+          </div>
+          <ul className={styles.stores}>
+            {COMBOS.map((c) => (
+              <li key={c.slug} className={`${styles.plan} ${c.featured ? styles.featured : ""}`} data-reveal>
+                <div className={styles.planHead}>
+                  <span className={styles.planNum}>Cada mes{c.featured && <em>El más elegido</em>}</span>
+                  <h3 className={styles.planName}>{c.name}</h3>
+                  <p className={styles.kind}>{c.pitch}</p>
+                </div>
+                <p className={styles.price}><small>Precio normal {formatBs(c.normal)}</small><b>{formatBs(c.precio)} <small>/mes</small></b><small>con {PROMO.pct} % menos los {PROMO.meses} primeros meses</small></p>
+                <ul className={styles.includes}>
+                  {c.hacemos.slice(0, 4).map((d) => <li key={d}><IconCheck width={18} height={18} />{d}</li>)}
+                </ul>
+                <Link href={`${REDES_URL}#${c.slug}`} className={`btn ${c.featured ? "btn-primary" : "btn-ghost"} ${styles.planBtn}`}>Ver el detalle</Link>
+              </li>
+            ))}
+          </ul>
+          <p className={styles.note}>Para empezar: logo con perfil, portada e ícono {formatBs(PRECIO.logo)} · creación de cada red {formatBs(PRECIO.red)} · logo + Facebook, Instagram y TikTok {formatBs(INICIO.precio)}. <Link href={REDES_URL}>Ver el catálogo completo de redes sociales</Link></p>
         </div>
       </section>
 

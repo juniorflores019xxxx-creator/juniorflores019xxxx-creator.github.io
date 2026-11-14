@@ -10,8 +10,8 @@ import Catalog from "@/components/catalog/Catalog";
 import { CATALOG_FAQ, CATALOG_URL, WEB_PLANS, formatBs } from "@/lib/catalog";
 import { SITE } from "@/lib/site";
 
-const title = `Catálogo de páginas web | ${SITE.name}`;
-const description = `Páginas web en Bolivia desde ${formatBs(WEB_PLANS[0].price)}: página de presentación, sitio corporativo, catálogo con WhatsApp y desarrollo a medida. 20 diseños con demostración.`;
+const title = `Catálogo de páginas web y marketing digital | ${SITE.name}`;
+const description = `Páginas web en Bolivia desde ${formatBs(WEB_PLANS[0].price)}: página de presentación, sitio corporativo, catálogo con WhatsApp y desarrollo a medida. 20 diseños con demostración, y combos de marketing digital y community manager.`;
 
 export const metadata: Metadata = {
   title,
