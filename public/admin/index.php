@@ -234,6 +234,56 @@ if ($logged && isset($_GET['enviar'])) {
     }
 }
 
+// Catálogos de servicios para enviar por WhatsApp. Cada opción dice qué formulario mandar cuando el cliente la elige.
+// Precios iguales a los PDF de public/catalogos/ (se generan en la computadora de SIBNOVA). Al cambiar un precio, cambiar ambos.
+const CATALOGOS = [
+    [
+        'id' => 'redes-sociales',
+        'titulo' => 'Redes sociales: logo, creación de redes y manejo mensual',
+        'resumen' => 'Precio de cada servicio por separado y 3 combos mensuales (Esencial, Profesional y Premium) con videos grabados en el negocio, publicaciones y manejo de redes. Aparte: logo y creación de redes.',
+        'enlace' => '/redes-sociales/',
+        'pdf' => '/catalogos/sibnova-servicios-redes-sociales.pdf',
+        'promo' => 'Promoción del 20 % para quienes contraten hasta el 31 de enero de 2027, durante los 3 primeros meses.',
+        'opciones' => [
+            ['Combo Esencial: 2 videos, 5 publicaciones, Facebook e Instagram', 'Bs 1.960/mes con promoción · normal Bs 2.450', 'combo-esencial'],
+            ['Combo Profesional: 4 videos, 8 publicaciones, 8 historias, 3 redes', 'Bs 3.500/mes con promoción · normal Bs 4.380', 'combo-profesional'],
+            ['Combo Premium: 8 videos, 12 publicaciones, 12 historias, 3 redes y publicidad', 'Bs 6.010/mes con promoción · normal Bs 7.520', 'combo-premium'],
+            ['Logo + creación de Facebook, Instagram y TikTok', 'Bs 2.640 con promoción (por separado Bs 3.300)', 'logo-redes'],
+            ['Solo logo', 'Bs 2.400', 'logo'],
+            ['Solo creación de redes', 'Bs 300 por red', 'redes-sociales'],
+            ['Servicios sueltos (videos, publicaciones, dron…)', 'Según lo que elija', 'servicios-sueltos'],
+        ],
+    ],
+    [
+        'id' => 'paginas-web',
+        'titulo' => 'Páginas web y catálogo con WhatsApp',
+        'resumen' => 'Paquetes Presencia y Empresa, catálogo de productos con botón de WhatsApp y los 20 diseños para elegir.',
+        'enlace' => '/catalogo/',
+        'promo' => 'Páginas web desde Bs 1.500.',
+        'opciones' => [
+            ['Página web Presencia', 'Bs 1.500', 'pagina-web'],
+            ['Sitio web Empresa', 'Bs 4.990', 'pagina-web'],
+            ['Catálogo con WhatsApp (adicional del paquete Empresa)', '+ Bs 2.390', 'catalogo-whatsapp'],
+        ],
+    ],
+];
+// Abre WhatsApp con el catálogo: para el cliente, o para alguien que lo reenviará a un conocido
+if ($logged && isset($_GET['enviar_catalogo'])) {
+    $cat = find_by_id(CATALOGOS, (string)$_GET['enviar_catalogo']);
+    $tel = preg_replace('/\D/', '', (string)($_GET['tel'] ?? ''));
+    if (strlen($tel) === 8) $tel = '591' . $tel;
+    if ($cat && strlen($tel) >= 8) {
+        $nombre = clean($_GET['nombre'] ?? '', 60);
+        $hola = 'Hola' . ($nombre !== '' ? ' ' . $nombre : '') . ', te saluda SIBNOVA 👋';
+        $url = SITE_URL . $cat['enlace'];
+        $txt = ($_GET['modo'] ?? '') === 'referido'
+            ? $hola . ' Gracias por recomendarnos. Te dejo nuestro catálogo de ' . mb_strtolower($cat['titulo']) . ' para que se lo reenvíes a quien quieras: ' . $url . "\n\n" . $cat['promo'] . ' Si tu conocido nos escribe a este número diciendo que va de tu parte, lo atendemos con mucho gusto.'
+            : $hola . ' Te comparto nuestro catálogo de ' . mb_strtolower($cat['titulo']) . ': ' . $url . "\n\nAhí ves el precio de cada servicio por separado y los combos. " . $cat['promo'] . "\n\nCuando elijas, avísame y te envío un formulario corto con las preguntas de lo que elegiste para empezar.";
+        header('Location: https://wa.me/' . $tel . '?text=' . rawurlencode($txt), true, 303);
+        exit;
+    }
+}
+
 /* ============================================================
    Interfaz del CRM (HTML sin JavaScript: la política de seguridad no permite scripts)
    ============================================================ */
@@ -275,7 +325,7 @@ function page(string $title, string $body, string $active = '', bool $bare = fal
     global $tok;
     $nav = [['inicio', '/admin/', 'Inicio', 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z'], ['clientes', '/admin/?clientes=1', 'Clientes', 'M16 19a4 4 0 0 0-8 0M12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM20 19a3 3 0 0 0-3-3M17 11a2.5 2.5 0 1 0 0-5M4 19a3 3 0 0 1 3-3M7 11a2.5 2.5 0 1 1 0-5'],
         ['solicitudes', '/admin/?solicitudes=1', 'Solicitudes', 'M4 5h16v14H4zM4 9h16M8 13h5'], ['cotizaciones', '/admin/?cotizaciones=1', 'Cotizaciones', 'M7 3h10v18l-5-3-5 3zM10 8h4M10 12h4'], ['datos', '/admin/?datos=1', 'Datos recibidos', 'M12 3v12M7 10l5 5 5-5M4 21h16'],
-        ['formularios', '/admin/?formularios=1', 'Formularios', 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5'], ['cuenta', '/admin/?cuenta=1', 'Cuenta', 'M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0']];
+        ['catalogos', '/admin/?catalogos=1', 'Catálogos', 'M4 4h7v16H4zM13 4h7v16h-7M6.5 8h2M15.5 8h2'], ['formularios', '/admin/?formularios=1', 'Formularios', 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5'], ['cuenta', '/admin/?cuenta=1', 'Cuenta', 'M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0']];
     $links = implode('', array_map(fn($n) => '<a href="' . $n[1] . '"' . ($n[0] === $active ? ' aria-current="page"' : '') . '><svg viewBox="0 0 24 24" aria-hidden="true"><path d="' . $n[3] . '"/></svg>' . $n[2] . '</a>', $nav));
     $side = $bare ? '' : '<aside class="side"><a class="brand" href="/admin/"><img src="/brand/sn-logo-256.webp" alt="" width="40" height="19"><span>SIBNOVA<small>CRM</small></span></a><nav>' . $links . '</nav>
         <form method="post" class="logout">' . $tok . '<input type="hidden" name="accion" value="salir"><button class="ghost sm">Salir</button></form><a class="site" href="/" target="_blank" rel="noopener">Ver sibnova.com.bo ↗</a></aside>';
@@ -440,6 +490,30 @@ if (isset($_GET['cot'])) {
       <section class="card"><h2>PDF de la proforma</h2>' . ($files ? '<ul class="files">' . $files . '</ul>' : '<p class="muted">El agente todavía no subió el PDF.</p>') . '</section>
       <section class="card"><h2>Actividad</h2>' . ($hist ? '<ul class="timeline">' . $hist . '</ul>' : '<p class="muted">Sin actividad.</p>') . '</section>
     </div></div>', 'cotizaciones');
+}
+
+/* ---------- Catálogos ---------- */
+if (isset($_GET['catalogos'])) {
+    try { $fs = formularios()['formularios']; } catch (Throwable $e) { $fs = []; }
+    $cards = '';
+    foreach (CATALOGOS as $cat) {
+        $url = SITE_URL . $cat['enlace'];
+        $rows = '';
+        foreach ($cat['opciones'] as [$op, $precio, $fid]) {
+            $fm = find_by_id($fs, $fid);
+            $rows .= '<tr><td><b>' . h($op) . '</b><br><small class="muted">' . h($precio) . '</small></td><td>' . ($fm
+                ? '<small class="muted">' . h($fm['titulo']) . '</small> · <a href="' . h(SITE_URL . '/datos-proyecto/?f=' . rawurlencode($fid)) . '" target="_blank" rel="noopener">ver ↗</a>'
+                : '<span class="warn">Formulario aún no publicado</span>') . '</td><td>' . ($fm
+                ? '<form method="get" class="inline" target="_blank"><input type="hidden" name="enviar" value="' . h($fid) . '"><input name="nombre" placeholder="Nombre" maxlength="60" style="width:120px"><input name="tel" required placeholder="WhatsApp" inputmode="tel" maxlength="20" style="width:130px"><button class="wa sm">Enviar formulario</button></form>'
+                : '') . '</td></tr>';
+        }
+        $cards .= '<section class="card grid"><div><h2 style="margin:0">' . h($cat['titulo']) . '</h2><p class="sub">' . h($cat['resumen']) . '</p><span class="badge" style="--c:#34d399">' . h($cat['promo']) . '</span></div>
+        <input class="url" readonly value="' . h($url) . '" aria-label="Enlace del catálogo" style="font-family:ui-monospace,Consolas,monospace;font-size:.82rem">
+        <form method="get" class="inline" target="_blank"><input type="hidden" name="enviar_catalogo" value="' . h($cat['id']) . '"><input name="nombre" placeholder="Nombre" maxlength="60" style="flex:1;min-width:130px"><input name="tel" required placeholder="WhatsApp: 7xxxxxxx" inputmode="tel" maxlength="20" style="flex:1;min-width:140px"><select name="modo"><option value="cliente">Para el cliente</option><option value="referido">Para que lo reenvíe a un conocido</option></select><button class="wa">Enviar catálogo por WhatsApp</button></form>
+        <p style="margin:0"><a href="' . h($url) . '" target="_blank" rel="noopener">Ver el catálogo como el cliente ↗</a>' . (!empty($cat['pdf']) ? ' · <a href="' . h(SITE_URL . $cat['pdf']) . '" target="_blank" rel="noopener">Descargar el PDF para adjuntarlo ↗</a>' : '') . '</p>
+        <div class="scroll"><h3 style="margin:6px 0 0;font-size:.95rem">Cuando el cliente elija, envíale este formulario</h3><table><thead><tr><th>Lo que eligió</th><th>Formulario</th><th>Enviar</th></tr></thead><tbody>' . $rows . '</tbody></table></div></section>';
+    }
+    page('Catálogos', '<div class="top"><div><h1>Catálogos de servicios</h1><p class="sub">1) Envía el catálogo por WhatsApp al cliente, o a quien te recomienda para que lo reenvíe. 2) Cuando el cliente elija un combo o servicio, envíale el formulario de esa fila: sus respuestas llegan a «Datos recibidos».</p></div></div><div class="grid">' . $cards . '</div>', 'catalogos');
 }
 
 /* ---------- Formularios ---------- */
@@ -627,6 +701,7 @@ page('Inicio', '<div class="top"><div><h1>Hola, equipo SIBNOVA</h1><p class="sub
 <section style="margin-bottom:18px"><h2>Embudo de ventas</h2><div class="board">' . $cols . '</div></section>
 <div class="grid two"><section class="card"><h2>Actividad reciente</h2>' . ($feedHtml ? '<ul class="feed">' . $feedHtml . '</ul>' : empty_state('Sin actividad todavía')) . '</section>
 <section class="card"><h2>Accesos rápidos</h2><ul class="feed">
+<li><span class="dot" style="--c:#34d399"></span><div><a href="/admin/?catalogos=1">Enviar un catálogo de servicios</a><small>Redes sociales y páginas web, con el formulario de cada combo</small></div></li>
 <li><span class="dot" style="--c:#1fa855"></span><div><a href="/admin/?formularios=1">Enviar un formulario a un cliente</a><small>Página web, logo, redes, apps, IA o automatización</small></div></li>
 <li><span class="dot" style="--c:#4c8dff"></span><div><a href="/admin/?solicitudes=1&amp;estado=' . rawurlencode('Nueva solicitud') . '">Atender solicitudes nuevas</a><small>' . $cuenta(NUEVAS) . ' por atender</small></div></li>
 <li><span class="dot" style="--c:#a78bfa"></span><div><a href="/admin/?clientes=1">Ver todos los clientes</a><small>Historial completo de cada cliente</small></div></li>

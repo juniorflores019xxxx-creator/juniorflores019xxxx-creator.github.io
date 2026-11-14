@@ -12,6 +12,7 @@ const LINKS = [
   { label: "Automatización", href: "/servicios/automatizacion-empresarial/" },
   { label: "Desarrollo Web", href: "/servicios/desarrollo-web/" },
   { label: "Catálogo de páginas web", href: "/catalogo/" },
+  { label: "Redes sociales", href: "/redes-sociales/" },
   { label: "Contacto", href: "#contacto" },
 ];
 

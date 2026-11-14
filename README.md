@@ -136,7 +136,8 @@ Alternativa sin configuración: Vercel o Netlify detectan Next.js y publican dir
 ## Formularios de datos para clientes
 
 - **`/datos-proyecto/?f=<formulario>`**: formularios privados (fuera del menú y de Google) para que el cliente envíe los datos, textos, colores y archivos de su proyecto.
-- Formularios disponibles: `pagina-web`, `catalogo-whatsapp`, `logo`, `redes-sociales`, `logo-redes`, `aplicacion`, `inteligencia-artificial` y `automatizacion`.
+- Formularios disponibles: `pagina-web`, `catalogo-whatsapp`, `logo`, `redes-sociales`, `logo-redes`, `aplicacion`, `inteligencia-artificial`, `automatizacion`, `combo-esencial`, `combo-profesional`, `combo-premium` y `servicios-sueltos`.
+- **Catálogos** (`/admin/?catalogos=1`): envía por WhatsApp el catálogo de redes sociales (`public/catalogos/sibnova-servicios-redes-sociales.pdf`) o el de páginas web, y al lado de cada combo o servicio el formulario que corresponde. Los catálogos y sus precios están en `CATALOGOS` dentro de `public/admin/index.php`; si cambia un precio, cambiar también el PDF.
 - **Uso diario:** bandeja `/admin/` → **Formularios**: escribes el WhatsApp del cliente y se abre el chat con el enlace listo. Las respuestas y archivos llegan a **Datos recibidos**.
 - **Crear un formulario nuevo para otro trabajo:** agrega una entrada en `FORMS` de `src/lib/forms.ts` reutilizando los bloques (contacto, empresa, colores, archivos, cierre). Se valida en el servidor con `/api/formularios.json`, que se genera en cada build. Nunca pedir contraseñas.
 - **Pasar el trabajo a Claude:** en el detalle de cada solicitud o dato recibido, «Descargar para Claude» baja un ZIP con `brief.md` y los archivos del cliente. Abre la carpeta en Claude Code y pide «haz el proyecto con el brief» (habilidad `crear-proyecto-cliente`).

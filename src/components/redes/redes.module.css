@@ -1,0 +1,48 @@
+.promoPill { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 44px; padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(52, 211, 153, 0.4); background: rgba(52, 211, 153, 0.08); color: var(--grey); font-size: 0.92rem; }
+.promoPill b { color: #6ee7b7; }
+.ctas { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.combos { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+@media (min-width: 900px) { .combos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.antes { color: var(--grey-2); font-size: 0.9rem; text-decoration: line-through; }
+.mes { color: var(--grey); font-size: 0.95rem; font-weight: 400; font-family: var(--font-sans); letter-spacing: 0; }
+.ahorro { color: #6ee7b7; font-size: 0.86rem; font-weight: 600; }
+.label { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue-2); }
+.regalos { display: grid; gap: 8px; margin-top: auto; padding: 14px; border-radius: 14px; border: 1px solid rgba(255, 196, 0, 0.3); background: rgba(255, 196, 0, 0.06); }
+.regalos .label { color: #ffd666; }
+.regalos ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.regalos li { display: flex; gap: 8px; color: var(--grey); font-size: 0.9rem; line-height: 1.45; }
+.regalos li::before { content: "★"; color: #ffd666; }
+
+.inicio { display: grid; gap: 16px; align-items: center; margin-top: 18px; padding: 22px; border-radius: 20px; border: 1px dashed rgba(119, 158, 255, 0.4); }
+@media (min-width: 800px) { .inicio { grid-template-columns: 1fr auto; gap: 28px; } }
+.inicio h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; letter-spacing: -0.02em; }
+.inicio p { color: var(--grey); font-size: 0.95rem; line-height: 1.55; margin-top: 6px; }
+.inicioPrecio { display: grid; gap: 4px; justify-items: start; }
+@media (min-width: 800px) { .inicioPrecio { justify-items: end; text-align: right; } }
+.inicioPrecio b { font-family: var(--font-display); font-weight: 600; font-size: 2rem; letter-spacing: -0.04em; white-space: nowrap; }
+
+.lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.grupo { padding: 12px 18px; font-family: var(--font-mono); font-size: 0.76rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue-2); background: rgba(46, 125, 255, 0.07); border-bottom: 1px solid var(--line); }
+.item { display: grid; grid-template-columns: 1fr auto; gap: 6px 18px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+.lista > li:last-child { border-bottom: 0; }
+.item b { color: var(--paper); font-weight: 600; }
+.item p { grid-column: 1; color: var(--grey); font-size: 0.9rem; line-height: 1.5; }
+.itemPrecio { grid-row: 1 / span 2; grid-column: 2; display: grid; justify-items: end; align-content: start; text-align: right; }
+.itemPrecio strong { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; color: var(--paper); white-space: nowrap; }
+.itemPrecio small { color: var(--grey); font-size: 0.8rem; }
+
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: p; }
+@media (min-width: 720px) { .pasos { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1100px) { .pasos { grid-template-columns: repeat(4, 1fr); } }
+.pasos li { counter-increment: p; display: grid; gap: 6px; align-content: start; padding: 20px; border-radius: 18px; border: 1px solid var(--line); }
+.pasos li::before { content: "0" counter(p); font-family: var(--font-mono); font-size: 0.78rem; color: var(--blue-2); }
+.pasos b { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; }
+.pasos p { color: var(--grey); font-size: 0.92rem; line-height: 1.5; }
+
+.condiciones { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+@media (min-width: 900px) { .condiciones { grid-template-columns: 1fr 1fr; gap: 10px 32px; } }
+.condiciones li { display: flex; gap: 10px; color: var(--grey); font-size: 0.94rem; line-height: 1.55; }
+.condiciones li::before { content: "•"; color: var(--blue-2); }
+.pdf { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-top: 28px; padding: 20px 22px; border-radius: 18px; border: 1px solid var(--line); background: rgba(245, 247, 251, 0.03); }
+.pdf p { color: var(--grey); font-size: 0.95rem; }

@@ -287,6 +287,130 @@ export const FORMS: DataForm[] = [
   ];
 }
 
+/* ---------- Formularios del catálogo de redes sociales (combos mensuales y servicios sueltos) ----------
+   Se envían desde /admin/ → Catálogos, según lo que elija el cliente. Precios en el catálogo PDF (public/catalogos/). */
+{
+  const redes = FORMS.find((f) => f.id === "redes-sociales")!;
+  const sec = (f: DataForm, title: string) => f.sections.find((s) => s.title === title)!;
+  const aviso = (texto: string): Section => ({ title: "Lo que elegiste", fields: [{ name: "aviso_combo", label: "Tu elección", type: "note", help: texto }] });
+
+  const DUENO_ACCESO = ["Las creo yo y les doy acceso a SIBNOVA", "Ya tengo las cuentas: solo les doy acceso"];
+  const redesCombo = (incluidas: string): Section => ({
+    ...sec(redes, "Tus redes"),
+    fields: [
+      ...sec(redes, "Tus redes").fields.map((x) =>
+        x.name === "redes" ? { ...x, label: "¿En qué redes trabajamos?", help: `Tu combo incluye ${incluidas}. Si quieres otra red, márcala y te la cotizamos aparte.` } : x),
+      { name: "aviso_creacion", label: "Creación de redes", type: "note", help: "Tu combo es el manejo de cada mes. Si todavía no tienes alguna de estas redes, su creación se cobra aparte: Bs 300 por red, o el paquete logo + 3 redes con descuento.", when: { field: "trabajo_redes", in: ["Crear las redes desde cero", "Crear algunas y mejorar otras"] } },
+      { name: "aviso_acceso", label: "Cómo nos das acceso", type: "note", help: "Nunca escribas contraseñas aquí. Te mandamos una guía corta por WhatsApp para agregarnos como administradores desde tu Facebook (Meta Business Suite) y tu TikTok. Las cuentas siguen siendo tuyas.", when: { field: "quien_crea", in: DUENO_ACCESO } },
+    ],
+  });
+  const NEGOCIO: Section = {
+    title: "Tu negocio",
+    fields: [
+      { name: "rubro", label: "¿A qué se dedica tu negocio?", type: "textarea", required: true, max: 1500, placeholder: "Qué vendes o qué servicio das, desde cuándo y qué te diferencia" },
+      { name: "publico", label: "¿Quiénes son tus clientes?", type: "textarea", max: 800 },
+      { name: "tiene_logo", label: "¿Tienes logo?", type: "select", required: true, options: ["Sí, lo subo al final", "No, quiero que SIBNOVA lo diseñe (se cobra aparte)", "Sí, pero quiero mejorarlo (se cobra aparte)"] },
+    ],
+  };
+  const CONTENIDO_MES: Section = {
+    title: "Contenido de cada mes",
+    intro: "Con esto armamos el calendario del mes. Antes de publicar te lo mostramos para que lo apruebes.",
+    fields: [
+      { name: "servicios", label: "Productos o servicios que quieres mostrar", type: "textarea", required: true, max: 3000, help: "Empieza por los que más quieres vender." },
+      { name: "promociones", label: "Promociones u ofertas actuales", type: "textarea", max: 1500 },
+      { name: "tono", label: "¿Cómo quieres hablarle a tus clientes?", type: "select", options: ["Cercano y amigable", "Profesional", "Divertido", "Elegante"] },
+      { name: "precios", label: "¿Mostramos precios en tus publicaciones?", type: "select", options: ["Sí", "No", "Solo algunos", "Lo que me recomienden"] },
+      { name: "temas", label: "Temas o mensajes importantes para publicar", type: "textarea", max: 1500, placeholder: "Por ejemplo: cómo trabajamos, nuestros clientes, consejos de nuestro rubro…" },
+      { name: "fechas", label: "Fechas especiales de tu negocio", type: "textarea", max: 800, placeholder: "Aniversario, temporadas altas, ferias, lanzamientos…" },
+      { name: "preguntas_clientes", label: "Preguntas que más te hacen tus clientes, con su respuesta", type: "textarea", max: 3000, help: "Con esto respondemos tus mensajes y comentarios igual que lo harías tú." },
+      { name: "competencia", label: "Cuentas que te gustan o de tu competencia", type: "textarea", max: 800 },
+      { name: "imagenes_referencia", label: "¿Usamos imágenes de bancos libres cuando falten fotos propias?", type: "select", options: ["Sí, combínalas con mis fotos y videos", "Solo cuando no haya fotos propias", "No, solo material de mi negocio"] },
+    ],
+  };
+  const GRABACION: Section = {
+    title: "Grabación de videos y fotos",
+    intro: "Nuestro camarógrafo va a tu negocio a grabar los videos del mes y sacar fotos. Agendamos la fecha contigo.",
+    fields: [
+      { name: "direccion_grabacion", label: "¿Dónde grabamos?", type: "text", required: true, max: 200, placeholder: "Dirección del local, oficina, almacén o lugar de trabajo" },
+      { name: "dias_grabacion", label: "¿Qué días te queda mejor que vayamos?", type: "multi", options: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"] },
+      { name: "horario_grabacion", label: "¿En qué horario?", type: "text", max: 120, placeholder: "Por ejemplo: de 9:00 a 12:00" },
+      { name: "contacto_grabacion", label: "¿Quién nos recibe el día de la grabación?", type: "text", max: 160, placeholder: "Nombre y celular" },
+      { name: "que_mostrar", label: "¿Qué quieres que mostremos en los videos?", type: "multi", options: ["Mis productos", "Cómo trabajamos (procesos)", "Mi equipo", "El local o las instalaciones", "Clientes satisfechos (con su permiso)", "Lo que me recomienden"] },
+      { name: "quien_aparece", label: "¿Quién habla o aparece en los videos?", type: "select", options: ["Yo, el dueño o encargado", "Alguien de mi equipo", "Nadie: solo productos y lugar", "Lo que me recomienden"] },
+      { name: "aviso_permisos", label: "Permiso de las personas", type: "note", help: "Solo grabamos a trabajadores o clientes que estén de acuerdo en aparecer. Te ayudamos a pedir su permiso." },
+    ],
+  };
+  const APROBACION: Section = {
+    title: "Aprobaciones",
+    fields: [
+      { name: "aprueba", label: "¿Quién aprueba el calendario, los diseños y los videos?", type: "text", required: true, max: 160, placeholder: "Nombre y WhatsApp" },
+      { name: "inicio_deseado", label: "¿Desde cuándo quieres empezar?", type: "date" },
+    ],
+  };
+  const PUBLICIDAD: Section = {
+    title: "Publicidad pagada",
+    intro: "Tu combo incluye el manejo de anuncios. Lo que pagas a Facebook o TikTok por mostrarlos va aparte y lo pagas tú directamente.",
+    fields: [
+      { name: "presupuesto_publicidad", label: "¿Cuánto podrías invertir en anuncios al mes?", type: "select", required: true, options: ["Menos de Bs 500", "Entre Bs 500 y Bs 1.000", "Entre Bs 1.000 y Bs 3.000", "Más de Bs 3.000", "Quiero que me recomienden"] },
+      { name: "objetivo_publicidad", label: "¿Qué quieres lograr con los anuncios?", type: "multi", options: ["Que me escriban por WhatsApp", "Vender un producto o servicio", "Que más gente conozca mi marca", "Que visiten mi local", "Conseguir seguidores"] },
+      { name: "zona_publicidad", label: "¿Dónde quieres que se vean tus anuncios?", type: "text", max: 200, placeholder: "Ciudades o países" },
+      { name: "cliente_ideal", label: "Describe a tu cliente ideal", type: "textarea", max: 1000, placeholder: "Edad, a qué se dedica, qué busca…" },
+    ],
+  };
+  const ARCHIVOS_PLAN: Section = { title: "Archivos", intro: "Tu logo y todo lo que podamos usar en tus publicaciones. " + PESADOS, fields: [{ ...ARCHIVOS_MARCA, label: "Tu logo", help: "En la mejor calidad que tengas (PNG o PDF)." }, FOTOS, VIDEOS, DRIVE] };
+
+  const combo = (id: string, nombre: string, incluidas: string, incluye: string, conPublicidad: boolean): DataForm => ({
+    id,
+    title: `Datos para tu Combo ${nombre}`,
+    short: `Manejo y contenido mensual del Combo ${nombre}: negocio, redes, temas, grabación y aprobaciones.`,
+    intro: "Con estas respuestas planificamos tu primer mes: qué publicar, qué grabar y cómo atender a tus clientes. Lo que no sepas, déjalo en blanco o elige «lo que me recomienden». Tu información es confidencial: solo la usamos para tu proyecto.",
+    sections: [
+      aviso(`Combo ${nombre}. Cada mes: ${incluye}`),
+      CONTACTO,
+      NEGOCIO,
+      redesCombo(incluidas),
+      sec(redes, "Información del perfil"),
+      CONTENIDO_MES,
+      GRABACION,
+      ...(conPublicidad ? [PUBLICIDAD] : []),
+      APROBACION,
+      ARCHIVOS_PLAN,
+      { ...CIERRE, fields: CIERRE.fields.filter((x) => x.name !== "fecha_deseada") },
+    ],
+  });
+
+  FORMS.push(
+    combo("combo-esencial", "Esencial", "Facebook e Instagram", "2 videos grabados en tu negocio, 5 publicaciones con imagen y texto, manejo de Facebook e Instagram (publicar y responder de lunes a sábado), plan y calendario del mes e informe de resultados. De regalo: fotos de la sesión y mejora de tu perfil.", false),
+    combo("combo-profesional", "Profesional", "Facebook, Instagram y TikTok", "4 videos grabados en tu negocio, 8 publicaciones con imagen y texto, 8 historias, manejo de Facebook, Instagram y TikTok (publicar y responder de lunes a sábado), plan y calendario del mes, informe y reunión mensual. De regalo: fotos de la sesión, mejora de tus perfiles y respuestas listas para tus preguntas frecuentes.", false),
+    combo("combo-premium", "Premium", "Facebook, Instagram y TikTok", "8 videos grabados en tu negocio, 12 publicaciones con imagen y texto, 12 historias, manejo de Facebook, Instagram y TikTok también domingos y feriados, manejo de publicidad pagada, plan y calendario del mes, informe y reunión mensual. De regalo: fotos de las sesiones, mejora de tus perfiles, respuestas listas y portada especial para fechas importantes.", true),
+    {
+      id: "servicios-sueltos",
+      title: "Pedido de servicios por separado",
+      short: "El cliente marca los servicios sueltos del catálogo (videos, publicaciones, historias, dron…) y la cantidad.",
+      intro: "Marca los servicios que quieres y cuántos. Te confirmamos el total por WhatsApp antes de empezar.",
+      sections: [
+        CONTACTO,
+        {
+          title: "Servicios que quieres",
+          fields: [
+            { name: "servicios_elegidos", label: "Servicios", type: "multi", required: true, options: [
+              "Logo de tu empresa", "Creación de una red social", "Plan y calendario del mes", "Manejo de una red social por mes",
+              "Publicaciones con imagen y texto", "Historias de 24 horas", "Carrusel (varias imágenes)", "Video corto grabado en tu negocio",
+              "Manejo de publicidad pagada", "Atención domingos y feriados", "Informe de resultados", "Reunión mensual", "Toma con dron (se cotiza)"] },
+            { name: "cantidades", label: "¿Cuántos de cada uno?", type: "textarea", max: 1000, placeholder: "Por ejemplo: 4 videos, 8 publicaciones, creación de Instagram y TikTok" },
+            { name: "rubro", label: "¿A qué se dedica tu negocio?", type: "textarea", required: true, max: 1500 },
+            REDES_ACTUALES,
+            { name: "detalle", label: "Cuéntanos qué necesitas", type: "textarea", max: 2000, placeholder: "Para qué es, qué quieres mostrar, fechas importantes…" },
+            { name: "direccion_grabacion", label: "Si pediste videos o fotos: ¿dónde grabamos?", type: "text", max: 200 },
+          ],
+        },
+        { title: "Archivos", intro: "Tu logo y material que podamos usar. " + PESADOS, fields: [ARCHIVOS_MARCA, FOTOS, VIDEOS, DRIVE] },
+        CIERRE,
+      ],
+    },
+  );
+}
+
 export const getForm = (id: string) => FORMS.find((f) => f.id === id);
 export const FORM_URL = "/datos-proyecto/";
 export const ACCEPT: Record<NonNullable<Field["accept"]>, string[]> = {
