@@ -56,7 +56,7 @@ export const INICIO = { precio: PRECIO.logo + 3 * PRECIO.red };
 
 export const SUELTOS: { grupo: string; items: { t: string; d: string; precio: number | null; unidad: string }[] }[] = [
   { grupo: "Para empezar (pago único)", items: [
-    { t: "Logo de tu empresa", d: "Propuestas para elegir y 2 rondas de ajustes. Recibes tu logo para imprimir y para internet, más tu foto de perfil, tu portada y tu ícono listos para redes.", precio: PRECIO.logo, unidad: "pago único" },
+    { t: "Logo de tu empresa", d: "3 propuestas de logo para elegir, hechas con los colores y el estilo que nos indiques en un formulario corto, y 2 rondas de ajustes. Recibes tu logo para imprimir y para internet, más tu foto de perfil, tu portada y tu ícono listos para redes.", precio: PRECIO.logo, unidad: "pago único" },
     { t: "Creación de una red social", d: "Abrimos tu página en Facebook, Instagram o TikTok con tu correo y tu número, la verificamos y subimos tu foto de perfil, tu portada, tu descripción y tus datos de contacto.", precio: PRECIO.red, unidad: "por red" },
   ] },
   { grupo: "Contenido y atención (cada mes)", items: [

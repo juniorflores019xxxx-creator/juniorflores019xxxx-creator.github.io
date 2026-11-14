@@ -82,7 +82,7 @@ export default function RedesCatalog() {
           <div className={r.inicio} data-reveal>
             <div>
               <h3>¿Todavía no tienes logo o redes?</h3>
-              <p>Tu logo con foto de perfil, portada e ícono ({formatBs(PRECIO.logo)}), más la creación de tu Facebook, Instagram y TikTok con todo cargado ({formatBs(PRECIO.red)} cada una). Después eliges tu combo mensual para que manejemos tus redes.</p>
+              <p>Tu logo (eliges entre 3 propuestas) con foto de perfil, portada e ícono ({formatBs(PRECIO.logo)}), más la creación de tu Facebook, Instagram y TikTok con todo cargado ({formatBs(PRECIO.red)} cada una). Después eliges tu combo mensual para que manejemos tus redes.</p>
             </div>
             <div className={r.inicioPrecio}>
               <b>{formatBs(INICIO.precio)}</b>
