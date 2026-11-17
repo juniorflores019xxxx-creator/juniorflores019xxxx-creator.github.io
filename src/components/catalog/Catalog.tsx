@@ -91,37 +91,6 @@ export default function Catalog() {
         </div>
       </section>
 
-      {/* ---------- Marketing digital y community manager ---------- */}
-      <section id="marketing" className="section" aria-labelledby="marketing-titulo">
-        <div className="wrap">
-          <div className={service.head}>
-            <div>
-              <span className={styles.soon}>Nuevo · {PROMO.pct} % de descuento hasta el {PROMO.hasta}</span>
-              <h2 id="marketing-titulo" className="display h2">Marketing digital y <em className={styles.accent}>community manager</em></h2>
-            </div>
-            <p className="lead" data-reveal>Cada mes hacemos el contenido de tu negocio: videos, diseños y textos. Si quieres, también lo publicamos y atendemos tus redes. Y para atraer clientes nuevos, manejamos tu publicidad pagada y tu Google Maps.</p>
-          </div>
-          <ul className={styles.stores}>
-            {COMBOS.map((c) => (
-              <li key={c.slug} className={`${styles.plan} ${c.featured ? styles.featured : ""}`} data-reveal>
-                <div className={styles.planHead}>
-                  <span className={styles.planNum}>Cada mes{c.featured && <em>El más elegido</em>}</span>
-                  <h3 className={styles.planName}>{c.name}</h3>
-                  <p className={styles.kind}>{c.pitch}</p>
-                </div>
-                <p className={styles.price}><small>Precio normal {formatBs(c.normal)}</small><b>{formatBs(c.precio)} <small>/mes</small></b><small>Tú publicas · con gestión de tus redes {formatBs(c.precio + c.gestion.precio)}/mes</small></p>
-                <ul className={styles.includes}>
-                  {c.hacemos.slice(0, 4).map((d) => <li key={d}><IconCheck width={18} height={18} />{d}</li>)}
-                </ul>
-                <Link href={`${REDES_URL}#${c.slug}`} className={`btn ${c.featured ? "btn-primary" : "btn-ghost"} ${styles.planBtn}`}>Ver el detalle</Link>
-              </li>
-            ))}
-          </ul>
-          <p className={styles.note}>Precios con {PROMO.pct} % menos los {PROMO.meses} primeros meses. <b>Publicidad pagada y Google Maps:</b> + {formatBs(MAS_CLIENTES.precio)}/mes · <b>Proyectos de marketing:</b> {COMBOS_MK.map((c) => `${c.name} ${formatBs(c.precio)}`).join(" · ")}. <Link href={`${REDES_URL}#planes`}>Ver planes y precios</Link></p>
-          <p className={styles.note}><b>Diseño gráfico (pago único, aparte):</b> logo con 3 propuestas, perfil, portada e ícono {formatBs(PRECIO.logo)} · creación de cada red {formatBs(PRECIO.red)} · logo + Facebook, Instagram y TikTok {formatBs(INICIO.precio)}. <Link href={`${REDES_URL}#diseno`}>Ver diseño y creación de redes</Link></p>
-        </div>
-      </section>
-
       {/* ---------- Tiendas online ---------- */}
       <section id="tiendas" className="section" aria-labelledby="tiendas-titulo">
         <div className="wrap">
@@ -159,6 +128,37 @@ export default function Catalog() {
           <ul className={styles.addons}>
             {ADDONS.map((a) => <li key={a.t}><span>{a.t}</span><b>{formatBs(a.price)}{a.unit && <small> {a.unit}</small>}</b></li>)}
           </ul>
+        </div>
+      </section>
+
+      {/* ---------- Marketing digital y community manager ---------- */}
+      <section id="marketing" className="section" aria-labelledby="marketing-titulo">
+        <div className="wrap">
+          <div className={service.head}>
+            <div>
+              <span className={styles.soon}>Nuevo · {PROMO.pct} % de descuento hasta el {PROMO.hasta}</span>
+              <h2 id="marketing-titulo" className="display h2">Marketing digital y <em className={styles.accent}>community manager</em></h2>
+            </div>
+            <p className="lead" data-reveal>Cada mes hacemos el contenido de tu negocio: videos, diseños y textos. Si quieres, también lo publicamos y atendemos tus redes. Y para atraer clientes nuevos, manejamos tu publicidad pagada y tu Google Maps.</p>
+          </div>
+          <ul className={styles.stores}>
+            {COMBOS.map((c) => (
+              <li key={c.slug} className={`${styles.plan} ${c.featured ? styles.featured : ""}`} data-reveal>
+                <div className={styles.planHead}>
+                  <span className={styles.planNum}>Cada mes{c.featured && <em>El más elegido</em>}</span>
+                  <h3 className={styles.planName}>{c.name}</h3>
+                  <p className={styles.kind}>{c.pitch}</p>
+                </div>
+                <p className={styles.price}><small>Precio normal {formatBs(c.normal)}</small><b>{formatBs(c.precio)} <small>/mes</small></b><small>Con {PROMO.pct} % de descuento los {PROMO.meses} primeros meses · tú publicas</small><small>Con gestión de tus redes: {formatBs(c.precio + c.gestion.precio)}/mes</small></p>
+                <ul className={styles.includes}>
+                  {c.hacemos.slice(0, 4).map((d) => <li key={d}><IconCheck width={18} height={18} />{d}</li>)}
+                </ul>
+                <Link href={`${REDES_URL}#${c.slug}`} className={`btn ${c.featured ? "btn-primary" : "btn-ghost"} ${styles.planBtn}`}>Ver el detalle</Link>
+              </li>
+            ))}
+          </ul>
+          <p className={styles.note}>Precios con {PROMO.pct} % de descuento los {PROMO.meses} primeros meses; después rige el precio normal. <b>Publicidad pagada y Google Maps:</b> + {formatBs(MAS_CLIENTES.precio)}/mes con descuento · <b>Proyectos de marketing:</b> {COMBOS_MK.map((c) => `${c.name} ${formatBs(c.precio)}`).join(" · ")}. <Link href={`${REDES_URL}#planes`}>Ver planes y precios</Link></p>
+          <p className={styles.note}><b>Diseño gráfico (pago único, aparte):</b> logo con 3 propuestas, perfil, portada e ícono {formatBs(PRECIO.logo)} · creación de cada red {formatBs(PRECIO.red)} · logo + Facebook, Instagram y TikTok {formatBs(INICIO.precio)}. <Link href={`${REDES_URL}#diseno`}>Ver diseño y creación de redes</Link></p>
         </div>
       </section>
 

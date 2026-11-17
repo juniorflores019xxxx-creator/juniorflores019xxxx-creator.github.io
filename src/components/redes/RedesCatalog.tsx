@@ -72,7 +72,8 @@ export default function RedesCatalog() {
                 <p className={styles.price}>
                   <span className={r.antes}>Precio normal {formatBs(c.normal)}</span>
                   <b>{formatBs(c.precio)} <span className={r.mes}>/mes</span></b>
-                  <span className={r.ahorro}>Tú publicas con nuestro calendario</span>
+                  <span className={r.ahorro}>Con {PROMO.pct} % de descuento los {PROMO.meses} primeros meses</span>
+                  <span className={r.mes}>Tú publicas con nuestro calendario</span>
                 </p>
                 <span className={r.label}>Cada mes hacemos</span>
                 <ul className={styles.includes}>
@@ -85,13 +86,13 @@ export default function RedesCatalog() {
                 <div className={r.gestion}>
                   <span className={r.label}>Paso 2 · ¿Que lo publiquemos nosotros?</span>
                   <p>{c.gestion.detalle}.</p>
-                  <p className={r.gestionPrecio}><b>+ {formatBs(c.gestion.precio)}</b> al mes · Todo junto: <b>{formatBs(c.precio + c.gestion.precio)}/mes</b></p>
+                  <p className={r.gestionPrecio}><b>+ {formatBs(c.gestion.precio)}</b> al mes con descuento (normal {formatBs(c.gestion.normal)}) · Todo junto: <b>{formatBs(c.precio + c.gestion.precio)}/mes</b></p>
                 </div>
                 <a href={waLink(`Hola SIBNOVA, me interesa el ${c.name} (${formatBs(c.precio)} al mes, o ${formatBs(c.precio + c.gestion.precio)} con la gestión de mis redes). ¿Me cuentan cómo empezamos?`)} className={`btn ${c.featured ? "btn-primary" : "btn-ghost"} ${styles.planBtn}`} target="_blank" rel="noopener">Quiero este plan</a>
               </li>
             ))}
           </ul>
-          <p className={styles.note}>Precios con {PROMO.pct} % de descuento durante los {PROMO.meses} primeros meses. Sin la promoción, la gestión cuesta {COMBOS.map((c) => `${formatBs(c.gestion.normal)} (${c.name.replace("Plan ", "")})`).join(", ")} al mes.</p>
+          <p className={styles.note}>Los precios de los planes, la gestión y la publicidad son con {PROMO.pct} % de descuento durante los {PROMO.meses} primeros meses, para quienes contraten hasta el {PROMO.hasta}. Desde el cuarto mes rige el precio normal.</p>
 
           {/* Paso 3 */}
           <div id="mas-clientes" className={r.inicio} data-reveal>
@@ -104,6 +105,7 @@ export default function RedesCatalog() {
             <div className={r.inicioPrecio}>
               <span className={r.antes}>{formatBs(MAS_CLIENTES.normal)}</span>
               <b>+ {formatBs(MAS_CLIENTES.precio)} <span className={r.mes}>/mes</span></b>
+              <span className={r.ahorro}>Con {PROMO.pct} % de descuento los {PROMO.meses} primeros meses</span>
               <a href={waLink(`Hola SIBNOVA, me interesa la publicidad pagada y Google Maps (${formatBs(MAS_CLIENTES.precio)} al mes).`)} className="btn btn-ghost" target="_blank" rel="noopener">Lo quiero</a>
             </div>
           </div>
